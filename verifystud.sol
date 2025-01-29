@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.0;
 
-import {registerStud} from "hhttps://github.com/Aureum21/blockchain/blob/main/registerStud.sol";
+import {registerStud} from "https://github.com/Aureum21/blockchain/blob/main/registerStud.sol";
 import {verifyinst} from "https://github.com/Aureum21/blockchain/blob/main/verifyinst.sol";
 
 contract verifystud {
