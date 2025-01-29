@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.0;
 import {verifystud} from "https://bafybeiekmnlspfgdu5gqlq5oqz4w3w7p776c5vl5e2sstigckre5c2xsri.ipfs.dweb.link?filename=verifystud.sol";
-import {verifyinst} from "https://bafybeibxvdtjxbzqpgmuqjyeye6phpqzjmuulnzdtutnyn26rui7qbupna.ipfs.dweb.link?filename=verifyinst.sol";
+import {verifyinst} from "https://github.com/Aureum21/blockchain/blob/main/verifyinst.sol";
 
 contract student {
     address MOE;
