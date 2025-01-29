@@ -341,7 +341,7 @@ contract student {
     }
     modifier isAgentCertAllowed(string memory _certname) {
         bool isAuthorized = false;
-        for (uint256 i = 0; i <= certificationmap[_certname].visibleTo.length; i++){
+        for (uint256 i = 0; i < certificationmap[_certname].visibleTo.length; i++){
             if ( certificationmap[_certname].visibleTo[i] == msg.sender){
                 isAuthorized = true;
             }
@@ -351,7 +351,7 @@ contract student {
     }
     modifier isAgentexpAllowed(address _institute) {
         bool isAuthorized = false;
-        for (uint256 i = 0; i <= workexpmap[_institute].visibleTo.length; i++){
+        for (uint256 i = 0; i < workexpmap[_institute].visibleTo.length; i++){
             if ( workexpmap[_institute].visibleTo[i] == msg.sender){
                 isAuthorized = true;
             }
