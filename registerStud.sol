@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-import {student} from "https://bafybeiceoufrkr5dgar4n5gto27fl6kobkxiq3jrzxbt5ixtf5xaxyobyu.ipfs.dweb.link?filename=student.sol";
+import {student} from "https://github.com/Aureum21/blockchain/blob/main/student.sol";
 pragma solidity ^0.8.0;
 contract registerStud {
     address public MOE;
