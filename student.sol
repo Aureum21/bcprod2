@@ -83,7 +83,8 @@ contract student {
         string certificate_name;
         bool verified;
         // bool visible;
-        address[] visibleTo;
+        // address[] visibleTo;
+        mapping(address => bool) visibleTo;
     }
     // the key is the certificate name eg bachelors and the value is the struct and the name inside is the employee name.
     mapping(string => certificationInfo) certificationmap;
@@ -93,24 +94,28 @@ contract student {
         string memory _name,
         address _institute,
         string memory _certificate_name
-    ) public OnlyStudent {
-        certificationInfo memory newcertificationInfo;
-        newcertificationInfo.name = _name;
-        newcertificationInfo.institute = _institute;
-        newcertificationInfo.certificate_name = _certificate_name;
-        newcertificationInfo.verified = false;
-        // newcertificationInfo.visible = true;
-        certificationmap[_certificate_name] = newcertificationInfo;
-        certifications.push(_certificate_name);
-        certificationmap[_certificate_name].visibleTo.push(student_address);
-        certificationmap[_certificate_name].visibleTo.push(instAddress);
-        certificationmap[_certificate_name].visibleTo.push(MOE);
-    }
-    function makeCertVisibleTo(address recAgent, string memory _certificate_name) public {
-        require((msg.sender == MOE) || (msg.sender == instAddress) || (msg.sender == student_address));
-        certificationmap[_certificate_name].visibleTo.push(recAgent); 
-        // isCertVisible[recAgent] = true;
+        ) public OnlyStudent {
+        certificationInfo storage newCert = certificationmap[_certificate_name];
+        newCert.name = _name;
+        newCert.institute = _institute;
+        newCert.certificate_name = _certificate_name;
+        newCert.verified = false;
 
+        newCert.visibleTo[student_address] = true;
+        newCert.visibleTo[instAddress] = true;
+        newCert.visibleTo[MOE] = true;
+
+        certifications.push(_certificate_name);
+    }
+
+
+    function makeCertVisibleTo(address recAgent, string memory _certificate_name) public {
+        require(
+            (msg.sender == MOE) || (msg.sender == instAddress) || (msg.sender == student_address),
+            "Not authorized"
+        );
+
+    certificationmap[_certificate_name].visibleTo[recAgent] = true;
     }
     // gotta check the security. security barely passed
     function verifyCertification(string memory _certname) public {
@@ -155,7 +160,8 @@ contract student {
         string enddate;
         bool verified;
         string description;
-        address[] visibleTo;
+        // address[] visibleTo;
+        mapping(address => bool) visibleTo;
     }
     // try using mapping to map(same institution different roles)
     
@@ -169,24 +175,27 @@ contract student {
         string memory _enddate,
         string memory _description
     ) public OnlyStudent {
-        workexpInfo memory newworkexp;
-        newworkexp.role = _role;
-        newworkexp.institute = _institute;
-        newworkexp.startdate = _startdate;
-        newworkexp.enddate = _enddate;
-        newworkexp.verified = false;
-        newworkexp.description = _description;
-        workexpmap[_institute] = newworkexp;
+        workexpInfo storage newExp = workexpmap[_institute];
+        newExp.role = _role;
+        newExp.institute = _institute;
+        newExp.startdate = _startdate;
+        newExp.enddate = _enddate;
+        newExp.verified = false;
+        newExp.description = _description;
+
+        newExp.visibleTo[student_address] = true;
+        newExp.visibleTo[instAddress] = true;
+        newExp.visibleTo[MOE] = true;
+
         workexps.push(_institute);
-        workexpmap[_institute].visibleTo.push(student_address);
-        workexpmap[_institute].visibleTo.push(instAddress);
-        workexpmap[_institute].visibleTo.push(MOE);
     }
 
     function makeExpVisibleTo(address recAgent, address _institute) public {
-        require((msg.sender == MOE) || (msg.sender == instAddress) || (msg.sender == student_address));
-        workexpmap[_institute].visibleTo.push(recAgent); 
-        // isExpVisible[recAgent] = true;
+        require(
+            (msg.sender == MOE) || (msg.sender == instAddress) || (msg.sender == student_address),
+            "Not authorized"
+        );
+        workexpmap[_institute].visibleTo[recAgent] = true;
     }
 
     function verifyWorkExp(address _institute) public {
@@ -340,26 +349,12 @@ contract student {
         _;
     }
     modifier isAgentCertAllowed(string memory _certname) {
-        bool isAuthorized = false;
-        for (uint256 i = 0; i < certificationmap[_certname].visibleTo.length; i++){
-            if ( certificationmap[_certname].visibleTo[i] == msg.sender){
-                isAuthorized = true;
-            }
-        }
-        require(isAuthorized,"not Authorized");
+        require(certificationmap[_certname].visibleTo[msg.sender], "Not Authorized");
         _;
     }
     modifier isAgentexpAllowed(address _institute) {
-        bool isAuthorized = false;
-        for (uint256 i = 0; i < workexpmap[_institute].visibleTo.length; i++){
-            if ( workexpmap[_institute].visibleTo[i] == msg.sender){
-                isAuthorized = true;
-            }
-        }
-        require(isAuthorized,"not Authorized");
+        require(workexpmap[_institute].visibleTo[msg.sender], "Not Authorized");
         _;
     }
     
-
-
 }
