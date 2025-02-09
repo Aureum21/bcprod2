@@ -37,10 +37,8 @@ contract institute {
         string cert_type;
         string student_name;
         address institute;
-        string startdate;
-        string enddate;
         bool verified;
-        string description;
+        string officialCertHash;
         address[] visibleTo;
     }
     struct studentandtype {
@@ -64,9 +62,7 @@ contract institute {
     function addEducation(
         string memory _student_name,
         address _student,
-        string memory _startdate,
-        string memory _enddate,
-        string memory _description,
+        string memory _hash,
         string memory _cert_type
     ) public OnlyInstitute {
         official_cert_info memory new_official_cert;
@@ -77,10 +73,8 @@ contract institute {
         new_official_cert.student_name = _student_name;
         new_official_cert.student = _student;
         new_official_cert.institute = msg.sender;
-        new_official_cert.startdate = _startdate;
-        new_official_cert.enddate = _enddate;
         new_official_cert.verified = false;
-        new_official_cert.description = _description;
+        new_official_cert.officialCertHash = _hash;
         official_certmap[key] = new_official_cert;
         indexTovalue[indexcount] = newstudenttotype;
         certified_students.push(_student);
@@ -116,8 +110,6 @@ contract institute {
             string memory,
             address,
             address,
-            string memory,
-            string memory,
             bool,
             string memory
         )
@@ -128,10 +120,8 @@ contract institute {
             cert.student_name,
             cert.student,
             cert.institute,
-            cert.startdate,
-            cert.enddate,
             cert.verified,
-            cert.description
+            cert.officialCertHash
         );
     }
 
@@ -146,8 +136,6 @@ contract institute {
             string memory,
             address,
             address,
-            string memory,
-            string memory,
             bool,
             string memory
         )
