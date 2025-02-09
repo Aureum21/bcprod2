@@ -82,8 +82,7 @@ contract student {
         address institute;
         string certificate_name;
         bool verified;
-        // bool visible;
-        // address[] visibleTo;
+        string certificateHash;
         mapping(address => bool) visibleTo;
     }
     // the key is the certificate name eg bachelors and the value is the struct and the name inside is the employee name.
@@ -93,14 +92,15 @@ contract student {
     function addCertification(
         string memory _name,
         address _institute,
-        string memory _certificate_name
+        string memory _certificate_name,
+        string memory _certhash
         ) public OnlyStudent {
         certificationInfo storage newCert = certificationmap[_certificate_name];
         newCert.name = _name;
         newCert.institute = _institute;
         newCert.certificate_name = _certificate_name;
         newCert.verified = false;
-
+        newCert.certificateHash= _certhash;
         newCert.visibleTo[student_address] = true;
         newCert.visibleTo[instAddress] = true;
         newCert.visibleTo[MOE] = true;
@@ -125,13 +125,14 @@ contract student {
 
     function getCertificationBycertName(
         string memory _certname
-    ) public view isAgentCertAllowed(_certname) returns (string memory, address, string memory, bool) {
+    ) public view isAgentCertAllowed(_certname) returns (string memory, address, string memory, bool, string memory) {
+        certificationInfo storage newCert = certificationmap[_certname];
         return (
-            certificationmap[_certname].name,
-            certificationmap[_certname].institute,
-            certificationmap[_certname].certificate_name,
-            certificationmap[_certname].verified
-            // certificationmap[_certname].visible
+            newCert.name,
+            newCert.institute,
+            newCert.certificate_name,
+            newCert.verified,
+            newCert.certificateHash
         );
     }
 
@@ -141,7 +142,7 @@ contract student {
 
     function getCertificationByIndex(
         uint256 _index
-    ) public view returns (string memory, address, string memory, bool) {
+    ) public view returns (string memory, address, string memory, bool, string memory) {
         return getCertificationBycertName(certifications[_index]);
     }
     // to be used in the front end  to say if i wanna show the certificate or not
@@ -160,7 +161,7 @@ contract student {
         string enddate;
         bool verified;
         string description;
-        // address[] visibleTo;
+        string workexpHash;
         mapping(address => bool) visibleTo;
     }
     // try using mapping to map(same institution different roles)
@@ -173,7 +174,8 @@ contract student {
         address _institute,
         string memory _startdate,
         string memory _enddate,
-        string memory _description
+        string memory _description,
+        string memory _workexpHash
     ) public OnlyStudent {
         workexpInfo storage newExp = workexpmap[_institute];
         newExp.role = _role;
@@ -182,6 +184,7 @@ contract student {
         newExp.enddate = _enddate;
         newExp.verified = false;
         newExp.description = _description;
+        newExp.workexpHash = _workexpHash;
 
         newExp.visibleTo[student_address] = true;
         newExp.visibleTo[instAddress] = true;
@@ -215,16 +218,20 @@ contract student {
             string memory,
             string memory,
             bool,
+            string memory,
             string memory
         )
     {
+    workexpInfo storage newworkexp = workexpmap[_institute];
         return (
-            workexpmap[_institute].role,
-            workexpmap[_institute].institute,
-            workexpmap[_institute].startdate,
-            workexpmap[_institute].enddate,
-            workexpmap[_institute].verified,
-            workexpmap[_institute].description
+
+            newworkexp.role,
+            newworkexp.institute,
+            newworkexp.startdate,
+            newworkexp.enddate,
+            newworkexp.verified,
+            newworkexp.description,
+            newworkexp.workexpHash
         );
     }
 
@@ -243,6 +250,7 @@ contract student {
             string memory,
             string memory,
             bool,
+            string memory,
             string memory
         )
     {
@@ -263,6 +271,7 @@ contract student {
         string experience;
         bool endorsed;
         address endorser_address;
+        string skillHash;
         // the thing written when endorsed
         string review;
         bool visible;
@@ -274,7 +283,8 @@ contract student {
     function addSkill(
         string memory _name,
         string memory _student_name,
-        string memory _experience
+        string memory _experience,
+        string memory _skillhash
     ) public OnlyStudent {
         //created an instance of the employee skill set
         skillInfo memory employeeSkillSet;
@@ -284,6 +294,7 @@ contract student {
         employeeSkillSet.experience = _experience;
         employeeSkillSet.endorsed = false;
         employeeSkillSet.visible = true;
+        employeeSkillSet.skillHash = _skillhash;
         skillmap[_name] = employeeSkillSet;
         skills.push(_name);
     }
@@ -307,16 +318,20 @@ contract student {
             bool,
             address,
             string memory,
-            bool
+            bool,
+            string memory
         )
     {
+        skillInfo storage newskill = skillmap[_name];
         return (
-            skillmap[_name].name,
-            skillmap[_name].experience,
-            skillmap[_name].endorsed,
-            skillmap[_name].endorser_address,
-            skillmap[_name].review,
-            skillmap[_name].visible
+            newskill.name,
+            newskill.experience,
+            newskill.endorsed,
+            newskill.endorser_address,
+            newskill.review,
+            newskill.visible,
+            newskill.skillHash
+            
         );
     }
 
@@ -335,7 +350,8 @@ contract student {
             bool,
             address,
             string memory,
-            bool
+            bool,
+            string memory
         )
     {
         return getSkillByName(skills[_index]);
