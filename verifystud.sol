@@ -162,7 +162,7 @@ contract verifystud {
         view
         returns (string memory, address, string memory, string memory, address)
     {
-        require(index < pendingStudentsarray.length, "Index out of bounds");
+        require(index < transferStudentsarray.length, "Index out of bounds");
 
         pendingstudents memory studentinfo = transferStudentsarray[index];
 
