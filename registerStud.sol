@@ -17,6 +17,7 @@ contract registerStud {
     mapping(bytes32 => registerStudentsStruct) public registeredStudentsMap;
     // mapping(bytes32 => pendingStudents) public pendingStudentsMap;
     mapping(address => address) public registeredStudentsContract;
+    mapping(address => uint256) public studAddressToIndex;
     function generateKey(
         address _address,
         string memory _id
@@ -52,15 +53,18 @@ contract registerStud {
         registeredStudentsMap[key] = newStudentStruct;
         registeredStudentsContract[_student_address] = address(newstudent);
         registeredStudentsarray.push(newStudentStruct);
+        studAddressToIndex[_student_address] = registeredStudentsarray.length - 1;
     }
 
     
-    function addInstTostudInfo(uint256 index, bytes32 key, address _instAddress) public returns(bool) {
+    function addInstTostudInfo(bytes32 key, address _instAddress) public returns(bool) {
+        uint index = studAddressToIndex[registeredStudentsMap[key].student_address];
         registeredStudentsarray[index].instAddress = _instAddress;
         registeredStudentsMap[key].instAddress = _instAddress;
         return true;
     }
-    function removeInstFromstudInfo(uint256 index, bytes32 key) public returns(bool) {
+    function removeInstFromstudInfo(bytes32 key) public returns(bool) {
+        uint index = studAddressToIndex[registeredStudentsMap[key].student_address];
         registeredStudentsarray[index].instAddress = address(0);
         registeredStudentsMap[key].instAddress = address(0);
         return true;
