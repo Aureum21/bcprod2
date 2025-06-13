@@ -82,7 +82,7 @@ contract verifystud {
 
     function verifystudent(uint256 index) public onlyverfiedInstitute  {
         (, address student_address,,string memory id,address instaddress)=getPendingStudentByindex(index);
-        require(msg.sender == instaddress, "Not the Stuent's Institute");
+        require(msg.sender == instaddress, "Not the Student's Institute");
         
         // address studContractaddress = studreg.getRegisteredStudentsContract(
         //     student_address
@@ -93,14 +93,14 @@ contract verifystud {
             student_address,
             id
         );
-        require(studreg.addInstTostudInfo(index, key, msg.sender), "Failed to add institute to student info");
+        require(studreg.addInstTostudInfo(key, msg.sender), "Failed to add institute to student info");
         // student(studContractaddress).addInstToProfile(msg.sender);
 
     }
 
      function verifyTransferstudent(uint256 index) public {
         (,address student_address,,string memory id,address instaddress)=getTransferStudentByindex(index);
-        require(msg.sender == instaddress, "Not the Stuent's Institute");
+        require(msg.sender == instaddress, "Not the Student's Institute");
         
         // address studContractaddress = studreg.getRegisteredStudentsContract(
         //     student_address
@@ -111,11 +111,11 @@ contract verifystud {
             student_address,
             id
         );
-        require(studreg.addInstTostudInfo(index, key, msg.sender), "Failed to add institute to student info");
+        require(studreg.addInstTostudInfo(key, msg.sender), "Failed to add institute to student info");
         // student(studContractaddress).addInstToProfile(msg.sender);
 
     }
-    function removeGraduateStud(uint256 index,address student_address,string memory id) public {
+    function removeGraduateStud(address student_address,string memory id) public {
         bytes32 key = studreg.generateKey(
             student_address,
             id
@@ -123,7 +123,7 @@ contract verifystud {
         
         (,address studAddress,,,address currentInstAddress)=studreg.getRegisteredStudentByKey(key);
         require((msg.sender == currentInstAddress) || (msg.sender == studAddress));
-        require(studreg.removeInstFromstudInfo(index, key), "Failed to remove institute from student info");
+        require(studreg.removeInstFromstudInfo(key), "Failed to remove institute from student info");
     }
 
     function getTransferStudentsCount() public view returns (uint256) {
