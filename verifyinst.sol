@@ -2,8 +2,8 @@
 
 pragma solidity ^0.8.0;
 
-import "./registerInst.sol";
-import "./institute.sol";
+import "https://github.com/Aureum21/blockchain/blob/main/registerInst.sol";
+import "https://github.com/Aureum21/blockchain/blob/main/institute.sol";
 
 contract verifyinst {
     address public MOE;
