@@ -2,9 +2,9 @@
 
 pragma solidity ^0.8.0;
 
-import {registerStud} from "./registerStud.sol";
-import {student} from "./student.sol";
-import {verifyinst} from "./verifyinst.sol";
+import {registerStud} from "https://github.com/Aureum21/blockchain/blob/main/registerStud.sol";
+import {student} from "https://github.com/Aureum21/blockchain/blob/main/student.sol";
+import {verifyinst} from "https://github.com/Aureum21/blockchain/blob/main/verifyinst.sol";
 
 contract verifystud {
     address public MOE;
