@@ -3,7 +3,7 @@ const path = require("path");
 const fs = require("fs-extra");
 const Web3Quorum = require("web3js-quorum");
 const chainId = 1337;
-const { besu, tessera } = require("../Files/keys");
+const { besu, tessera, contractInformations } = require("../Files/keys");
 const createContract = require("../Files/main");
 const contractJsonRegStudPath = path.resolve(
   __dirname,
@@ -14,6 +14,15 @@ const contractJsonRegStud = JSON.parse(
   fs.readFileSync(contractJsonRegStudPath)
 );
 const contractAbiRegStud = contractJsonRegStud.abi;
+const contractJsonStudentPath = path.resolve(
+  __dirname,
+  "../Files",
+  "student.json"
+);
+const contractJsonStudent = JSON.parse(
+  fs.readFileSync(contractJsonStudentPath)
+);
+const contractAbiStudent = contractJsonStudent.abi;
 
 // Public Data
 const contractJsonPublicDataPath = path.resolve(
@@ -134,7 +143,97 @@ async function RegisterStudentPublic(contractAddress, value) {
   console.log("Result from Register:", receipt);
   return receipt;
 }
+
+const gentStudentInstitution = async (
+  clientUrl,
+  fromPrivateKey,
+  fromPublicKey,
+  toPublicKey,
+  key
+) => {
+  const web3 = new Web3(clientUrl);
+  const web3quorum = new Web3Quorum(web3, chainId);
+  const contract = new web3quorum.eth.Contract(contractAbiRegStud);
+  // eslint-disable-next-line no-underscore-dangl
+  const functionAbi = contract._jsonInterface.find((e) => {
+    return e.name === "getRegisteredStudentByKey";
+  });
+  const functionArgs = web3quorum.eth.abi
+    .encodeParameter(functionAbi.inputs[0], key)
+    .slice(2);
+  const functionParams = {
+    to: contractInformations.registerStud.contractAddress,
+    data: functionAbi.signature + functionArgs,
+    privateKey: fromPrivateKey,
+    privateFrom: fromPublicKey,
+    privateFor: [toPublicKey],
+  };
+  const transactionHash = await web3quorum.priv.generateAndSendRawTransaction(
+    functionParams
+  );
+  // console.log(`Transaction hash: ${transactionHash}`);
+  const result = await web3quorum.priv.waitForTransactionReceipt(
+    transactionHash
+  );
+  const decoded = web3quorum.eth.abi.decodeParameters(
+    functionAbi.outputs,
+    result.output
+  );
+  console.log("decoded", decoded);
+  return decoded;
+};
+
+const getStudentInformation = async (
+  clientUrl,
+  address,
+  fromPrivateKey,
+  fromPublicKey,
+  toPublicKey
+) => {
+  const web3 = new Web3(clientUrl);
+  const web3quorum = new Web3Quorum(web3, chainId);
+  const contract = new web3quorum.eth.Contract(contractAbiStudent);
+  // eslint-disable-next-line no-underscore-dangle
+  const functionAbi = contract._jsonInterface.find((e) => {
+    return e.name === "getStudentInfo";
+  });
+
+  const functionArgs = web3quorum.eth.abi
+    .encodeParameters(functionAbi.inputs, [])
+    .slice(2);
+  const functionParams = {
+    to: address,
+    data: functionAbi.signature + functionArgs,
+    privateKey: fromPrivateKey,
+    privateFrom: fromPublicKey,
+    privateFor: [toPublicKey],
+  };
+  const transactionHash = await web3quorum.priv.generateAndSendRawTransaction(
+    functionParams
+  );
+  // console.log(`Transaction hash: ${transactionHash}`);
+  const result = await web3quorum.priv.waitForTransactionReceipt(
+    transactionHash
+  );
+  const decoded = web3quorum.eth.abi.decodeParameters(
+    functionAbi.outputs,
+    result.output
+  );
+  console.log("decoded", decoded);
+  const key = web3.utils.soliditySha3(decoded[0], decoded[3]);
+  console.log("key", key);
+  const studentInfo = await gentStudentInstitution(
+    clientUrl,
+
+    fromPrivateKey,
+    fromPublicKey,
+    toPublicKey,
+    key
+  );
+  return studentInfo;
+};
 module.exports = {
   RegisterStudentPrivate,
   RegisterStudentPublic,
+  getStudentInformation,
 };

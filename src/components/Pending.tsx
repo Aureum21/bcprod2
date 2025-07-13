@@ -6,8 +6,11 @@ export interface data {
 }
 interface PendingProps {
   data: data[];
+  accept: (name: string, address: string, id: string, index: number) => void;
+  reject: (name: string, address: string, id: string, index: number) => void;
 }
-const Pending = ({ data }: PendingProps) => {
+
+const Pending = ({ data, accept, reject }: PendingProps) => {
   return (
     <Card.Root>
       <Card.Body>
@@ -15,15 +18,27 @@ const Pending = ({ data }: PendingProps) => {
           <VStack key={index}>
             <HStack>
               <Text>Name:</Text>
-              <Text>{item.name}</Text>
+              <Text>{item.name + " " + item.id}</Text>
             </HStack>
             <HStack>
               <Text>Address:</Text>
               <Text>{item.address}</Text>
             </HStack>
             <HStack>
-              <Button>Accept</Button>
-              <Button>Reject</Button>
+              <Button
+                onClick={() => {
+                  accept(item.name, item.address, item.id, index);
+                }}
+              >
+                Accept
+              </Button>
+              <Button
+                onClick={() => {
+                  reject(item.name, item.address, item.id, index);
+                }}
+              >
+                Reject
+              </Button>
             </HStack>
           </VStack>
         ))}

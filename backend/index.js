@@ -12,9 +12,15 @@ const { tessera, besu, contractInformations } = require("./Files/keys.js");
 const RegisterInstitutePrivateToPending = require("./Functions/InstFunctions.js");
 const {
   RegisterStudentPrivate,
+  getStudentInformation,
   RegisterStudentPublic,
 } = require("./Functions/StudFunctions.js");
-const { ListPendingInstitutes } = require("./Functions/AdminFunctions.js");
+const {
+  ListPendingInstitutes,
+  createInstContract,
+  VerifyInstitute,
+  registerInstToPublic,
+} = require("./Functions/AdminFunctions.js");
 const chainId = 1337;
 
 const contractJsonRegStudPath = path.resolve(
@@ -121,6 +127,83 @@ app.get("/listPendingInstitutes", async (req, res) => {
   );
   console.log(institutes);
   res.status(200).json(institutes);
+});
+
+app.post("/acceptInstitute", async (req, res) => {
+  const { name, address, id, index } = req.body;
+  const moeAddress = besu.member1.accountAddress;
+  const InstContract = await createInstContract(
+    besu.member1.url,
+    besu.member1.accountPrivateKey,
+    tessera.member1.publicKey,
+    tessera.member2.publicKey,
+    [name, address, id, moeAddress]
+  );
+
+  const InstContractAddress = InstContract.contractAddress;
+  console.log("InstContractAddress: ", InstContractAddress);
+
+  const resultPrivate = await VerifyInstitute(
+    besu.member1.url,
+    { name, address, id, index, InstContractAddress },
+
+    besu.member1.accountPrivateKey,
+    tessera.member1.publicKey,
+    tessera.member2.publicKey
+  );
+  console.log("Private Registration Receipt", resultPrivate);
+  const resultPublic = await registerInstToPublic(
+    contractInformations.publicdata.contractAddress,
+    [address, InstContractAddress]
+  );
+
+  if (resultPrivate.status === "0x1" && resultPublic.status === true) {
+    res.status(200).json({ message: "Institute verified successfully" });
+  } else {
+    res.status(500).json({ message: "Failed to verify institute" });
+  }
+});
+
+app.post("/rejectInstitute", async (req, res) => {
+  const { name, address, id, index } = req.body;
+  const resultPrivate = await removePendingInst(
+    besu.member1.url,
+    { name, address, id, index },
+    besu.member1.accountPrivateKey,
+    tessera.member1.publicKey,
+    tessera.member2.publicKey
+  );
+  console.log(resultPrivate);
+  if (resultPrivate.status === "0x1") {
+    res.status(200).json({ message: "Institute rejected successfully" });
+  } else {
+    res.status(500).json({ message: "Failed to reject institute" });
+  }
+});
+
+app.get("/studentInformation", async (req, res) => {
+  const { contractAddress } = req.query;
+  console.log("contractAddress", contractAddress);
+  const studentInfo = await getStudentInformation(
+    besu.member3.url,
+    contractAddress,
+    besu.member3.accountPrivateKey,
+    tessera.member3.publicKey,
+    tessera.member1.publicKey
+  );
+  console.log(studentInfo);
+
+  const studentInformation = {
+    name: studentInfo[0],
+    accountAddress: studentInfo[1],
+    email: studentInfo[2],
+    id: studentInfo[3],
+    institution: studentInfo[4],
+  };
+
+  console.log(studentInformation);
+  console.log(contractAddress);
+  res.status(200).json(studentInformation);
 });
 // Placeholder for your Quorum/Web3 logic
 // app.post('/api/your-endpoint', async (req, res) => { ... });
