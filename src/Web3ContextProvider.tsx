@@ -22,6 +22,8 @@ interface Web3ContextType {
   account?: string | undefined;
   connect: () => Promise<string | undefined>;
   check: (account: string) => Promise<UserData>;
+  studentContractAddress: string;
+  instituteContractAddress: string;
 }
 
 export const Web3Context = createContext<Web3ContextType>({
@@ -32,6 +34,8 @@ export const Web3Context = createContext<Web3ContextType>({
   check: async () => {
     return { type: "", contAddress: "", node: "" };
   },
+  studentContractAddress: "",
+  instituteContractAddress: "",
 });
 
 interface Web3ProviderProps {
@@ -39,6 +43,10 @@ interface Web3ProviderProps {
 }
 
 export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
+  const [studentContractAddress, setStudentContractAddress] =
+    useState<string>("");
+  const [instituteContractAddress, setInstituteContractAddress] =
+    useState<string>("");
   const [web3, setWeb3] = useState<Web3 | null>(null);
   const [account, setAccount] = useState<string | undefined>(undefined);
   const [trigger, setTrigger] = useState<boolean>(false);
@@ -65,12 +73,11 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
       publicdata.abi,
       contInfo.publicdata.contractAddress
     );
-    console.log("contractInstance", contractInstance);
+
     try {
       const isMoe = await contractInstance.methods
         .ismoe()
         .call({ from: account });
-      console.log("is Moe", isMoe);
       if (isMoe) {
         return { type: "moe", contAddress: "", node: "" };
       }
@@ -85,6 +92,7 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
       console.log("value2", value2);
 
       if (value2[0] !== ZERO_ADDRESS) {
+        setInstituteContractAddress(value2[0]);
         return { type: "institute", contAddress: value2[0], node: value2[1] };
       }
     } catch (err) {
@@ -98,6 +106,7 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
       console.log("value3", value3);
 
       if (value3[0] !== ZERO_ADDRESS) {
+        setStudentContractAddress(value3[0]);
         return { type: "student", contAddress: value3[0], node: value3[1] };
       }
     } catch (err) {
@@ -110,7 +119,15 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
 
   return (
     <Web3Context.Provider
-      value={{ trigger, setTrigger, account, connect, check }}
+      value={{
+        trigger,
+        setTrigger,
+        account,
+        connect,
+        check,
+        studentContractAddress,
+        instituteContractAddress,
+      }}
     >
       {children}
     </Web3Context.Provider>

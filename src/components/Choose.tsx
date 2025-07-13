@@ -1,12 +1,16 @@
-import { Button, Card, Center } from "@chakra-ui/react";
+import { Button, Card, Center, Image } from "@chakra-ui/react";
 import { useContext } from "react";
 import { Link as RouterLink } from "react-router-dom";
 import { Web3Context } from "../Web3ContextProvider";
 import { useNavigate } from "react-router-dom";
+import logoBlack from "../assets/Student Data Management(black).svg";
+import logoWhite from "../assets/Student Data Management(white).svg";
+import { useColorMode } from "../components/ui/color-mode";
 
 const Choose = () => {
   const navigate = useNavigate();
   const { setTrigger, connect, check } = useContext(Web3Context);
+  const theme = useColorMode().colorMode;
 
   const handleLogin = async () => {
     const connecdAccount = await connect();
@@ -25,12 +29,13 @@ const Choose = () => {
     }
   };
   return (
-    <Center>
-      <Card.Root width="500px">
-        <Card.Body gap="2">
-          <Card.Title mt="2" justifyContent={"center"}>
-            Student Data Management System
-          </Card.Title>
+    <center>
+      <Card.Root width="500px" padding={2}>
+        <Card.Header>
+          <Image src={theme === "dark" ? logoWhite : logoBlack} />
+        </Card.Header>
+
+        <Card.Body>
           <Card.Description></Card.Description>
         </Card.Body>
         <Card.Footer justifyContent={"center"} spaceX={2}>
@@ -40,7 +45,7 @@ const Choose = () => {
           <Button onClick={handleLogin}>Login</Button>
         </Card.Footer>
       </Card.Root>
-    </Center>
+    </center>
   );
 };
 export default Choose;
