@@ -28,7 +28,6 @@ const Choose = () => {
       else if (data.type === "rec") navigate("/rec-home");
     }
   };
-
   return (
     <center>
       <Card.Root width="500px" padding={2}>

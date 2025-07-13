@@ -3,13 +3,43 @@ import ColorMode from "../../components/ColorMode";
 import NavBar from "../../components/NavBar";
 import logoWhite from "../../assets/LogoWhite.svg";
 import logoBlack from "../../assets/LogoBlack.svg";
-import Pending from "../../components/Pending";
+import Pending, { type Data } from "../../components/Pending";
 import { useColorMode } from "../../components/ui/color-mode";
-
+import { useEffect, useState } from "react";
+import axios from "axios";
 const PendingStud = () => {
   const colorMode = useColorMode().colorMode;
-  const pendings = [1, 2, 3, 4];
-  const transfer = [5, 6, 7, 8];
+  const [pendings, setPendings] = useState<Data[]>([]);
+  const [transfer, setTransfer] = useState<Data[]>([]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const transferRes = await axios.get(
+          "http://localhost:5000/listTransferStudents"
+        );
+        console.log("transferRes.data: ", transferRes.data);
+        console.log(transferRes.data);
+        setTransfer(
+          Array.isArray(transferRes.data)
+            ? transferRes.data
+            : [transferRes.data]
+        );
+
+        const pendingRes = await axios.get(
+          "http://localhost:5000/listPendingStudents"
+        );
+        console.log(pendingRes.data);
+        setPendings(
+          Array.isArray(pendingRes.data) ? pendingRes.data : [pendingRes.data]
+        );
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   return (
     <Grid templateAreas={{ base: `"nav" "main"` }}>
       <GridItem area="nav" justifyContent={"space-between"}>
@@ -32,14 +62,16 @@ const PendingStud = () => {
           <HStack minWidth={"500px"} justifyContent={"center"}>
             <VStack marginEnd={"80px"}>
               <Text>Pending Students</Text>
-              {pendings.map((pending) => (
-                <Pending key={pending} data={pending}></Pending>
+              {/* there are multiple pending students */}
+              {pendings.map((pending, index) => (
+                <Pending key={index} data={pending} type="pending"></Pending>
               ))}
             </VStack>
             <VStack>
               <Text>Transfer Students</Text>
-              {transfer.map((transfer) => (
-                <Pending key={transfer} data={transfer}></Pending>
+              {/* there are multiple transfer students */}
+              {transfer.map((transfer, index) => (
+                <Pending key={index} data={transfer} type="transfer"></Pending>
               ))}
             </VStack>
           </HStack>

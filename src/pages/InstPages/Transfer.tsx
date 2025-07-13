@@ -5,8 +5,11 @@ import logoWhite from "../../assets/LogoWhite.svg";
 import logoBlack from "../../assets/LogoBlack.svg";
 import TransferRegister from "../../components/TransferRegister";
 import { useColorMode } from "../../components/ui/color-mode";
+import { useContext } from "react";
+import { Web3Context } from "../../Web3ContextProvider";
 const Transfer = () => {
   const colorMode = useColorMode().colorMode;
+  const { account } = useContext(Web3Context);
   return (
     <Grid templateAreas={{ base: `"nav" "main"` }}>
       <GridItem area="nav" justifyContent={"space-between"}>

@@ -8,12 +8,24 @@ const Web3 = require("web3");
 const Web3Quorum = require("web3js-quorum");
 const PORT = process.env.PORT || 5000;
 const createContract = require("./Files/main.js");
+
+const {
+  ListTransferStudents,
+  ListPendingStudents,
+  VerifyPendingStudent,
+  VerifyTransferStudent,
+  getInstitutesCount,
+} = require("./Functions/transferFunctions.js");
 const { tessera, besu, contractInformations } = require("./Files/keys.js");
-const RegisterInstitutePrivateToPending = require("./Functions/InstFunctions.js");
+const {
+  RegisterInstitutePrivateToPending,
+  RegisterStudentPrivateTransfer,
+} = require("./Functions/InstFunctions.js");
 const {
   RegisterStudentPrivate,
   getStudentInformation,
   RegisterStudentPublic,
+  RegisterStudentPrivateToPending,
 } = require("./Functions/StudFunctions.js");
 const {
   ListPendingInstitutes,
@@ -207,6 +219,85 @@ app.get("/studentInformation", async (req, res) => {
 });
 // Placeholder for your Quorum/Web3 logic
 // app.post('/api/your-endpoint', async (req, res) => { ... });
+
+app.post("/regStudToInstPending", async (req, res) => {
+  const { student_address, institute_address } = req.body;
+
+  const resultPrivate = await RegisterStudentPrivateToPending(
+    besu.member3.url,
+    [student_address, institute_address],
+    besu.member3.accountPrivateKey,
+    tessera.member3.publicKey,
+    tessera.member1.publicKey
+  );
+  console.log(resultPrivate);
+  if (resultPrivate.status === "0x1") {
+    res.status(200).json({ message: "Student added to pending successfully" });
+  } else {
+    res.status(500).json({ message: "Failed to add student to pending" });
+  }
+});
+app.post("/regStudToInstTransfer", async (req, res) => {
+  const { student_address, current_institute_address, new_institute_address } =
+    req.body;
+  console.log("student_address", student_address);
+  console.log("current_institute_address", current_institute_address);
+  console.log("new_institute_address", new_institute_address);
+  const resultPrivate = await RegisterStudentPrivateTransfer([
+    student_address,
+    current_institute_address,
+    new_institute_address,
+  ]);
+  console.log(resultPrivate);
+  if (resultPrivate.status === "0x1") {
+    res.status(200).json({ message: "Institution transfer Pending" });
+  } else {
+    res.status(500).json({ message: "Failed to transfer institution" });
+  }
+});
+
+app.get("/listPendingStudents", async (req, res) => {
+  const PendingStudents = await ListPendingStudents();
+  console.log(PendingStudents);
+  res.status(200).json(PendingStudents);
+});
+app.get("/listTransferStudents", async (req, res) => {
+  const TransferStudents = await ListTransferStudents();
+  console.log(TransferStudents);
+  res.status(200).json(TransferStudents);
+});
+app.post("/acceptPendingStudent", async (req, res) => {
+  const { name, address, email, id, index, institute_address } = req.body;
+  const result = await VerifyPendingStudent(
+    name,
+    address,
+    email,
+    id,
+    index,
+    institute_address
+  );
+  if (result) {
+    res.status(200).json({ message: "Student accepted successfully" });
+  } else {
+    res.status(500).json({ message: "Failed to accept student" });
+  }
+});
+app.post("/acceptTransferStudent", async (req, res) => {
+  const { name, address, email, id, index, institute_address } = req.body;
+  const result = await VerifyTransferStudent(
+    name,
+    address,
+    email,
+    id,
+    index,
+    institute_address
+  );
+  if (result) {
+    res.status(200).json({ message: "Student accepted successfully" });
+  } else {
+    res.status(500).json({ message: "Failed to accept student" });
+  }
+});
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
