@@ -8,6 +8,7 @@ const Web3 = require("web3");
 const Web3Quorum = require("web3js-quorum");
 const PORT = process.env.PORT || 5000;
 const createContract = require("./Files/main.js");
+const addOfficialCert = require("./Functions/uploadcerts.js");
 
 const {
   ListTransferStudents,
@@ -296,6 +297,37 @@ app.post("/acceptTransferStudent", async (req, res) => {
     res.status(200).json({ message: "Student accepted successfully" });
   } else {
     res.status(500).json({ message: "Failed to accept student" });
+  }
+});
+
+app.post("/addOfficialCert", async (req, res) => {
+  const {
+    name,
+    student_address,
+    certificate_type,
+    institute_address,
+    certificate_hash,
+    institute_contract_address,
+    startDate,
+    endDate,
+    description,
+  } = req.body;
+  const result = await addOfficialCert(
+    name,
+    student_address,
+    institute_address,
+    certificate_hash,
+    certificate_type,
+    institute_contract_address,
+    startDate,
+    endDate,
+    description
+  );
+  console.log(result);
+  if (result.status === "0x1") {
+    res.status(200).json({ message: "Institution transfer Pending" });
+  } else {
+    res.status(500).json({ message: "Failed to transfer institution" });
   }
 });
 

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Home</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Welcome to IPFS Storage</h1>
+      <p>This is a simple IPFS storage app.</p>
+
+      <div class="action-section">
+        <button id="uploadButton">Upload a file</button>
+
+        <div class="hash-input-section">
+          <input
+            type="text"
+            id="hashInput"
+            placeholder="Enter file hash to download"
+          />
+          <button id="downloadButton">Download File</button>
+        </div>
+      </div>
+
+      <div id="uploadedFileDisplay"></div>
+      <div id="uploadedFiles">
+        <h2>Uploaded Files</h2>
+        <ul id="fileList"></ul>
+      </div>
+
+      <script>
+        document.getElementById("uploadButton").onclick = function () {
+          var popup = window.open(
+            "http://localhost:3000/",
+            "IPFS Upload",
+            "width=600,height=400"
+          );
+          popup.onload = function () {
+            popup.document.getElementById("uploadComplete").onclick =
+              function () {
+                var uploadedFile =
+                  popup.document.getElementById("fileName").innerText;
+                document.getElementById("uploadedFileDisplay").innerText =
+                  "Latest Upload: " + uploadedFile;
+                popup.close();
+              };
+          };
+        };
+
+        document.getElementById("downloadButton").onclick = async function () {
+          const hash = document.getElementById("hashInput").value.trim();
+          if (!hash) {
+            alert("Please enter a file hash");
+            return;
+          }
+
+          try {
+            const response = await fetch(
+              `http://localhost:3000/preview/${hash}`
+            );
+            if (!response.ok) {
+              throw new Error("File not found");
+            }
+
+            // Create a temporary link to trigger the download
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `file-${hash}`; // Default filename
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+          } catch (error) {
+            console.error("Error downloading file:", error);
+            alert(
+              "Failed to download file. Please check if the hash is correct."
+            );
+          }
+        };
+
+        // Listen for messages from the upload window
+        window.addEventListener("message", function (event) {
+          // Verify the origin of the message
+          if (event.origin !== "http://localhost:3000") return;
+
+          const data = event.data;
+          if (data.success) {
+            const fileList = document.getElementById("fileList");
+            const listItem = document.createElement("li");
+            listItem.innerHTML = `
+                        <span>${data.filename}</span>
+                        <span class="hash">(Hash: ${data.hash})</span>
+                    `;
+            fileList.appendChild(listItem);
+          }
+        });
+      </script>
+
+      <style>
+        .action-section {
+          display: flex;
+          flex-direction: column;
+          gap: 15px;
+          margin-bottom: 20px;
+        }
+
+        .hash-input-section {
+          display: flex;
+          gap: 10px;
+          margin-top: 10px;
+        }
+
+        #hashInput {
+          flex: 1;
+          padding: 8px;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+          font-family: monospace;
+        }
+
+        button {
+          padding: 8px 16px;
+          background: #4caf50;
+          color: white;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+        }
+
+        button:hover {
+          background: #45a049;
+        }
+
+        #uploadedFileDisplay {
+          margin: 15px 0;
+          padding: 10px;
+          background: #e8f5e9;
+          border-radius: 4px;
+          display: none;
+        }
+
+        #uploadedFileDisplay:not(:empty) {
+          display: block;
+        }
+
+        #uploadedFiles {
+          margin-top: 20px;
+        }
+
+        #fileList {
+          list-style: none;
+          padding: 0;
+        }
+
+        #fileList li {
+          margin: 10px 0;
+          padding: 10px;
+          background: #f5f5f5;
+          border-radius: 4px;
+        }
+
+        .hash {
+          color: #666;
+          font-size: 0.9em;
+          margin-left: 10px;
+        }
+      </style>
+    </div>
+  </body>
+</html>
