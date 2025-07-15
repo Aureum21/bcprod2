@@ -176,6 +176,13 @@ const UploadCertificate = ({ type, onSubmit }: Props) => {
                 {type === "skill" && (
                   <>
                     <Field.Root>
+                      <Field.Label>Student Name</Field.Label>
+                      <Input
+                        name="studentName"
+                        onChange={(e) => handleChange(e)}
+                      />
+                    </Field.Root>
+                    <Field.Root>
                       <Field.Label>Skill Name</Field.Label>
                       <Input
                         name="skillName"

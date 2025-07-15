@@ -352,6 +352,33 @@ const getStudentInformation = async (
   );
   return studentInfo;
 };
+const addSkill = async (skill, student_name, experiance, contractAddress) => {
+  const web3 = new Web3(besu.member3.url);
+  const web3quorum = new Web3Quorum(web3, chainId);
+  const contract = new web3quorum.eth.Contract(contractAbiStudent);
+  const functionAbi = contract._jsonInterface.find((e) => {
+    return e.name === "addSkill";
+  });
+  console.log(skill, student_name, experiance, contractAddress);
+  const functionArgs = web3quorum.eth.abi
+    .encodeParameters(functionAbi.inputs, [skill, student_name, experiance])
+    .slice(2);
+  console.log(functionArgs);
+  const functionParams = {
+    to: contractAddress,
+    data: functionAbi.signature + functionArgs,
+    privateKey: besu.member3.accountPrivateKey,
+    privateFrom: tessera.member3.publicKey,
+    privateFor: [tessera.member1.publicKey],
+  };
+  const transactionHash = await web3quorum.priv.generateAndSendRawTransaction(
+    functionParams
+  );
+  const result = await web3quorum.priv.waitForTransactionReceipt(
+    transactionHash
+  );
+  return result;
+};
 
 module.exports = {
   RegisterStudentPrivate,
@@ -360,4 +387,5 @@ module.exports = {
   getStudContract,
   getStudProfile,
   getStudentInformation,
+  addSkill,
 };

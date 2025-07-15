@@ -27,6 +27,7 @@ const {
   getStudentInformation,
   RegisterStudentPublic,
   RegisterStudentPrivateToPending,
+  addSkill,
 } = require("./Functions/StudFunctions.js");
 const {
   ListPendingInstitutes,
@@ -328,6 +329,16 @@ app.post("/addOfficialCert", async (req, res) => {
     res.status(200).json({ message: "Institution transfer Pending" });
   } else {
     res.status(500).json({ message: "Failed to transfer institution" });
+  }
+});
+app.post("/addSkill", async (req, res) => {
+  const { name, skill_name, experience, contractAddress } = req.body;
+  const result = await addSkill(skill_name, name, experience, contractAddress);
+  console.log(result);
+  if (result.status === "0x1") {
+    res.status(200).json({ message: "Skill added successfully" });
+  } else {
+    res.status(500).json({ message: "Failed to add skill" });
   }
 });
 
