@@ -28,6 +28,7 @@ const {
   RegisterStudentPublic,
   RegisterStudentPrivateToPending,
   addSkill,
+  ListSkills,
 } = require("./Functions/StudFunctions.js");
 const {
   ListPendingInstitutes,
@@ -340,6 +341,13 @@ app.post("/addSkill", async (req, res) => {
   } else {
     res.status(500).json({ message: "Failed to add skill" });
   }
+});
+
+app.get("/listSkills", async (req, res) => {
+  const { contractAddress } = req.query;
+  const skills = await ListSkills(contractAddress);
+  console.log(skills);
+  res.status(200).json(skills);
 });
 
 app.listen(PORT, () => {

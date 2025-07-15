@@ -1,4 +1,11 @@
-import { Grid, GridItem, HStack, Image, VStack } from "@chakra-ui/react";
+import {
+  Center,
+  Grid,
+  GridItem,
+  HStack,
+  Image,
+  VStack,
+} from "@chakra-ui/react";
 import ColorMode from "../../components/ColorMode";
 import NavBar from "../../components/NavBar";
 import logoWhite from "../../assets/LogoWhite.svg";
@@ -10,9 +17,16 @@ import { useColorMode } from "../../components/ui/color-mode";
 import type { FormEvent } from "react";
 import type { data } from "../../components/UploadCertificate";
 import axios from "axios";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Web3Context } from "../../Web3ContextProvider";
+interface Skill {
+  name: string;
+  skill_name: string;
+  experience: string;
+}
 const AddSkill = () => {
+  const [skills, setSkills] = useState<Skill[]>([]);
+
   const colorMode = useColorMode().colorMode;
   const { studentContractAddress } = useContext(Web3Context);
   const handleUpload = async (data: data, e: FormEvent<HTMLFormElement>) => {
@@ -32,6 +46,23 @@ const AddSkill = () => {
     console.log(result);
   };
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const skills = await axios.get("http://localhost:5000/listSkills", {
+          params: {
+            contractAddress: studentContractAddress,
+          },
+        });
+        console.log(skills.data);
+        setSkills(skills.data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+    fetchData();
+  }, []);
+
   return (
     <Grid templateAreas={{ base: `"nav" "main"` }}>
       <GridItem area="nav" justifyContent={"space-between"}>
@@ -42,15 +73,15 @@ const AddSkill = () => {
         </HStack>
       </GridItem>
       <GridItem area="main" padding={2}>
-        <center>
-          <VStack>
+        <Center>
+          <HStack gap={10} alignItems="start">
+            <ShowData type="Skill" data={skills}></ShowData>
             <UploadCertificate
               onSubmit={handleUpload}
               type="skill"
             ></UploadCertificate>
-            <ShowData type="Skill"></ShowData>
-          </VStack>
-        </center>
+          </HStack>
+        </Center>
       </GridItem>
     </Grid>
   );
