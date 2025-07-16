@@ -13,35 +13,35 @@ module.exports = {
   },
   contractInformations: {
     registerStud: {
-      contractAddress: "0x9db181e9b4230dc1525496296e32fa914441d852",
+      contractAddress: "0x59793766164e121a1b5d42d95d2f7c3b76ea43fc",
       from: "0xf0e2db6c8dc6c681bb5d6ad121a107f300e9b2b5",
       fromName: "member1",
       for: "0xca843569e3427144cead5e4d5999a3d0ccf92b8e",
       forName: ["member2"],
     },
     registerInst: {
-      contractAddress: "0xa9a0a8fc92bd6547b2e38b0ba3fc26f737145267",
+      contractAddress: "0x076fdf4b0cd45e66e5b722e04b37a9d3b8781f0d",
       from: "0xf0e2db6c8dc6c681bb5d6ad121a107f300e9b2b5",
       fromName: "member1",
       for: "0x0fbdc686b912d7722dc86510934589e0aaf3b55a",
       forName: ["member3"],
     },
     verifyInst: {
-      contractAddress: "0x483b808eea8626c546fca9eec9319e0eb1afba12",
+      contractAddress: "0x80f4d2beecf9c2f831e0c3acd77492190f1ec633",
       from: "0xf0e2db6c8dc6c681bb5d6ad121a107f300e9b2b5",
       fromName: "member1",
       for: "0xf0e2db6c8dc6c681bb5d6ad121a107f300e9b2b5",
       forName: ["member1"],
     },
     verifyStud: {
-      contractAddress: "0x45616566c1dd9280ea3b26cbda9f5b0b5bab20f8",
+      contractAddress: "0xbf5eb34fcf265c6b372319effbef4c5a9231c52a",
       from: "0xf0e2db6c8dc6c681bb5d6ad121a107f300e9b2b5",
       fromName: "member1",
       for: "0xca843569e3427144cead5e4d5999a3d0ccf92b8e",
       forName: ["member2"],
     },
     publicdata: {
-      contractAddress: "0x3Ce6cc2316CAC4AAd6CBcB5080934C4674586221",
+      contractAddress: "0x00fFD3548725459255f1e78A61A07f1539Db0271",
       from: "c9c913c8c3c1cd416d80a0abf475db2062f161f6",
       fromName: "rpcnode",
     },
@@ -49,8 +49,8 @@ module.exports = {
   besu: {
     rpcnode: {
       name: "rpcnode",
-      url: "http://86.96.46.97:8545",
-      wsUrl: "ws://86.96.46.97:8546",
+      url: "http://192.168.1.97:8545",
+      wsUrl: "ws://192.168.1.97:8546",
       nodekey:
         "0e93a540518eeb673d94fb496b746008ab56605463cb9212493997f5755124d1",
       accountAddress: "c9c913c8c3c1cd416d80a0abf475db2062f161f6",
@@ -59,9 +59,9 @@ module.exports = {
     },
     member1: {
       name: "member1",
-      url: "http://86.96.46.97:20000",
-      wsUrl: "ws://86.96.46.97:20001",
-      privateUrl: "http://86.96.46.97:9081",
+      url: "http://192.168.1.97:20000",
+      wsUrl: "ws://192.168.1.97:20001",
+      privateUrl: "http://192.168.1.97:9081",
       nodekey:
         "0xb9a4bd1539c15bcc83fa9078fe89200b6e9e802ae992f13cd83c853f16e8bed4",
       accountAddress: "0xf0e2db6c8dc6c681bb5d6ad121a107f300e9b2b5",
@@ -70,9 +70,9 @@ module.exports = {
     },
     member2: {
       name: "member2",
-      url: "http://86.96.46.97:20002",
-      wsUrl: "ws://86.96.46.97:20003",
-      privateUrl: "http://86.96.46.97:9082",
+      url: "http://192.168.1.97:20002",
+      wsUrl: "ws://192.168.1.97:20003",
+      privateUrl: "http://192.168.1.97:9082",
       nodekey:
         "f18166704e19b895c1e2698ebc82b4e007e6d2933f4b31be23662dd0ec602570",
       accountAddress: "0xca843569e3427144cead5e4d5999a3d0ccf92b8e",
@@ -81,9 +81,9 @@ module.exports = {
     },
     member3: {
       name: "member3",
-      url: "http://86.96.46.97:20004",
-      wsUrl: "ws://86.96.46.97:20005",
-      privateUrl: "http://86.96.46.97:9083",
+      url: "http://192.168.1.97:20004",
+      wsUrl: "ws://192.168.1.97:20005",
+      privateUrl: "http://192.168.1.97:9083",
       nodekey:
         "4107f0b6bf67a3bc679a15fe36f640415cf4da6a4820affaac89c8b280dfd1b3",
       accountAddress: "0x0fbdc686b912d7722dc86510934589e0aaf3b55a",

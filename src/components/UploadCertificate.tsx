@@ -10,7 +10,7 @@ import {
 } from "@chakra-ui/react";
 import { useState, type FormEvent } from "react";
 import { HiUpload } from "react-icons/hi";
-type CertificateType = "normal" | "skill" | "workExperiance";
+type CertificateType = "normal" | "skill" | "workExperiance" | "unOfficial";
 export interface data {
   studentName: string;
   studentAddress: string;
@@ -24,6 +24,7 @@ export interface data {
   endDate: string;
   description: string;
   certificateHash: string;
+  certificateName: string;
 }
 interface Props {
   type: CertificateType;
@@ -52,6 +53,7 @@ const UploadCertificate = ({ type, onSubmit }: Props) => {
     endDate: "",
     description: "",
     certificateHash: "",
+    certificateName: "",
   });
   async function uploadToIPFS() {
     const popup = window.open(
@@ -172,7 +174,24 @@ const UploadCertificate = ({ type, onSubmit }: Props) => {
                     </Field.Root>
                   </>
                 )}
-
+                {type === "unOfficial" && (
+                  <>
+                    <Field.Root>
+                      <Field.Label>Certificate Name</Field.Label>
+                      <Input
+                        name="certificateName"
+                        onChange={(e) => handleChange(e)}
+                      />
+                    </Field.Root>
+                    <Field.Root>
+                      <Field.Label>Institute Address</Field.Label>
+                      <Input
+                        name="instituteAddress"
+                        onChange={(e) => handleChange(e)}
+                      />
+                    </Field.Root>
+                  </>
+                )}
                 {type === "skill" && (
                   <>
                     <Field.Root>
