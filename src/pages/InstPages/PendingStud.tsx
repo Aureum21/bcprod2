@@ -1,4 +1,13 @@
-import { Grid, GridItem, HStack, Image, VStack, Text } from "@chakra-ui/react";
+import {
+  Grid,
+  GridItem,
+  HStack,
+  Image,
+  VStack,
+  Text,
+  Box,
+  Spinner,
+} from "@chakra-ui/react";
 import ColorMode from "../../components/ColorMode";
 import NavBar from "../../components/NavBar";
 import logoWhite from "../../assets/LogoWhite.svg";
@@ -59,21 +68,62 @@ const PendingStud = () => {
       </GridItem>
       <GridItem area="main" padding={2}>
         <center>
-          <HStack minWidth={"500px"} justifyContent={"center"}>
-            <VStack marginEnd={"80px"}>
-              <Text>Pending Students</Text>
-              {/* there are multiple pending students */}
-              {pendings.map((pending, index) => (
-                <Pending key={index} data={pending} type="pending"></Pending>
-              ))}
-            </VStack>
-            <VStack>
-              <Text>Transfer Students</Text>
-              {/* there are multiple transfer students */}
-              {transfer.map((transfer, index) => (
-                <Pending key={index} data={transfer} type="transfer"></Pending>
-              ))}
-            </VStack>
+          <HStack
+            minWidth={"500px"}
+            justifyContent={"center"}
+            gap={"10px"}
+            align={"start"}
+          >
+            <Box
+              shadow="md"
+              borderRadius="md"
+              padding={2}
+              backdropBlur={"10px"}
+              minWidth={"592.65px"}
+            >
+              <VStack>
+                <Text fontWeight="bold" padding={2}>
+                  Registration Pending Students
+                </Text>
+                {/* there are multiple pending students */}
+                {pendings.length === 0 ? (
+                  <Spinner />
+                ) : (
+                  pendings.map((pending, index) => (
+                    <Pending
+                      key={index}
+                      data={pending}
+                      type="pending"
+                    ></Pending>
+                  ))
+                )}
+              </VStack>
+            </Box>
+            <Box
+              shadow="md"
+              borderRadius="md"
+              padding={2}
+              backdropBlur={"10px"}
+              minWidth={"592.65px"}
+            >
+              <VStack>
+                <Text fontWeight="bold" padding={2}>
+                  Transfer Pending Students
+                </Text>
+                {/* there are multiple transfer students */}
+                {transfer.length === 0 ? (
+                  <Spinner />
+                ) : (
+                  transfer.map((transfer, index) => (
+                    <Pending
+                      key={index}
+                      data={transfer}
+                      type="transfer"
+                    ></Pending>
+                  ))
+                )}
+              </VStack>
+            </Box>
           </HStack>
         </center>
       </GridItem>

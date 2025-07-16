@@ -24,12 +24,15 @@ const { tessera, besu, contractInformations } = require("./Files/keys.js");
 const {
   RegisterInstitutePrivateToPending,
   RegisterStudentPrivateTransfer,
+  getInstituteInfo,
 } = require("./Functions/InstFunctions.js");
 const {
   RegisterStudentPrivate,
   getStudentInformation,
   RegisterStudentPublic,
   RegisterStudentPrivateToPending,
+  addSkill,
+  ListSkills,
 } = require("./Functions/StudFunctions.js");
 const {
   ListPendingInstitutes,
@@ -329,9 +332,21 @@ app.post("/addOfficialCert", async (req, res) => {
   );
   console.log(result);
   if (result.status === "0x1") {
-    res.status(200).json({ message: "Institution transfer Pending" });
+    res
+      .status(200)
+      .json({ message: "Official Certificate added successfully" });
   } else {
-    res.status(500).json({ message: "Failed to transfer institution" });
+    res.status(500).json({ message: "Failed to add official certificate" });
+  }
+});
+app.post("/addSkill", async (req, res) => {
+  const { name, skill_name, experience, contractAddress } = req.body;
+  const result = await addSkill(skill_name, name, experience, contractAddress);
+  console.log(result);
+  if (result.status === "0x1") {
+    res.status(200).json({ message: "Skill added successfully" });
+  } else {
+    res.status(500).json({ message: "Failed to add skill" });
   }
 });
 app.post("/addUnOfficialCert", async (req, res) => {
@@ -392,6 +407,17 @@ app.get("/getWorkExp", async (req, res) => {
   res.status(200).json(result);
 });
 
+app.get("/listSkills", async (req, res) => {
+  const { contractAddress } = req.query;
+  const skills = await ListSkills(contractAddress);
+  console.log(skills);
+  res.status(200).json(skills);
+});
+app.get("/getInstituteInfo", async (req, res) => {
+  const info = await getInstituteInfo(req.query.contractAddress);
+  console.log(info);
+  res.status(200).json(info);
+});
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });

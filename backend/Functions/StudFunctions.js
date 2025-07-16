@@ -352,6 +352,110 @@ const getStudentInformation = async (
   );
   return studentInfo;
 };
+const addSkill = async (skill, student_name, experiance, contractAddress) => {
+  const web3 = new Web3(besu.member3.url);
+  const web3quorum = new Web3Quorum(web3, chainId);
+  const contract = new web3quorum.eth.Contract(contractAbiStudent);
+  const functionAbi = contract._jsonInterface.find((e) => {
+    return e.name === "addSkill";
+  });
+  console.log(skill, student_name, experiance, contractAddress);
+  const functionArgs = web3quorum.eth.abi
+    .encodeParameters(functionAbi.inputs, [skill, student_name, experiance])
+    .slice(2);
+  console.log(functionArgs);
+  const functionParams = {
+    to: contractAddress,
+    data: functionAbi.signature + functionArgs,
+    privateKey: besu.member3.accountPrivateKey,
+    privateFrom: tessera.member3.publicKey,
+    privateFor: [tessera.member1.publicKey],
+  };
+  const transactionHash = await web3quorum.priv.generateAndSendRawTransaction(
+    functionParams
+  );
+  const result = await web3quorum.priv.waitForTransactionReceipt(
+    transactionHash
+  );
+  return result;
+};
+const getSkillCount = async (contractAddress) => {
+  const web3 = new Web3(besu.member3.url);
+  const web3quorum = new Web3Quorum(web3, chainId);
+  const contract = new web3quorum.eth.Contract(contractAbiStudent);
+  const functionAbi = contract._jsonInterface.find((e) => {
+    return e.name === "getSkillCount";
+  });
+
+  const functionParams = {
+    to: contractAddress,
+    data: functionAbi.signature,
+    privateKey: besu.member3.accountPrivateKey,
+    privateFrom: tessera.member3.publicKey,
+    privateFor: [tessera.member1.publicKey],
+  };
+  console.log("contractAddress", contractAddress);
+  const transactionHash = await web3quorum.priv.generateAndSendRawTransaction(
+    functionParams
+  );
+  const result = await web3quorum.priv.waitForTransactionReceipt(
+    transactionHash
+  );
+  const decoded = web3quorum.eth.abi.decodeParameters(
+    functionAbi.outputs,
+    result.output
+  );
+  const count = decoded[0];
+  console.log("decoded", count);
+  return count;
+};
+const ListSkills = async (contractAddress) => {
+  const skills = [];
+  const web3 = new Web3(besu.member3.url);
+  const web3quorum = new Web3Quorum(web3, chainId);
+  const contract = new web3quorum.eth.Contract(contractAbiStudent);
+
+  const functionAbi = contract._jsonInterface.find((e) => {
+    return e.name === "getSkillByIndex";
+  });
+  const count = await getSkillCount(contractAddress);
+  for (let i = 0; i < count; i++) {
+    const functionArgs = web3quorum.eth.abi
+      .encodeParameter(functionAbi.inputs[0], i)
+      .slice(2);
+    console.log("functionArgs", functionArgs);
+    const functionParams = {
+      to: contractAddress,
+      data: functionAbi.signature + functionArgs,
+      privateKey: besu.member3.accountPrivateKey,
+      privateFrom: tessera.member3.publicKey,
+      privateFor: [tessera.member1.publicKey],
+    };
+    console.log("functionParams", functionParams);
+    const transactionHash = await web3quorum.priv.generateAndSendRawTransaction(
+      functionParams
+    );
+    const result = await web3quorum.priv.waitForTransactionReceipt(
+      transactionHash
+    );
+    const decoded = web3quorum.eth.abi.decodeParameters(
+      ["string", "string", "bool", "address", "string", "bool"],
+      result.output
+    );
+    console.log(decoded);
+    const skill = {
+      name: decoded[0],
+      experiance: decoded[1],
+      endorsed: decoded[2],
+      endorsedBy: decoded[3],
+      review: decoded[4],
+      visible: decoded[5],
+    };
+    skills.push(skill);
+  }
+  console.log("decoded", skills);
+  return skills;
+};
 
 module.exports = {
   RegisterStudentPrivate,
@@ -360,4 +464,6 @@ module.exports = {
   getStudContract,
   getStudProfile,
   getStudentInformation,
+  addSkill,
+  ListSkills,
 };
