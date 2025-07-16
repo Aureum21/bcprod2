@@ -22,16 +22,18 @@ const ShowData = ({ type, data }: Props) => {
             ) : (
               data.map((item: any, index: number) => {
                 return (
-                  <VStack key={index}>
-                    <HStack>
-                      <Text fontWeight="bold">Skill Name:</Text>
-                      <Text>{item.name}</Text>
-                    </HStack>
-                    <HStack>
-                      <Text fontWeight="bold">Experience:</Text>
-                      <Text>{item.experience}</Text>
-                    </HStack>
-                  </VStack>
+                  <Box key={index} shadow="md" p={2} mb={2} borderRadius="md">
+                    <VStack alignItems="left">
+                      <HStack>
+                        <Text fontWeight="300">Skill Name:</Text>
+                        <Text>{item.name}</Text>
+                      </HStack>
+                      <HStack>
+                        <Text fontWeight="300">Experience:</Text>
+                        <Text>{item.experiance}</Text>
+                      </HStack>
+                    </VStack>
+                  </Box>
                 );
               })
             )}

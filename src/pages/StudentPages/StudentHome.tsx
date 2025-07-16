@@ -10,6 +10,7 @@ import { useColorMode } from "../../components/ui/color-mode";
 import { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { Web3Context } from "../../Web3ContextProvider";
+import InfoSkeleton from "../../components/InfoSkeleton";
 export const pages = [
   "Home",
   "Register Institution",
@@ -48,7 +49,7 @@ const StudentHome = () => {
       </GridItem>
       <GridItem area="main" padding={2}>
         <center>
-          {data ? <StudentInfomation data={data} /> : <Spinner />}
+          {data ? <StudentInfomation data={data} /> : <InfoSkeleton />}
         </center>
       </GridItem>
     </Grid>

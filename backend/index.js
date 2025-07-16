@@ -21,6 +21,7 @@ const { tessera, besu, contractInformations } = require("./Files/keys.js");
 const {
   RegisterInstitutePrivateToPending,
   RegisterStudentPrivateTransfer,
+  getInstituteInfo,
 } = require("./Functions/InstFunctions.js");
 const {
   RegisterStudentPrivate,
@@ -327,9 +328,11 @@ app.post("/addOfficialCert", async (req, res) => {
   );
   console.log(result);
   if (result.status === "0x1") {
-    res.status(200).json({ message: "Institution transfer Pending" });
+    res
+      .status(200)
+      .json({ message: "Official Certificate added successfully" });
   } else {
-    res.status(500).json({ message: "Failed to transfer institution" });
+    res.status(500).json({ message: "Failed to add official certificate" });
   }
 });
 app.post("/addSkill", async (req, res) => {
@@ -349,7 +352,11 @@ app.get("/listSkills", async (req, res) => {
   console.log(skills);
   res.status(200).json(skills);
 });
-
+app.get("/getInstituteInfo", async (req, res) => {
+  const info = await getInstituteInfo(req.query.contractAddress);
+  console.log(info);
+  res.status(200).json(info);
+});
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
