@@ -1,6 +1,5 @@
 import { Box, Card, HStack, Image, VStack, Text } from "@chakra-ui/react";
 import user from "../assets/User.jpg";
-import type { workExp } from "../pages/StudentPages/AddWorkExp";
 export interface data {
   studentName: string;
   studentAddress: string;
@@ -21,36 +20,38 @@ interface Props {
   data: any;
 }
 
-
-const ShowData = ({ type, data }: Props) => (
-  <Box minWidth={"500px"}>
-    <Card.Root flexDirection="row" overflow="hidden" maxW="3xl">
-      <Box>
-        <Card.Body>
-          <Card.Title mb="2"></Card.Title>
-          <VStack align="start">
-            {type === "Skill" && (
+const ShowData = ({ type, data }: Props) => {
+  return (
+    <Box minWidth={"500px"}>
+      <Card.Root flexDirection="row" overflow="hidden" maxW="3xl">
+        <Box>
+          <Card.Body>
+            <Card.Title mb="2"></Card.Title>
+            <VStack align="start">
+              {type === "Skill" && (
+                <HStack>
+                  <Text fontWeight="bold">Name:</Text>
+                  <Text>{data.studentName}</Text>
+                </HStack>
+              )}
               <HStack>
-                <Text fontWeight="bold">Name:</Text>
-                <Text>{data.studentName}</Text>
+                <Text fontWeight="bold">
+                  {type === "Certificate"
+                    ? "Certificate Name:"
+                    : type === "Skill"
+                    ? "Skill: "
+                    : "Role"}
+                </Text>
+                <Text>
+                  {type === "Certificate"
+                    ? data.certificate_name
+                    : type === "Skill"
+                    ? data.skillName
+                    : data.role}
+                </Text>
               </HStack>
-            )}
-            <HStack>
-              <Text fontWeight="bold">
-                {type === "Certificate"
-                  ? "Certificate Name:"
-                  : type === "Skill"
-                  ? "Skill: "
-                  : "Role"}
-              </Text>
-              <Text>
-                {type === "Certificate"
-                  ? data.certificate_name
-                  : type === "Skill"
-                  ? data.skillName
-                  : data.role}
-              </Text>
-            </HStack>
+            </VStack>
+
             {type === "Skill" && data.length === 0 ? (
               <p>No Data</p>
             ) : (
@@ -90,7 +91,6 @@ const ShowData = ({ type, data }: Props) => (
                 <HStack>
                   <Text fontWeight="bold">Visible:</Text>
                   <Text>{data.visible ? "Yes" : "No"}</Text>
-
                 </HStack>
               </VStack>
             )}
