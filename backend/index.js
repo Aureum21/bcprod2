@@ -8,14 +8,17 @@ const Web3 = require("web3");
 const Web3Quorum = require("web3js-quorum");
 const PORT = process.env.PORT || 5000;
 const createContract = require("./Files/main.js");
-const addOfficialCert = require("./Functions/uploadcerts.js");
+const {
+  addOfficialCert,
+  addUnOfficialCert,
+  addWorkExp,
+} = require("./Functions/uploadcerts.js");
 
 const {
   ListTransferStudents,
   ListPendingStudents,
   VerifyPendingStudent,
   VerifyTransferStudent,
-  getInstitutesCount,
 } = require("./Functions/transferFunctions.js");
 const { tessera, besu, contractInformations } = require("./Files/keys.js");
 const {
@@ -37,6 +40,7 @@ const {
   VerifyInstitute,
   registerInstToPublic,
 } = require("./Functions/AdminFunctions.js");
+const { getUnOfficialCert, getWorkExp } = require("./Functions/getcerts.js");
 const chainId = 1337;
 
 const contractJsonRegStudPath = path.resolve(
@@ -344,6 +348,63 @@ app.post("/addSkill", async (req, res) => {
   } else {
     res.status(500).json({ message: "Failed to add skill" });
   }
+});
+app.post("/addUnOfficialCert", async (req, res) => {
+  const {
+    certificate_name,
+    institute_address,
+    student_contract_address,
+    certificate_hash,
+  } = req.body;
+
+  const result = await addUnOfficialCert(
+    certificate_name,
+    institute_address,
+    student_contract_address,
+    certificate_hash
+  );
+  console.log(result);
+  if (result.status === "0x1") {
+    res.status(200).json({ message: "Institution transfer Pending" });
+  } else {
+    res.status(500).json({ message: "Failed to transfer institution" });
+  }
+});
+app.post("/addWorkExp", async (req, res) => {
+  const {
+    role,
+    instAddress,
+    startDate,
+    endDate,
+    description,
+    certificate_hash,
+    student_contract_address,
+  } = req.body;
+  const result = await addWorkExp(
+    role,
+    instAddress,
+    startDate,
+    endDate,
+    description,
+    certificate_hash,
+    student_contract_address
+  );
+  console.log(result);
+  if (result.status === "0x1") {
+    res.status(200).json({ message: "Institution transfer Pending" });
+  } else {
+    res.status(500).json({ message: "Failed to transfer institution" });
+  }
+});
+app.get("/getUnOfficialCert", async (req, res) => {
+  const result = await getUnOfficialCert(req.query.contractAddress);
+  console.log(result);
+  res.status(200).json(result);
+});
+app.get("/getWorkExp", async (req, res) => {
+  const result = await getWorkExp(req.query.contractAddress);
+  console.log(result);
+  res.status(200).json(result);
 });
 
 app.get("/listSkills", async (req, res) => {

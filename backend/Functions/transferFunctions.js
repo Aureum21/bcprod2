@@ -371,4 +371,5 @@ module.exports = {
   VerifyPendingStudent,
   VerifyTransferStudent,
   getInstitutesCount,
+  getStudentsCount,
 };
