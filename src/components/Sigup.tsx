@@ -13,9 +13,8 @@ import { useNavigate } from "react-router-dom";
 
 const Signup = () => {
   const navigate = useNavigate();
-  const { account, connect, check } = useContext(Web3Context);
+  const { connect, check } = useContext(Web3Context);
   const [role, setRole] = useState<string>("Student");
-  const chainID = 1337;
   const [formData, setFormData] = useState({
     name: "",
     email: "",

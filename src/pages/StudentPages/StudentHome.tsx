@@ -7,9 +7,8 @@ import StudentInfomation, {
   type StudentInfo,
 } from "../../components/StudentInfomation";
 import { useColorMode } from "../../components/ui/color-mode";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
-import { Web3Context } from "../../Web3ContextProvider";
 import InfoSkeleton from "../../components/InfoSkeleton";
 export const pages = [
   "Home",
@@ -20,9 +19,10 @@ export const pages = [
 ];
 
 const StudentHome = () => {
-  const { account, studentContractAddress } = useContext(Web3Context);
-  console.log(account);
-  console.log(studentContractAddress);
+  const studentContractAddress = sessionStorage.getItem(
+    "studentContractAddress"
+  );
+  console.log("studentContractAddress from this", studentContractAddress);
   const colorMode = useColorMode().colorMode;
   const [data, setData] = useState<StudentInfo | undefined>(undefined);
   useEffect(() => {
@@ -33,7 +33,6 @@ const StudentHome = () => {
         },
       })
       .then((res) => {
-        console.log(res.data);
         setData(res.data);
       });
   }, []);
@@ -57,6 +56,3 @@ const StudentHome = () => {
 };
 
 export default StudentHome;
-function useWeb3Context(): { studentContractAddress: any } {
-  throw new Error("Function not implemented.");
-}

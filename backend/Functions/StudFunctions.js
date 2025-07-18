@@ -117,14 +117,7 @@ async function getStudProfile(
   console.log(studInfo);
   return studInfo;
 }
-async function RegisterStudentPrivate(
-  clientUrl,
-  address,
-  value,
-  fromPrivateKey,
-  fromPublicKey,
-  toPublicKey
-) {
+async function RegisterStudentPrivate(value) {
   console.log(
     besu.member3.url,
     besu.member3.accountPrivateKey,
@@ -142,14 +135,12 @@ async function RegisterStudentPrivate(
     "Student 11 Contract Address : ",
     StudentContract.contractAddress
   );
-  const web3 = new Web3(clientUrl);
+  const web3 = new Web3(besu.member3.url);
   const web3quorum = new Web3Quorum(web3, chainId);
   const contract = new web3quorum.eth.Contract(contractAbiRegStud);
   const functionAbi = contract._jsonInterface.find((e) => {
     return e.name === "registerStudents";
   });
-  console.log([...value, StudentContract.contractAddress]);
-
   const functionArgs = web3quorum.eth.abi
     .encodeParameters(functionAbi.inputs, [
       value[0],
@@ -160,11 +151,11 @@ async function RegisterStudentPrivate(
     ])
     .slice(2);
   const functionParams = {
-    to: address,
+    to: contractInformations.registerStud.contractAddress,
     data: functionAbi.signature + functionArgs,
-    privateKey: fromPrivateKey,
-    privateFrom: fromPublicKey,
-    privateFor: [toPublicKey],
+    privateKey: besu.member3.accountPrivateKey,
+    privateFrom: tessera.member3.publicKey,
+    privateFor: [tessera.member1.publicKey],
   };
   console.log("Student 22 Contract Address : ", functionParams);
   const transactionHash = await web3quorum.priv.generateAndSendRawTransaction(
@@ -266,17 +257,12 @@ async function RegisterStudentPrivateToPending(
   return result;
 }
 
-const gentStudentInstitution = async (
-  clientUrl,
-  fromPrivateKey,
-  fromPublicKey,
-  toPublicKey,
-  key
-) => {
-  const web3 = new Web3(clientUrl);
+const gentStudentInstitution = async (key) => {
+  const web3 = new Web3(besu.member3.url);
   const web3quorum = new Web3Quorum(web3, chainId);
   const contract = new web3quorum.eth.Contract(contractAbiRegStud);
   // eslint-disable-next-line no-underscore-dangl
+  console.log("contractStartedddd", contract);
   const functionAbi = contract._jsonInterface.find((e) => {
     return e.name === "getRegisteredStudentByKey";
   });
@@ -286,9 +272,9 @@ const gentStudentInstitution = async (
   const functionParams = {
     to: contractInformations.registerStud.contractAddress,
     data: functionAbi.signature + functionArgs,
-    privateKey: fromPrivateKey,
-    privateFrom: fromPublicKey,
-    privateFor: [toPublicKey],
+    privateKey: besu.member3.accountPrivateKey,
+    privateFrom: tessera.member3.publicKey,
+    privateFor: [tessera.member1.publicKey],
   };
   const transactionHash = await web3quorum.priv.generateAndSendRawTransaction(
     functionParams
@@ -304,38 +290,32 @@ const gentStudentInstitution = async (
   console.log("decoded", decoded);
   return decoded;
 };
-const getStudentInformation = async (
-  clientUrl,
-  address,
-  fromPrivateKey,
-  fromPublicKey,
-  toPublicKey
-) => {
-  const web3 = new Web3(clientUrl);
+const getStudentInformation = async (address) => {
+  console.log("getStudentInformation");
+  const web3 = new Web3(besu.member3.url);
   const web3quorum = new Web3Quorum(web3, chainId);
   const contract = new web3quorum.eth.Contract(contractAbiStudent);
   // eslint-disable-next-line no-underscore-dangle
   const functionAbi = contract._jsonInterface.find((e) => {
     return e.name === "getStudentInfo";
   });
+  console.log("functionAbi2222");
 
-  const functionArgs = web3quorum.eth.abi
-    .encodeParameters(functionAbi.inputs, [])
-    .slice(2);
   const functionParams = {
     to: address,
-    data: functionAbi.signature + functionArgs,
-    privateKey: fromPrivateKey,
-    privateFrom: fromPublicKey,
-    privateFor: [toPublicKey],
+    data: functionAbi.signature,
+    privateKey: besu.member3.accountPrivateKey,
+    privateFrom: tessera.member3.publicKey,
+    privateFor: [tessera.member1.publicKey],
   };
   const transactionHash = await web3quorum.priv.generateAndSendRawTransaction(
     functionParams
   );
-  // console.log(`Transaction hash: ${transactionHash}`);
-  const result = await web3quorum.priv.waitForTransactionReceipt(
-    transactionHash
-  );
+  console.log("transactionHash", transactionHash);
+  const result = await web3quorum.priv.call(transactionHash);
+  console.log("result", result);
+  console.log("result.output", result.output);
+  console.log("functionAbi.outputs", functionAbi.outputs);
   const decoded = web3quorum.eth.abi.decodeParameters(
     functionAbi.outputs,
     result.output
@@ -343,13 +323,8 @@ const getStudentInformation = async (
   console.log("decoded", decoded);
   const key = web3.utils.soliditySha3(decoded[0], decoded[3]);
   console.log("key", key);
-  const studentInfo = await gentStudentInstitution(
-    clientUrl,
-    fromPrivateKey,
-    fromPublicKey,
-    toPublicKey,
-    key
-  );
+  const studentInfo = await gentStudentInstitution(key);
+
   return studentInfo;
 };
 const addSkill = async (skill, student_name, experiance, contractAddress) => {

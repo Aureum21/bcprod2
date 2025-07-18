@@ -50,8 +50,21 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
   const [web3, setWeb3] = useState<Web3 | null>(null);
   const [account, setAccount] = useState<string | undefined>(undefined);
   const [trigger, setTrigger] = useState<boolean>(false);
+  useEffect(() => {
+    const storedAccount = sessionStorage.getItem("account");
+    const storedStud = sessionStorage.getItem("studentContractAddress");
+    const storedInst = sessionStorage.getItem("instituteContractAddress");
+    console.log("storedAccount", storedAccount);
+    console.log("storedStud", storedStud);
+    console.log("storedInst", storedInst);
+
+    if (storedAccount) setAccount(storedAccount);
+    if (storedStud) setStudentContractAddress(storedStud);
+    if (storedInst) setInstituteContractAddress(storedInst);
+  }, []);
 
   const connect = async () => {
+    logout();
     if (window.ethereum) {
       const web3Instance = new Web3(window.ethereum);
       setWeb3(web3Instance);
@@ -60,11 +73,19 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
         method: "eth_requestAccounts",
       });
       setAccount(accounts[0]);
+      sessionStorage.setItem("account", accounts[0]);
       return accounts[0];
     } else {
       alert("Please install MetaMask");
       return undefined;
     }
+  };
+  const logout = () => {
+    sessionStorage.clear();
+    setAccount(undefined);
+    setStudentContractAddress("");
+    setInstituteContractAddress("");
+    setTrigger(false);
   };
 
   const check = async (account: string) => {
@@ -73,7 +94,8 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
       publicdata.abi,
       contInfo.publicdata.contractAddress
     );
-
+    sessionStorage.removeItem("studentContractAddress");
+    sessionStorage.removeItem("instituteContractAddress");
     try {
       const isMoe = await contractInstance.methods
         .ismoe()
@@ -93,6 +115,7 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
 
       if (value2[0] !== ZERO_ADDRESS) {
         setInstituteContractAddress(value2[0]);
+        sessionStorage.setItem("instituteContractAddress", value2[0]);
         return { type: "institute", contAddress: value2[0], node: value2[1] };
       }
     } catch (err) {
@@ -107,6 +130,7 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
 
       if (value3[0] !== ZERO_ADDRESS) {
         setStudentContractAddress(value3[0]);
+        sessionStorage.setItem("studentContractAddress", value3[0]);
         return { type: "student", contAddress: value3[0], node: value3[1] };
       }
     } catch (err) {

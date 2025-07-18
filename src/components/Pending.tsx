@@ -1,7 +1,6 @@
-import { useContext, type MouseEvent } from "react";
+import { type MouseEvent } from "react";
 import { Card, CardBody, VStack, Text, HStack, Button } from "@chakra-ui/react";
 import axios from "axios";
-import { Web3Context } from "../Web3ContextProvider";
 
 export interface Data {
   name: string;
@@ -16,7 +15,7 @@ interface PendingProps {
 }
 
 const Pending = ({ data, type }: PendingProps) => {
-  const { account } = useContext(Web3Context);
+  const account = sessionStorage.getItem("account") as string;
   const handleAccept = (_e: MouseEvent<HTMLButtonElement>) => {
     axios.post("http://localhost:5000/acceptPendingStudent", {
       name: data.name,

@@ -3,19 +3,15 @@ import ColorMode from "../../components/ColorMode";
 import NavBar from "../../components/NavBar";
 import logoWhite from "../../assets/LogoWhite.svg";
 import logoBlack from "../../assets/LogoBlack.svg";
-import StudentInfomation, {
-  type StudentInfo,
-} from "../../components/StudentInfomation";
 import { useColorMode } from "../../components/ui/color-mode";
-import { useContext, useEffect, useState } from "react";
-import { Web3Context } from "../../Web3ContextProvider";
+import { useEffect, useState } from "react";
 import InstituteInformation, {
   type InstituteInfo,
 } from "../../components/InstituteInformation";
 import axios from "axios";
-const StudentHome = () => {
+const InstHome = () => {
   const colorMode = useColorMode().colorMode;
-  const { instituteContractAddress } = useContext(Web3Context);
+
   const [instInfo, setInstInfo] = useState({} as InstituteInfo);
   useEffect(() => {
     const getInstInfo = async () => {
@@ -23,7 +19,9 @@ const StudentHome = () => {
         "http://localhost:5000/getInstituteInfo",
         {
           params: {
-            contractAddress: instituteContractAddress,
+            contractAddress: sessionStorage.getItem(
+              "instituteContractAddress"
+            ) as string,
           },
         }
       );
@@ -57,4 +55,4 @@ const StudentHome = () => {
   );
 };
 
-export default StudentHome;
+export default InstHome;

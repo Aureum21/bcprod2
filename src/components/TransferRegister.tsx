@@ -1,8 +1,7 @@
 import { Box, Button, Card, Field, Input } from "@chakra-ui/react";
 import type { ChangeEvent } from "react";
 import axios from "axios";
-import { useContext, useState } from "react";
-import { Web3Context } from "../Web3ContextProvider";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 interface Props {
   type: "transfer" | "register" | "fetch";
@@ -10,7 +9,7 @@ interface Props {
 
 const TransferRegister = ({ type }: Props) => {
   const navigate = useNavigate();
-  const { account } = useContext(Web3Context);
+  const account = sessionStorage.getItem("account") as string;
   const [formDataPending, setFormDataPending] = useState({
     institute_address: "",
   });

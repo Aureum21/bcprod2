@@ -85,21 +85,14 @@ app.use(express.json());
 app.post("/registerStudent", async (req, res) => {
   const { name, student_address, email, id } = req.body;
 
-  const [resultPrivate, contractAddress] = await RegisterStudentPrivate(
-    besu.member3.url,
-    contractInformations.registerStud.contractAddress,
-    [
-      name,
-      student_address,
-      email,
-      id,
-      contractInformations.verifyStud.contractAddress,
-      contractInformations.verifyInst.contractAddress,
-    ],
-    besu.member3.accountPrivateKey,
-    tessera.member3.publicKey,
-    tessera.member1.publicKey
-  );
+  const [resultPrivate, contractAddress] = await RegisterStudentPrivate([
+    name,
+    student_address,
+    email,
+    id,
+    contractInformations.verifyStud.contractAddress,
+    contractInformations.verifyInst.contractAddress,
+  ]);
   console.log(contractInformations.publicdata.contractAddress);
   console.log(resultPrivate);
   console.log(contractAddress);
@@ -204,13 +197,7 @@ app.post("/rejectInstitute", async (req, res) => {
 app.get("/studentInformation", async (req, res) => {
   const { contractAddress } = req.query;
   console.log("contractAddress", contractAddress);
-  const studentInfo = await getStudentInformation(
-    besu.member3.url,
-    contractAddress,
-    besu.member3.accountPrivateKey,
-    tessera.member3.publicKey,
-    tessera.member1.publicKey
-  );
+  const studentInfo = await getStudentInformation(contractAddress);
   console.log(studentInfo);
 
   const studentInformation = {
@@ -225,8 +212,6 @@ app.get("/studentInformation", async (req, res) => {
   console.log(contractAddress);
   res.status(200).json(studentInformation);
 });
-// Placeholder for your Quorum/Web3 logic
-// app.post('/api/your-endpoint', async (req, res) => { ... });
 
 app.post("/regStudToInstPending", async (req, res) => {
   const { student_address, institute_address } = req.body;

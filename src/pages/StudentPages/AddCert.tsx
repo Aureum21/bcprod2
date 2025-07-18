@@ -24,7 +24,9 @@ interface addCert {
 }
 const AddCert = () => {
   const colorMode = useColorMode().colorMode;
-  const { studentContractAddress } = useContext(Web3Context);
+  const studentContractAddress = sessionStorage.getItem(
+    "studentContractAddress"
+  ) as string;
   const [certData, setCertData] = useState<addCert[]>([]);
   const onSubmit = (data: data, e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
