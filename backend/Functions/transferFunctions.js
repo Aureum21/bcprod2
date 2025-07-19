@@ -4,7 +4,6 @@ const fs = require("fs-extra");
 const Web3Quorum = require("web3js-quorum");
 const chainId = 1337;
 const { besu, tessera, contractInformations } = require("../Files/keys");
-const createContract = require("../Files/main");
 const { getStudContract } = require("./StudFunctions");
 // Verify Stud contract
 const contractJsonVerifyStudPath = path.resolve(

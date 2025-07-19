@@ -7,7 +7,10 @@ const fs = require("fs-extra");
 const Web3 = require("web3");
 const Web3Quorum = require("web3js-quorum");
 const PORT = process.env.PORT || 5000;
-const createContract = require("./Files/main.js");
+const {
+  createStudContract,
+  createInstContract,
+} = require("./Functions/deploy.js");
 const {
   addOfficialCert,
   addUnOfficialCert,
@@ -36,7 +39,6 @@ const {
 } = require("./Functions/StudFunctions.js");
 const {
   ListPendingInstitutes,
-  createInstContract,
   VerifyInstitute,
   registerInstToPublic,
 } = require("./Functions/AdminFunctions.js");
@@ -111,15 +113,11 @@ app.post("/registerStudent", async (req, res) => {
 app.post("/registerInstituteToPending", async (req, res) => {
   const { name, institute_address, id } = req.body;
 
-  const resultPrivate = await RegisterInstitutePrivateToPending(
-    besu.member2.url,
-    contractInformations.registerInst.contractAddress,
-    [institute_address, name, id],
-    contractAbiRegInst,
-    besu.member2.accountPrivateKey,
-    tessera.member2.publicKey,
-    tessera.member1.publicKey
-  );
+  const resultPrivate = await RegisterInstitutePrivateToPending([
+    institute_address,
+    name,
+    id,
+  ]);
 
   console.log(resultPrivate);
   if (resultPrivate.status === "0x1") {
@@ -130,14 +128,7 @@ app.post("/registerInstituteToPending", async (req, res) => {
 });
 
 app.get("/listPendingInstitutes", async (req, res) => {
-  const institutes = await ListPendingInstitutes(
-    besu.member2.url,
-    "node",
-    contractInformations.registerInst.contractAddress,
-    besu.member2.accountPrivateKey,
-    tessera.member2.publicKey,
-    tessera.member1.publicKey
-  );
+  const institutes = await ListPendingInstitutes();
   console.log(institutes);
   res.status(200).json(institutes);
 });
@@ -145,30 +136,28 @@ app.get("/listPendingInstitutes", async (req, res) => {
 app.post("/acceptInstitute", async (req, res) => {
   const { name, address, id, index } = req.body;
   const moeAddress = besu.member1.accountAddress;
-  const InstContract = await createInstContract(
-    besu.member1.url,
-    besu.member1.accountPrivateKey,
-    tessera.member1.publicKey,
-    tessera.member2.publicKey,
-    [name, address, id, moeAddress]
-  );
+  const InstContract = await createInstContract([
+    name,
+    address,
+    id,
+    moeAddress,
+  ]);
 
   const InstContractAddress = InstContract.contractAddress;
   console.log("InstContractAddress: ", InstContractAddress);
 
-  const resultPrivate = await VerifyInstitute(
-    besu.member1.url,
-    { name, address, id, index, InstContractAddress },
-
-    besu.member1.accountPrivateKey,
-    tessera.member1.publicKey,
-    tessera.member2.publicKey
-  );
+  const resultPrivate = await VerifyInstitute({
+    name,
+    address,
+    id,
+    index,
+    InstContractAddress,
+  });
   console.log("Private Registration Receipt", resultPrivate);
-  const resultPublic = await registerInstToPublic(
-    contractInformations.publicdata.contractAddress,
-    [address, InstContractAddress]
-  );
+  const resultPublic = await registerInstToPublic([
+    address,
+    InstContractAddress,
+  ]);
 
   if (resultPrivate.status === "0x1" && resultPublic.status === true) {
     res.status(200).json({ message: "Institute verified successfully" });
@@ -216,13 +205,10 @@ app.get("/studentInformation", async (req, res) => {
 app.post("/regStudToInstPending", async (req, res) => {
   const { student_address, institute_address } = req.body;
 
-  const resultPrivate = await RegisterStudentPrivateToPending(
-    besu.member3.url,
-    [student_address, institute_address],
-    besu.member3.accountPrivateKey,
-    tessera.member3.publicKey,
-    tessera.member1.publicKey
-  );
+  const resultPrivate = await RegisterStudentPrivateToPending([
+    student_address,
+    institute_address,
+  ]);
   console.log(resultPrivate);
   if (resultPrivate.status === "0x1") {
     res.status(200).json({ message: "Student added to pending successfully" });

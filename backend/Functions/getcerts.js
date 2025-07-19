@@ -27,8 +27,7 @@ const getCertCount = async (functionName, contractAddress) => {
   const web3 = new Web3(besu.member3.url);
   const web3quorum = new Web3Quorum(web3, chainId);
   const contract = new web3quorum.eth.Contract(contractAbiStud);
-
-  // Dynamically find the ABI for the provided function name
+  console.log("contractAddress", contractAddress);
   const functionAbi = contract._jsonInterface.find(
     (e) => e.name === functionName
   );

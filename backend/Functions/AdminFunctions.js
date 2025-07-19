@@ -44,15 +44,8 @@ const contractJsonInst = JSON.parse(fs.readFileSync(contractJsonInstPath));
 const contractAbiInst = contractJsonInst.abi;
 const contractBytecodeInst = contractJsonInst.evm.bytecode.object;
 
-const PendingInstituteCount = async (
-  clientUrl,
-  nodeName = "node",
-  address,
-  fromPrivateKey,
-  fromPublicKey,
-  toPublicKey
-) => {
-  const web3 = new Web3(clientUrl);
+const PendingInstituteCount = async () => {
+  const web3 = new Web3(besu.member2.url);
   const web3quorum = new Web3Quorum(web3, chainId);
   const contract = new web3quorum.eth.Contract(contractAbiRegInst);
   // eslint-disable-next-line no-underscore-dangle
@@ -60,11 +53,11 @@ const PendingInstituteCount = async (
     return e.name === "getPendingInstitutesCount";
   });
   const functionParams = {
-    to: address,
+    to: contractInformations.registerInst.contractAddress,
     data: functionAbi.signature,
-    privateKey: fromPrivateKey,
-    privateFrom: fromPublicKey,
-    privateFor: [toPublicKey],
+    privateKey: besu.member2.accountPrivateKey,
+    privateFrom: tessera.member2.publicKey,
+    privateFor: [tessera.member1.publicKey],
   };
   const transactionHash = await web3quorum.priv.generateAndSendRawTransaction(
     functionParams
@@ -76,26 +69,12 @@ const PendingInstituteCount = async (
 
   return result.output;
 };
-const ListPendingInstitutes = async (
-  clientUrl,
-  nodeName = "node",
-  address,
-  fromPrivateKey,
-  fromPublicKey,
-  toPublicKey
-) => {
-  const web3 = new Web3(clientUrl);
+const ListPendingInstitutes = async () => {
+  const web3 = new Web3(besu.member2.url);
   const web3quorum = new Web3Quorum(web3, chainId);
   const contract = new web3quorum.eth.Contract(contractAbiRegInst);
   // eslint-disable-next-line no-underscore-dangle
-  const number = await PendingInstituteCount(
-    clientUrl,
-    nodeName,
-    address,
-    fromPrivateKey,
-    fromPublicKey,
-    toPublicKey
-  );
+  const number = await PendingInstituteCount();
   const functionAbi = contract._jsonInterface.find((e) => {
     return e.name === "getPendingInstituteByIndex";
   });
@@ -106,11 +85,11 @@ const ListPendingInstitutes = async (
       .slice(2);
 
     const functionParams = {
-      to: address,
+      to: contractInformations.registerInst.contractAddress,
       data: functionAbi.signature + functionArgs,
-      privateKey: fromPrivateKey,
-      privateFrom: fromPublicKey,
-      privateFor: [toPublicKey],
+      privateKey: besu.member2.accountPrivateKey,
+      privateFrom: tessera.member2.publicKey,
+      privateFor: [tessera.member1.publicKey],
     };
     const transactionHash = await web3quorum.priv.generateAndSendRawTransaction(
       functionParams
@@ -169,14 +148,8 @@ const GenerateKey = async (
   return result.output;
 };
 
-const VerifyInstitute = async (
-  clientUrl,
-  info,
-  fromPrivateKey,
-  fromPublicKey,
-  toPublicKey
-) => {
-  const web3 = new Web3(clientUrl);
+const VerifyInstitute = async (info) => {
+  const web3 = new Web3(besu.member1.url);
   const web3quorum = new Web3Quorum(web3, chainId);
   const key = web3.utils.soliditySha3(info.address, info.id);
 
@@ -197,9 +170,9 @@ const VerifyInstitute = async (
   const functionParams = {
     to: contractInformations.verifyInst.contractAddress,
     data: functionAbi.signature + functionArgs,
-    privateKey: fromPrivateKey,
-    privateFrom: fromPublicKey,
-    privateFor: [toPublicKey],
+    privateKey: besu.member1.accountPrivateKey,
+    privateFrom: tessera.member1.publicKey,
+    privateFor: [tessera.member2.publicKey],
   };
   console.log("functionParams", functionParams);
   const transactionHash = await web3quorum.priv.generateAndSendRawTransaction(
@@ -213,38 +186,7 @@ const VerifyInstitute = async (
   return result;
 };
 
-async function createInstContract(
-  clientUrl,
-  fromPrivateKey,
-  fromPublicKey,
-  toPublicKey,
-  value
-) {
-  const web3 = new Web3(clientUrl);
-  const web3quorum = new Web3Quorum(web3, chainId);
-
-  const contractConstructorInit = web3.eth.abi
-    .encodeParameters(["string", "address", "string", "address"], value)
-    .slice(2);
-
-  const txOptions = {
-    data: "0x" + contractBytecodeInst + contractConstructorInit,
-    privateKey: fromPrivateKey,
-    privateFrom: fromPublicKey,
-    privateFor: [toPublicKey],
-  };
-  console.log("Creating contract...");
-  // Generate and send the Raw transaction to the Besu node using the eea_sendRawTransaction(https://besu.hyperledger.org/en/latest/Reference/API-Methods/#eea_sendrawtransaction) JSON-RPC call
-  const txHash = await web3quorum.priv.generateAndSendRawTransaction(txOptions);
-  console.log("Getting contractAddress from txHash: ", txHash);
-  const privateTxReceipt = await web3quorum.priv.waitForTransactionReceipt(
-    txHash
-  );
-  console.log("Private Transaction Receipt: ", privateTxReceipt);
-  return privateTxReceipt;
-}
-
-const registerInstToPublic = async (contractAddress, value) => {
+const registerInstToPublic = async (value) => {
   const host = besu.rpcnode.url;
   const web3 = new Web3(host);
 
@@ -256,7 +198,7 @@ const registerInstToPublic = async (contractAddress, value) => {
 
   const contractInstance = new web3.eth.Contract(
     contractAbiPublicData,
-    contractAddress
+    contractInformations.publicdata.contractAddress
   );
 
   // Encode function call
@@ -265,7 +207,7 @@ const registerInstToPublic = async (contractAddress, value) => {
     .encodeABI();
 
   const tx = {
-    to: contractAddress,
+    to: contractInformations.publicdata.contractAddress,
     data: data,
     gas: 150000, // or tune it
     gasPrice: "0x0", // for Besu/Quorum, no fees
@@ -323,7 +265,6 @@ const removePendingInst = async (
 module.exports = {
   ListPendingInstitutes,
   VerifyInstitute,
-  createInstContract,
   registerInstToPublic,
   removePendingInst,
 };

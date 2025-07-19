@@ -25,18 +25,11 @@ const contractJsonInstitute = JSON.parse(
 );
 const contractAbiInstitute = contractJsonInstitute.abi;
 const { getStudContract, getStudProfile } = require("./StudFunctions.js");
-const RegisterInstitutePrivateToPending = async (
-  clientUrl,
-  address,
-  value,
-  contractAbi,
-  fromPrivateKey,
-  fromPublicKey,
-  toPublicKey
-) => {
-  const web3 = new Web3(clientUrl);
+
+const RegisterInstitutePrivateToPending = async (value) => {
+  const web3 = new Web3(besu.member2.url);
   const web3quorum = new Web3Quorum(web3, chainId);
-  const contract = new web3quorum.eth.Contract(contractAbi);
+  const contract = new web3quorum.eth.Contract(contractAbiInstitute);
   // eslint-disable-next-line no-underscore-dangle
   const functionAbi = contract._jsonInterface.find((e) => {
     return e.name === "registerInstToPending";
@@ -46,11 +39,11 @@ const RegisterInstitutePrivateToPending = async (
     .encodeParameters(functionAbi.inputs, [value[0], value[1], value[2]])
     .slice(2);
   const functionParams = {
-    to: address,
+    to: contractInformations.registerInst.contractAddress,
     data: functionAbi.signature + functionArgs,
-    privateKey: fromPrivateKey,
-    privateFrom: fromPublicKey,
-    privateFor: [toPublicKey],
+    privateKey: besu.member2.accountPrivateKey,
+    privateFrom: tessera.member2.publicKey,
+    privateFor: [tessera.member1.publicKey],
   };
   const transactionHash = await web3quorum.priv.generateAndSendRawTransaction(
     functionParams

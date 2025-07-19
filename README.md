@@ -19,6 +19,13 @@ A blockchain-based system student certification manager holding four stake holde
 - `README.md`: This file contains the project documentation and instructions.
 - `package.json`: This file contains the project dependencies and scripts.
 - `node_modules`: This directory contains the project dependencies installed using npm.
+- `backend`: This directory contains server-side logic and functions for interacting with the blockchain.
+  - `Functions`: Contains JavaScript files for handling different operations like student and institute management.
+  - `index.js`: The main entry point for the backend server.
+- `src`: This directory contains the React frontend application.
+  - `components`: Reusable UI components such as `NavBar`, `ColorMode`, and `UploadCertificate`.
+  - `pages`: Different pages for the application, including `StudentPages`, `AdminPages`, and `InstPages`.
+  - `App.tsx`: The main entry point for the React application.
 
 ```
 blockchain_mbrslp-/
@@ -62,8 +69,34 @@ blockchain_mbrslp-/
 ├── package.json
 ├── README.md
 ├── readme2.md
-└── truffle-config.js
+├── truffle-config.js
+├── backend/
+│   ├── Functions/
+│   │   └── [Your JavaScript files]
+│   └── index.js
+├── src/
+│   ├── components/
+│   │   ├── NavBar.js
+│   │   ├── ColorMode.js
+│   │   └── UploadCertificate.js
+│   ├── pages/
+│   │   ├── StudentPages.js
+│   │   ├── AdminPages.js
+│   │   └── InstPages.js
+│   └── App.tsx
+└── index.js
 ```
+
+## Navigation
+- **Home Page**: Provides an overview and access to different user roles.
+- **Student Pages**: Allows students to manage their profiles, add certificates, and view information.
+- **Institute Pages**: Enables institutes to manage student data and verify credentials.
+- **Admin Pages**: For administrative tasks and overall management.
+
+## API Endpoints
+- `/addUnOfficialCert`: Endpoint for adding unofficial certificates.
+- `/getUnOfficialCert`: Endpoint for retrieving unofficial certificates.
+- `/studentInformation`: Endpoint for fetching student information based on the contract address.
 
 ## Prerequisites
 
