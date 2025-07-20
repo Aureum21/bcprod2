@@ -82,13 +82,7 @@ async function addUnOfficialCert(
   console.log("student_contract_address", student_contract_address);
   console.log("institute_address", institute_address);
   console.log("certificate_name", certificate_name);
-  const studentProfile = await getStudProfile(
-    besu.member3.url,
-    student_contract_address,
-    besu.member3.accountPrivateKey,
-    tessera.member3.publicKey,
-    tessera.member1.publicKey
-  );
+  const studentProfile = await getStudProfile(student_contract_address);
   console.log("studentProfile name", studentProfile.name);
   const web3 = new Web3(besu.member3.url);
   const web3quorum = new Web3Quorum(web3, chainId);

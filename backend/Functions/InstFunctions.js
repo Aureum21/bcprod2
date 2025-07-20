@@ -76,13 +76,7 @@ const RegisterStudentPrivateTransfer = async (value) => {
   const contract = new web3quorum.eth.Contract(contractAbiVerifyStud);
   console.log("Contract ABI:", contract._jsonInterface);
   const studentcontract = await getStudContract(value[0]);
-  const studInfo = await getStudProfile(
-    besu.member3.url,
-    studentcontract,
-    besu.member3.accountPrivateKey,
-    tessera.member3.publicKey,
-    tessera.member1.publicKey
-  );
+  const studInfo = await getStudProfile(studentcontract);
   const functionAbi = contract._jsonInterface.find((e) => {
     return e.name === "addTransferStudToPending";
   });

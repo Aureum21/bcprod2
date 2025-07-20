@@ -7,8 +7,6 @@ import UploadCertificate from "../../components/UploadCertificate";
 import ShowData from "../../components/ShowData";
 import { pages } from "./StudentHome";
 import { useColorMode } from "../../components/ui/color-mode";
-import { useContext } from "react";
-import { Web3Context } from "../../Web3ContextProvider";
 import type { data } from "../../components/UploadCertificate";
 import axios from "axios";
 import type { FormEvent } from "react";
@@ -25,7 +23,9 @@ export interface workExp {
 }
 const AddWorkExp = () => {
   const colorMode = useColorMode().colorMode;
-  const { studentContractAddress } = useContext(Web3Context);
+  const studentContractAddress = sessionStorage.getItem(
+    "studentContractAddress"
+  ) as string;
   const [certData, setCertData] = useState<workExp[]>([]);
   const onSubmit = (data: data, e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();

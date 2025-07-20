@@ -70,9 +70,10 @@ const AddCert = () => {
               onSubmit={onSubmit}
               type="unOfficial"
             ></UploadCertificate>
-            {certData.map((item) => (
-              <ShowData type="Certificate" data={item}></ShowData>
-            ))}
+            {certData.map((item) => {
+              console.log("item", item);
+              return <ShowData type="Certificate" data={item}></ShowData>;
+            })}
           </VStack>
         </center>
       </GridItem>

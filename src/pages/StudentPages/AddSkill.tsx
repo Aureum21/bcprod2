@@ -17,18 +17,22 @@ import { useColorMode } from "../../components/ui/color-mode";
 import type { FormEvent } from "react";
 import type { data } from "../../components/UploadCertificate";
 import axios from "axios";
-import { useContext, useEffect, useState } from "react";
-import { Web3Context } from "../../Web3ContextProvider";
+import { useEffect, useState } from "react";
 interface Skill {
   name: string;
-  skill_name: string;
   experience: string;
+  endorsed: boolean;
+  endorsedBy: string;
+  review: string;
+  visible: boolean;
 }
 const AddSkill = () => {
   const [skills, setSkills] = useState<Skill[]>([]);
 
   const colorMode = useColorMode().colorMode;
-  const { studentContractAddress } = useContext(Web3Context);
+  const studentContractAddress = sessionStorage.getItem(
+    "studentContractAddress"
+  ) as string;
   const handleUpload = async (data: data, e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log(
@@ -75,7 +79,9 @@ const AddSkill = () => {
       <GridItem area="main" padding={2}>
         <Center>
           <HStack gap={10} alignItems="start">
-            <ShowData type="Skill" data={skills}></ShowData>
+            {skills.map((item) => {
+              return <ShowData type="Skill" data={item}></ShowData>;
+            })}
             <UploadCertificate
               onSubmit={handleUpload}
               type="skill"

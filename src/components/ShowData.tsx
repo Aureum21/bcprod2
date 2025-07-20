@@ -27,50 +27,20 @@ const ShowData = ({ type, data }: Props) => {
         <Box>
           <Card.Body>
             <Card.Title mb="2"></Card.Title>
-            <VStack align="start">
-              {type === "Skill" && (
-                <HStack>
-                  <Text fontWeight="bold">Name:</Text>
-                  <Text>{data.studentName}</Text>
-                </HStack>
-              )}
-              <HStack>
-                <Text fontWeight="bold">
-                  {type === "Certificate"
-                    ? "Certificate Name:"
-                    : type === "Skill"
-                    ? "Skill: "
-                    : "Role"}
-                </Text>
-                <Text>
-                  {type === "Certificate"
-                    ? data.certificate_name
-                    : type === "Skill"
-                    ? data.skillName
-                    : data.role}
-                </Text>
-              </HStack>
-            </VStack>
 
-            {type === "Skill" && data.length === 0 ? (
-              <p>No Data</p>
-            ) : (
-              data.map((item: any, index: number) => {
-                return (
-                  <Box key={index} shadow="md" p={2} mb={2} borderRadius="md">
-                    <VStack alignItems="left">
-                      <HStack>
-                        <Text fontWeight="300">Skill Name:</Text>
-                        <Text>{item.name}</Text>
-                      </HStack>
-                      <HStack>
-                        <Text fontWeight="300">Experience:</Text>
-                        <Text>{item.experiance}</Text>
-                      </HStack>
-                    </VStack>
-                  </Box>
-                );
-              })
+            {type === "Skill" && (
+              <Box shadow="md" p={2} mb={2} borderRadius="md">
+                <VStack alignItems="left">
+                  <HStack>
+                    <Text fontWeight="300">Skill Name:</Text>
+                    <Text>{data.name}</Text>
+                  </HStack>
+                  <HStack>
+                    <Text fontWeight="300">Experience:</Text>
+                    <Text>{data.experience}</Text>
+                  </HStack>
+                </VStack>
+              </Box>
             )}
             {type === "Certificate" && (
               <VStack alignItems={"left"}>

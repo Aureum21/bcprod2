@@ -390,7 +390,7 @@ const ListSkills = async (contractAddress) => {
     console.log(decoded);
     const skill = {
       name: decoded[0],
-      experiance: decoded[1],
+      experience: decoded[1],
       endorsed: decoded[2],
       endorsedBy: decoded[3],
       review: decoded[4],
