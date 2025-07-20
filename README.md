@@ -1,142 +1,120 @@
-# Blockchain MBRSLP
-
-To run the project
-
-`npx quorum-dev-quickstart`
+# Student Data Management System
 
 ## Project Overview
 
-A blockchain-based system student certification manager holding four stake holders: the Students, the Education Institutions, the MOE (education adminstrative) and employing Organizations. The membership system that utilizes IPFS for decentralized storage. The project includes user registration, institute management, and administrative features.
+A blockchain-based system student data management system holding four stake holders: the Students, the Education Institutions, the MOE (education adminstrative) and employing Organizations. The system that utilizes IPFS for decentralized storage. 
+The project includes:
+- `User registration` : Registering students and Institutes to the network.
+- `Verification`: authentication to new users by an already verified stakeholder.
+- `Certificate Upload`: adding certificates: official and unofficial to students profile for employers to access
+- `Transfering Institutes`: trnasfering a student from one institute to another.
+  
+## To run the project
+we are using the hyperledger besu as our private blockchain network. To setup up the system on your machine, follow the below procedures.
 
-## Project Structure
+1, install quorum-dev-quickstart
 
-- `contracts`: This directory contains the smart contracts written in Solidity.
-- `migrations`: This directory contains the migration scripts for deploying the smart contracts.
-- `test`: This directory contains the test files for the smart contracts.
-- `truffle-config.js`: This file contains the configuration for the Truffle Suite.
+```
+npx quorum-dev-quickstart
+```
+> **ℹ️ NOTE**  
+> From the options select: `Hyperledger Besu`, `Y`, `Loki`, `N`, `N`, `Enter` respectively.
+
+2, navigate to quorum test network folder
+
+```
+cd quorum-test-network
+```
+
+3, clone the github repository 
+
+```
+git clone https://github.com/mbrslp-blockchain/privatebc.git
+```
+
+4, Replace contracts and scripts in the quickstart with smart_contract and script folders from the repo. 
+
+```
+rm -rf dapps
+rm -rf smart_contracts/contracts
+rm -rf smart_contracts/scripts
+mv privatebc/smart_contracts smart_contracts/contracts
+mv privatebc/scripts smart_contracts/scripts
+mv privatebc dapps
+```
+
+### The folder structure  in dapps should look like:
 - `frontend`: This directory contains the frontend application code.
+- `backend`: Contains the backend logic written in expressJs to interact with the network.
 - `ipfs`: This directory contains the IPFS configuration and files.
 - `README.md`: This file contains the project documentation and instructions.
 - `package.json`: This file contains the project dependencies and scripts.
-- `node_modules`: This directory contains the project dependencies installed using npm.
+### The folder structure  in smart_contracts should look like:
+- `contracts`: This directory contains the smart contracts written in Solidity.
+- `scripts`: Contains compile and deploy logic.
+- ...
+  
+5, Being in the quorum-test-network directory run 
+```
+./run.sh
+```
+6, Install dependencies and navigate to scripts folder
+```
+cd smart_contracts/
+npm i --force
+cd scripts/
+```
+7, compile the smart contracts
+```
+node compile.js
+```
+8, deploy the contracts and update the contracts addresses in keys.js file.
+```
+cd privacy
+node deploy_regInst.js
+```
+> Update the contract address of the registerInst key in keys .js
 
 ```
-blockchain_mbrslp-/
-├── contracts/
-│   ├── Migrations.sol
-│   └── [Your contract files].sol
-│
-├── frontend/
-│   ├── html/
-│   │   ├── admin.html
-│   │   ├── connect.html
-│   │   ├── fetchprof.html
-│   │   ├── institute.html
-│   │   ├── registration.html
-│   │   └── student.html
-│   │
-│   ├── js/
-│   │   ├── constants/
-│   │   │   └── constantsregisterinst.js
-│   │   └── admin.js
-│   │
-│   ├── css/
-│   │   └── [Your CSS files]
-│   │
-│   └── assets/
-│       └── [Your image/media files]
-│
-├── ipfs/
-│   └── README.md
-│
-├── migrations/
-│   ├── 1_initial_migration.js
-│   └── [Your migration files].js
-│
-├── test/
-│   └── [Your test files].js
-│
-├── node_modules/
-│
-├── .gitignore
-├── package.json
-├── README.md
-├── readme2.md
-└── truffle-config.js
+node deploy_regStud.js
 ```
-
-## Prerequisites
-
-- Node.js v16+
-- npm or yarn
-- Hyperledger Besu nodes (private network)
-- Tessera privacy manager
-
-### Installation (Backend)
-
-```bash
-git clone https://github.com/mbrslp-blockchain/privatebc.git
-cd privatebc/backend
-npm install
+> Update the contract address of the registerStud key in keys .js
 ```
-
-### Environment Setup
-
-- Configure Besu and Tessera nodes as per the `/config` directory.
-- Update contract addresses and keys in `/backend/Files/keys.js`.
-
-### Running the Backend
-
-```bash
-npm start
+node deploy_verInst.js
 ```
+> Update the contract address of the verifyInst key in keys .js
 
-## Running the Frontend
+```
+node deploy_verStud.js
+```
+> Update the contract address of the verifyStud key in keys .js
 
-The frontend application is located in the `/frontend` directory.
+```
+cd ../public/
+node publicdata.js
+```
+> Update the contract address of the publicdata key in keys .js
 
-1. Install dependencies:
+9, navigate to the ipfs in dapps and run ipfs
+```
+# from the main directory(quorum-test-network)
+cd dapps/ipfs
+npm i --force
+npm run start
+```
+10, navigate to the backend and run index.js
+```
+# from the main directory(quorum-test-network)
+cd dapps/backend
+npm i --force
+npm run start
+```
+11, navigate to the frontend and run index.js
+```
+# from the main directory(quorum-test-network)
+cd dapps/frontend
+npm i --force
+npm run dev
+```
+> open the link and play with the system.
 
-   ```bash
-   cd privatebc/frontend
-   npm install
-   ```
-
-2. Start the frontend development server:
-
-   ```bash
-   npm start
-   ```
-
-   This will launch the frontend app, typically on [http://localhost:3000](http://localhost:3000).  
-   Ensure that the backend server is running and accessible to the frontend for API calls.
-
-> Note: If your frontend uses a different framework or has custom build/start instructions, refer to the documentation in the `/frontend` directory.
-
-## API Endpoints
-
-- `POST /registerStudent`: Register a student (private and public records).
-- `GET /studentInformation?contractAddress=...`: Fetch student details by contract address.
-- `POST /regStudToInstPending`: Register pending institution transfer.
-- `POST /regStudToInstTransfer`: Complete student transfer between institutions.
-- `GET /listPendingStudents`: List all students pending institution transfer.
-
-Refer to `backend/index.js` for more endpoints and details.
-
-## Smart Contracts
-
-- `registerStud.sol`: Manages registration of students.
-- `student.sol`: Stores student profile and academic data.
-- `publicdata.sol`: Handles public-facing student data.
-- `verifystud.sol`: Verifies student registration and transfer.
-- Additional contracts for skills/certificates and institutional logic.
-
-Contract ABIs and deployment info are located in `backend/Files`.
-
-## Contributing
-
-Contributions are welcome! Please fork the repo and open a pull request with your improvements.
-
-## License
-
-This project is licensed under the MIT License.
