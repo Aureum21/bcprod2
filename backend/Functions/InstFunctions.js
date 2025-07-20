@@ -15,25 +15,39 @@ const contractJsonVerifyStud = JSON.parse(
 );
 const contractAbiVerifyStud = contractJsonVerifyStud.abi;
 //Institute contract
-const contractJsonInstitutePath = path.resolve(
+const contractJsonInstPath = path.resolve(
   __dirname,
   "../Files",
   "institute.json"
 );
-const contractJsonInstitute = JSON.parse(
-  fs.readFileSync(contractJsonInstitutePath)
+const contractJsonInst = JSON.parse(fs.readFileSync(contractJsonInstPath));
+const contractAbiInstitute = contractJsonInst.abi;
+
+//Register Institute contract
+const contractJsonRegInstPath = path.resolve(
+  __dirname,
+  "../Files",
+  "registerInst.json"
 );
-const contractAbiInstitute = contractJsonInstitute.abi;
+const contractJsonRegInst = JSON.parse(
+  fs.readFileSync(contractJsonRegInstPath)
+);
+const contractAbiRegInst = contractJsonRegInst.abi;
 const { getStudContract, getStudProfile } = require("./StudFunctions.js");
 
 const RegisterInstitutePrivateToPending = async (value) => {
   const web3 = new Web3(besu.member2.url);
   const web3quorum = new Web3Quorum(web3, chainId);
-  const contract = new web3quorum.eth.Contract(contractAbiInstitute);
+  const contract = new web3quorum.eth.Contract(contractAbiRegInst);
+  console.log("Contract ABI:", contract._jsonInterface);
   // eslint-disable-next-line no-underscore-dangle
   const functionAbi = contract._jsonInterface.find((e) => {
     return e.name === "registerInstToPending";
   });
+  if (!functionAbi) {
+    console.error("Function ABI for 'registerInstToPending' not found.");
+    return { error: "Function ABI not found" };
+  }
 
   const functionArgs = web3quorum.eth.abi
     .encodeParameters(functionAbi.inputs, [value[0], value[1], value[2]])
@@ -60,6 +74,7 @@ const RegisterStudentPrivateTransfer = async (value) => {
   const web3 = new Web3(besu.member2.url);
   const web3quorum = new Web3Quorum(web3, chainId);
   const contract = new web3quorum.eth.Contract(contractAbiVerifyStud);
+  console.log("Contract ABI:", contract._jsonInterface);
   const studentcontract = await getStudContract(value[0]);
   const studInfo = await getStudProfile(
     besu.member3.url,
@@ -71,6 +86,10 @@ const RegisterStudentPrivateTransfer = async (value) => {
   const functionAbi = contract._jsonInterface.find((e) => {
     return e.name === "addTransferStudToPending";
   });
+  if (!functionAbi) {
+    console.error("Function ABI for 'addTransferStudToPending' not found.");
+    return { error: "Function ABI not found" };
+  }
   const functionArgs = web3quorum.eth.abi
     .encodeParameters(functionAbi.inputs, [
       studInfo.name,
@@ -104,9 +123,14 @@ const getInstituteInfo = async (address) => {
   const web3quorum = new Web3Quorum(web3, chainId);
   console.log("address", address);
   const contract = new web3quorum.eth.Contract(contractAbiInstitute);
+  console.log("Contract ABI:", contract._jsonInterface);
   const functionAbi = contract._jsonInterface.find((e) => {
     return e.name === "getInstInfo";
   });
+  if (!functionAbi) {
+    console.error("Function ABI for 'getInstInfo' not found.");
+    return { error: "Function ABI not found" };
+  }
   console.log("functionAbi", functionAbi);
 
   const functionParams = {

@@ -1,4 +1,4 @@
-import { Grid, GridItem, HStack, Image, Spinner } from "@chakra-ui/react";
+import { Grid, GridItem, HStack, Image } from "@chakra-ui/react";
 import ColorMode from "../../components/ColorMode";
 import NavBar from "../../components/NavBar";
 import logoWhite from "../../assets/LogoWhite.svg";

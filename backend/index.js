@@ -112,7 +112,9 @@ app.post("/registerStudent", async (req, res) => {
 
 app.post("/registerInstituteToPending", async (req, res) => {
   const { name, institute_address, id } = req.body;
-
+  console.log("name", name);
+  console.log("institute_address", institute_address);
+  console.log("id", id);
   const resultPrivate = await RegisterInstitutePrivateToPending([
     institute_address,
     name,
