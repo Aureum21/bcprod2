@@ -1,4 +1,13 @@
-import { Box, Button, Card, Field, Input } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Card,
+  Field,
+  Input,
+  List,
+  Text,
+  VStack,
+} from "@chakra-ui/react";
 import type { ChangeEvent } from "react";
 import axios from "axios";
 import { useState } from "react";
@@ -62,9 +71,14 @@ const TransferRegister = ({ type }: Props) => {
       [e.target.name]: e.target.value,
     });
   }
+  const [searchTerm, setSearchTerm] = useState("");
+  const words = ["apple", "banana", "cherry", "date", "grape", "mango"];
 
+  const filteredWords = words.filter((word) =>
+    word.toLowerCase().includes(searchTerm.toLowerCase())
+  );
   return (
-    <Box width={"500px"}>
+    <Box width={{ base: "full", md: "700px" }}>
       <form
         onSubmit={(e) => {
           if (type === "register") {
@@ -90,7 +104,7 @@ const TransferRegister = ({ type }: Props) => {
             </Card.Description>
           </Card.Header>
           <Card.Body>
-            {type === "transfer" && (
+            {/* {type === "transfer" && (
               <Field.Root>
                 <Field.Label>Student Address:</Field.Label>
                 <Input
@@ -128,7 +142,42 @@ const TransferRegister = ({ type }: Props) => {
               {type === "fetch" && (
                 <Input name="fetch_stud_info" placeholder="Student Address" />
               )}
-            </Field.Root>
+            </Field.Root> */}
+
+            {/* New with Search bar */}
+            <Input
+              placeholder="Type to search..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              mb={4}
+            />
+            <List.Root variant="plain">
+              <VStack
+                width="full"
+                alignItems="start"
+                overflowY="scroll"
+                height="200px"
+                p={2}
+              >
+                {filteredWords.length > 0 ? (
+                  filteredWords.map((word, index) => (
+                    <List.Item
+                      width="full"
+                      key={index}
+                      bg="gray.100"
+                      p={2}
+                      rounded="md"
+                      gap={2}
+                      onClick={() => setSearchTerm(word)}
+                    >
+                      {word}
+                    </List.Item>
+                  ))
+                ) : (
+                  <Text color="gray.500">No results found.</Text>
+                )}
+              </VStack>
+            </List.Root>
           </Card.Body>
           <Card.Footer>
             <Button type="submit">

@@ -1,4 +1,14 @@
-import { Grid, GridItem, HStack, Image } from "@chakra-ui/react";
+import {
+  Box,
+  Grid,
+  GridItem,
+  HStack,
+  Image,
+  Input,
+  List,
+  ListItem,
+  Text,
+} from "@chakra-ui/react";
 import logoWhite from "../../assets/LogoWhite.svg";
 import logoBlack from "../../assets/LogoBlack.svg";
 import NavBar from "../../components/NavBar";
@@ -6,8 +16,17 @@ import ColorMode from "../../components/ColorMode";
 import TransferRegister from "../../components/TransferRegister";
 import { pages } from "./StudentHome";
 import { useColorMode } from "../../components/ui/color-mode";
+import { useState } from "react";
+
 const RegisterToInst = () => {
   const colorMode = useColorMode().colorMode;
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const words = ["apple", "banana", "cherry", "date", "grape", "mango"];
+
+  const filteredWords = words.filter((word) =>
+    word.toLowerCase().includes(searchTerm.toLowerCase())
+  );
   return (
     <Grid templateAreas={{ base: `"nav" "main"` }}>
       <GridItem area="nav" justifyContent={"space-between"}>

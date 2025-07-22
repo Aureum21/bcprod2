@@ -1,5 +1,4 @@
 // WARNING: the keys here are demo purposes ONLY. Please use a tool like EthSigner for production, rather than hard coding private keys
-
 export default {
   tessera: {
     member1: {
@@ -14,35 +13,35 @@ export default {
   },
   contractInformations: {
     registerStud: {
-      contractAddress: "0x30f553cdfe0005bbbe9a91afbb2e6d611c6ab3c2",
+      contractAddress: "0xb6118ce2774e7050ee6ec910167faf2ef3fc5042",
       from: "0xf0e2db6c8dc6c681bb5d6ad121a107f300e9b2b5",
       fromName: "member1",
       for: "0xca843569e3427144cead5e4d5999a3d0ccf92b8e",
       forName: ["member2"],
     },
     registerInst: {
-      contractAddress: "0x0f149d0a53a10420f8ce25a8824118bbb62b677d",
+      contractAddress: "0x798ba7b86675064b365fc770c451ca056e2e7040",
       from: "0xf0e2db6c8dc6c681bb5d6ad121a107f300e9b2b5",
       fromName: "member1",
       for: "0x0fbdc686b912d7722dc86510934589e0aaf3b55a",
       forName: ["member3"],
     },
     verifyInst: {
-      contractAddress: "0x6e2ea5309d6c092bd933381f808da152eb521911",
+      contractAddress: "0x471edab0fbde50e69420cc98bad7516f91e10c27",
       from: "0xf0e2db6c8dc6c681bb5d6ad121a107f300e9b2b5",
       fromName: "member1",
       for: "0xf0e2db6c8dc6c681bb5d6ad121a107f300e9b2b5",
       forName: ["member1"],
     },
     verifyStud: {
-      contractAddress: "0x07ea0d7f2104e7f8c7262282d8e0e79bee0fb0db",
+      contractAddress: "0x1c69bcd73cca022e6395deb4f8a6a1538cb50071",
       from: "0xf0e2db6c8dc6c681bb5d6ad121a107f300e9b2b5",
       fromName: "member1",
       for: "0xca843569e3427144cead5e4d5999a3d0ccf92b8e",
       forName: ["member2"],
     },
     publicdata: {
-      contractAddress: "0x38Fef9ccf460A4d296f8327eBF7A9DfbD9135709",
+      contractAddress: "0x899CE22c2142f60ecA9574c3781A076136D46373",
       from: "c9c913c8c3c1cd416d80a0abf475db2062f161f6",
       fromName: "rpcnode",
     },
