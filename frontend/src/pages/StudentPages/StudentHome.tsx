@@ -26,15 +26,18 @@ const StudentHome = () => {
   const colorMode = useColorMode().colorMode;
   const [data, setData] = useState<StudentInfo | undefined>(undefined);
   useEffect(() => {
-    axios
-      .get("http://localhost:5000/studentInformation", {
-        params: {
-          contractAddress: studentContractAddress,
-        },
-      })
-      .then((res) => {
-        setData(res.data);
-      });
+    !JSON.parse(sessionStorage.getItem("studentInfo") as string)
+      ? axios
+          .get("http://localhost:5000/studentInformation", {
+            params: {
+              contractAddress: studentContractAddress,
+            },
+          })
+          .then((res) => {
+            sessionStorage.setItem("studentInfo", JSON.stringify(res.data));
+            setData(res.data);
+          })
+      : null;
   }, []);
 
   return (
@@ -48,7 +51,17 @@ const StudentHome = () => {
       </GridItem>
       <GridItem area="main" padding={2}>
         <center>
-          {data ? <StudentInfomation data={data} /> : <InfoSkeleton />}
+          {JSON.parse(sessionStorage.getItem("studentInfo") as string) ? (
+            <StudentInfomation
+              data={
+                JSON.parse(
+                  sessionStorage.getItem("studentInfo") as string
+                ) as StudentInfo
+              }
+            />
+          ) : (
+            <InfoSkeleton />
+          )}
         </center>
       </GridItem>
     </Grid>
