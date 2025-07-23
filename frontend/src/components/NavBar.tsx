@@ -16,7 +16,7 @@ const NavBar = ({ pages, type }: Props) => {
               to={
                 "/" +
                 type.toLowerCase() +
-                "-" +
+                "/" +
                 page.toLowerCase().replace(/\s+/g, "-")
               }
             >

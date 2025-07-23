@@ -1,19 +1,11 @@
-import { Grid, GridItem, HStack, Image, VStack } from "@chakra-ui/react";
-import ColorMode from "../../components/ColorMode";
-import NavBar from "../../components/NavBar";
-import logoWhite from "../../assets/LogoWhite.svg";
-import logoBlack from "../../assets/LogoBlack.svg";
-import UploadCertificate from "../../components/UploadCertificate";
-import ShowData from "../../components/ShowData";
-import { pages } from "./StudentHome";
-import { useColorMode } from "../../components/ui/color-mode";
-import { useContext } from "react";
-import { Web3Context } from "../../Web3ContextProvider";
-import type { data } from "../../components/UploadCertificate";
+import { VStack } from "@chakra-ui/react";
 import axios from "axios";
 import type { FormEvent } from "react";
-import { useState } from "react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import ShowData from "../../components/ShowData";
+import type { data } from "../../components/UploadCertificate";
+import UploadCertificate from "../../components/UploadCertificate";
+import { useColorMode } from "../../components/ui/color-mode";
 interface addCert {
   name: string;
   institute: string;
@@ -55,29 +47,18 @@ const AddCert = () => {
     showData();
   }, []);
   return (
-    <Grid templateAreas={{ base: `"nav" "main"` }}>
-      <GridItem area="nav" justifyContent={"space-between"}>
-        <HStack justifyContent="space-between" padding={2}>
-          <Image src={colorMode === "dark" ? logoWhite : logoBlack} />
-          <NavBar pages={pages} type="Student"></NavBar>
-          <ColorMode />
-        </HStack>
-      </GridItem>
-      <GridItem area="main" padding={2}>
-        <center>
-          <VStack>
-            <UploadCertificate
-              onSubmit={onSubmit}
-              type="unOfficial"
-            ></UploadCertificate>
-            {certData.map((item) => {
-              console.log("item", item);
-              return <ShowData type="Certificate" data={item}></ShowData>;
-            })}
-          </VStack>
-        </center>
-      </GridItem>
-    </Grid>
+    <>
+      <VStack>
+        <UploadCertificate
+          onSubmit={onSubmit}
+          type="unOfficial"
+        ></UploadCertificate>
+        {certData.map((item) => {
+          console.log("item", item);
+          return <ShowData type="Certificate" data={item}></ShowData>;
+        })}
+      </VStack>
+    </>
   );
 };
 

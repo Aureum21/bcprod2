@@ -53,7 +53,7 @@ const Signup = () => {
           if (result.status === 200) {
             navigate("/Student-home");
           } else if (result.status === 500) {
-            navigate("/register");
+            navigate("/signup");
           }
         } else if (formData.role === "Institution") {
           const result = await axios.post(
@@ -67,7 +67,7 @@ const Signup = () => {
           if (result.status === 200) {
             navigate("/waiting-for-verification");
           } else if (result.status === 500) {
-            navigate("/register");
+            navigate("/signup");
           }
         }
       } else {

@@ -1,23 +1,11 @@
-import {
-  Center,
-  Grid,
-  GridItem,
-  HStack,
-  Image,
-  VStack,
-} from "@chakra-ui/react";
-import ColorMode from "../../components/ColorMode";
-import NavBar from "../../components/NavBar";
-import logoWhite from "../../assets/LogoWhite.svg";
-import logoBlack from "../../assets/LogoBlack.svg";
-import UploadCertificate from "../../components/UploadCertificate";
-import ShowData from "../../components/ShowData";
-import { pages } from "./StudentHome";
-import { useColorMode } from "../../components/ui/color-mode";
-import type { FormEvent } from "react";
-import type { data } from "../../components/UploadCertificate";
+import { HStack, VStack } from "@chakra-ui/react";
 import axios from "axios";
+import type { FormEvent } from "react";
 import { useEffect, useState } from "react";
+import ShowData from "../../components/ShowData";
+import { useColorMode } from "../../components/ui/color-mode";
+import type { data } from "../../components/UploadCertificate";
+import UploadCertificate from "../../components/UploadCertificate";
 interface Skill {
   name: string;
   experience: string;
@@ -68,28 +56,17 @@ const AddSkill = () => {
   }, []);
 
   return (
-    <Grid templateAreas={{ base: `"nav" "main"` }}>
-      <GridItem area="nav" justifyContent={"space-between"}>
-        <HStack justifyContent="space-between" padding={2}>
-          <Image src={colorMode === "dark" ? logoWhite : logoBlack} />
-          <NavBar pages={pages} type="Student"></NavBar>
-          <ColorMode />
-        </HStack>
-      </GridItem>
-      <GridItem area="main" padding={2}>
-        <Center>
-          <HStack gap={10} alignItems="start">
-            {skills.map((item) => {
-              return <ShowData type="Skill" data={item}></ShowData>;
-            })}
-            <UploadCertificate
-              onSubmit={handleUpload}
-              type="skill"
-            ></UploadCertificate>
-          </HStack>
-        </Center>
-      </GridItem>
-    </Grid>
+    <>
+      <VStack gap={10} alignItems="center">
+        {skills.map((item) => {
+          return <ShowData type="Skill" data={item}></ShowData>;
+        })}
+        <UploadCertificate
+          onSubmit={handleUpload}
+          type="skill"
+        ></UploadCertificate>
+      </VStack>
+    </>
   );
 };
 

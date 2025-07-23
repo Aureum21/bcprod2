@@ -22,10 +22,10 @@ const Choose = () => {
       const data = await check(connecdAccount);
       console.log("data: ", data);
 
-      if (data.type === "moe") navigate("/admin-home");
-      else if (data.type === "institute") navigate("/institution-home");
-      else if (data.type === "student") navigate("/Student-home");
-      else if (data.type === "rec") navigate("/rec-home");
+      if (data.type === "moe") navigate("/admin");
+      else if (data.type === "institute") navigate("/institution/home");
+      else if (data.type === "student") navigate("/student/home");
+      else if (data.type === "rec") navigate("/rec/home");
     }
   };
   return (
@@ -39,7 +39,7 @@ const Choose = () => {
           <Card.Description></Card.Description>
         </Card.Body>
         <Card.Footer justifyContent={"center"} spaceX={2}>
-          <RouterLink to="/register">
+          <RouterLink to="/signup">
             <Button variant="outline">SignUp</Button>
           </RouterLink>
           <Button onClick={handleLogin}>Login</Button>

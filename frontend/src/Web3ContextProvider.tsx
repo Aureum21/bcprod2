@@ -101,6 +101,7 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
         .ismoe()
         .call({ from: account });
       if (isMoe) {
+        sessionStorage.setItem("type", "moe");
         return { type: "moe", contAddress: "", node: "" };
       }
     } catch (err) {
@@ -116,6 +117,7 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
       if (value2[0] !== ZERO_ADDRESS) {
         setInstituteContractAddress(value2[0]);
         sessionStorage.setItem("instituteContractAddress", value2[0]);
+        sessionStorage.setItem("type", "institute");
         return { type: "institute", contAddress: value2[0], node: value2[1] };
       }
     } catch (err) {
@@ -131,6 +133,7 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
       if (value3[0] !== ZERO_ADDRESS) {
         setStudentContractAddress(value3[0]);
         sessionStorage.setItem("studentContractAddress", value3[0]);
+        sessionStorage.setItem("type", "student");
         return { type: "student", contAddress: value3[0], node: value3[1] };
       }
     } catch (err) {
