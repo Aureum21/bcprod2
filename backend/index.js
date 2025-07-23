@@ -223,10 +223,12 @@ app.post("/regStudToInstPending", async (req, res) => {
   }
 });
 app.post("/regStudToInstTransfer", async (req, res) => {
-  const { student_address, current_institute_address, new_institute_address } =
+  const { student_address, current_institute_address, new_institute_name } =
     req.body;
   console.log("student_address", student_address);
   console.log("current_institute_address", current_institute_address);
+  console.log("new_institute_name", new_institute_name);
+  const new_institute_address = await getInstituteAddress(new_institute_name);
   console.log("new_institute_address", new_institute_address);
   const resultPrivate = await RegisterStudentPrivateTransfer([
     student_address,
