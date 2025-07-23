@@ -59,9 +59,16 @@ const PendingStud = () => {
             {pendings.length === 0 ? (
               <Spinner />
             ) : (
-              pendings.map((pending, index) => (
-                <Pending key={index} data={pending} type="pending"></Pending>
-              ))
+              pendings.map((pending, index) =>
+                pending.address !==
+                "0x0000000000000000000000000000000000000000" ? (
+                  <Pending key={index} data={pending} type="pending"></Pending>
+                ) : (
+                  <>
+                    <Text>No Pending Students</Text>
+                  </>
+                )
+              )
             )}
           </VStack>
         </Box>
@@ -80,9 +87,20 @@ const PendingStud = () => {
             {transfer.length === 0 ? (
               <Spinner />
             ) : (
-              transfer.map((transfer, index) => (
-                <Pending key={index} data={transfer} type="transfer"></Pending>
-              ))
+              transfer.map((transfer, index) =>
+                transfer.address !==
+                "0x0000000000000000000000000000000000000000" ? (
+                  <Pending
+                    key={index}
+                    data={transfer}
+                    type="transfer"
+                  ></Pending>
+                ) : (
+                  <>
+                    <Text>No Transfer Students</Text>
+                  </>
+                )
+              )
             )}
           </VStack>
         </Box>
