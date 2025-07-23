@@ -29,7 +29,9 @@ const Signup = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const account = await connect();
+
     console.log(account);
+
     if (account) {
       const data = await check(account);
       console.log("data: ", data);

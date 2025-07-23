@@ -6,6 +6,7 @@ const path = require("path");
 const fs = require("fs-extra");
 const Web3 = require("web3");
 const Web3Quorum = require("web3js-quorum");
+
 const PORT = process.env.PORT || 5000;
 const {
   createStudContract,
@@ -41,6 +42,8 @@ const {
   ListPendingInstitutes,
   VerifyInstitute,
   registerInstToPublic,
+  ListInstitutes,
+  getInstituteAddress,
 } = require("./Functions/AdminFunctions.js");
 const { getUnOfficialCert, getWorkExp } = require("./Functions/getcerts.js");
 const chainId = 1337;
@@ -205,7 +208,8 @@ app.get("/studentInformation", async (req, res) => {
 });
 
 app.post("/regStudToInstPending", async (req, res) => {
-  const { student_address, institute_address } = req.body;
+  const { student_address, institute_name } = req.body;
+  const institute_address = await getInstituteAddress(institute_name);
 
   const resultPrivate = await RegisterStudentPrivateToPending([
     student_address,
@@ -390,6 +394,11 @@ app.get("/getInstituteInfo", async (req, res) => {
   const info = await getInstituteInfo(req.query.contractAddress);
   console.log(info);
   res.status(200).json(info);
+});
+app.get("/getInstList", async (req, res) => {
+  const institutes = await ListInstitutes();
+  console.log(institutes);
+  res.status(200).json(institutes);
 });
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

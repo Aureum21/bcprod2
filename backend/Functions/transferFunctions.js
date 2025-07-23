@@ -218,6 +218,7 @@ const ListTransferStudents = async () => {
   return students;
 };
 const addInstTostudInfo = async (index, key, institute_address) => {
+  console.log("Args", index, key, institute_address);
   const web3 = new Web3(besu.member3.url);
   const web3quorum = new Web3Quorum(web3, chainId);
   const contract = new web3quorum.eth.Contract(contractAbiRegStud);

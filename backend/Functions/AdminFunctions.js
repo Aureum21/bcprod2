@@ -148,6 +148,36 @@ const GenerateKey = async (
   return result.output;
 };
 
+const removePendingInstitute = async (index, key) => {
+  const web3 = new Web3(besu.member1.url);
+  const web3quorum = new Web3Quorum(web3, chainId);
+  const contract = new web3quorum.eth.Contract(contractAbiRegInst);
+  // eslint-disable-next-line no-underscore-dangle
+  const functionAbi = contract._jsonInterface.find((e) => {
+    return e.name === "removePendingInstitute";
+  });
+
+  const functionArgs = web3quorum.eth.abi
+    .encodeParameters(functionAbi.inputs, [key, index])
+    .slice(2);
+  const functionParams = {
+    to: contractInformations.registerInst.contractAddress,
+    data: functionAbi.signature + functionArgs,
+    privateKey: besu.member1.accountPrivateKey,
+    privateFrom: tessera.member1.publicKey,
+    privateFor: [tessera.member2.publicKey],
+  };
+  const transactionHash = await web3quorum.priv.generateAndSendRawTransaction(
+    functionParams
+  );
+  // console.log(`Transaction hash: ${transactionHash}`);
+  const result = await web3quorum.priv.waitForTransactionReceipt(
+    transactionHash
+  );
+
+  return result;
+};
+
 const VerifyInstitute = async (info) => {
   const web3 = new Web3(besu.member1.url);
   const web3quorum = new Web3Quorum(web3, chainId);
@@ -158,12 +188,13 @@ const VerifyInstitute = async (info) => {
   const functionAbi = contract._jsonInterface.find((e) => {
     return e.name === "verifyInstitution";
   });
+
   console.log("index", info.index, "address", info.InstContractAddress);
   const functionArgs = web3quorum.eth.abi
     .encodeParameters(functionAbi.inputs, [
-      key,
-      info.index,
       info.InstContractAddress,
+      info.name,
+      info.address,
     ])
     .slice(2);
   console.log("functionArgs", functionArgs);
@@ -172,7 +203,7 @@ const VerifyInstitute = async (info) => {
     data: functionAbi.signature + functionArgs,
     privateKey: besu.member1.accountPrivateKey,
     privateFrom: tessera.member1.publicKey,
-    privateFor: [tessera.member2.publicKey],
+    privateFor: [tessera.member1.publicKey],
   };
   console.log("functionParams", functionParams);
   const transactionHash = await web3quorum.priv.generateAndSendRawTransaction(
@@ -183,6 +214,9 @@ const VerifyInstitute = async (info) => {
   const result = await web3quorum.priv.waitForTransactionReceipt(
     transactionHash
   );
+  console.log("VerifyInstitute result", result);
+  const removeResult = await removePendingInstitute(info.index, key);
+  console.log("removeResult", removeResult);
   return result;
 };
 
@@ -222,49 +256,80 @@ const registerInstToPublic = async (value) => {
 
   return receipt;
 };
-const removePendingInst = async (
-  clientUrl,
-  info,
-  fromPrivateKey,
-  fromPublicKey,
-  toPublicKey
-) => {
-  const key = await GenerateKey(
-    clientUrl,
-    { address: info.address, id: info.id },
-    fromPrivateKey,
-    fromPublicKey,
-    toPublicKey
-  );
-  const web3 = new Web3(clientUrl);
+
+const ListInstitutes = async () => {
+  const web3 = new Web3(besu.member1.url);
   const web3quorum = new Web3Quorum(web3, chainId);
-  const contract = new web3quorum.eth.Contract(contractAbiRegInst);
-  // eslint-disable-next-line no-underscore-dangle
+  const contract = new web3quorum.eth.Contract(contractAbiVerifyInst);
+  console.log("Contract ABI:", contract._jsonInterface);
   const functionAbi = contract._jsonInterface.find((e) => {
-    return e.name === "removePendingInstitute";
+    return e.name === "getInstList";
   });
-  const functionArgs = web3quorum.eth.abi
-    .encodeParameters(functionAbi.inputs, [key, info.index])
-    .slice(2);
+
+  console.log("functionAbi", functionAbi);
+
   const functionParams = {
-    to: contractInformations.registerInst.contractAddress,
-    data: functionAbi.signature + functionArgs,
-    privateKey: fromPrivateKey,
-    privateFrom: fromPublicKey,
-    privateFor: [toPublicKey],
+    to: contractInformations.verifyInst.contractAddress,
+    data: functionAbi.signature,
+    privateKey: besu.member1.accountPrivateKey,
+    privateFrom: tessera.member1.publicKey,
+    privateFor: [tessera.member1.publicKey],
   };
+  console.log("functionParams", functionParams);
   const transactionHash = await web3quorum.priv.generateAndSendRawTransaction(
     functionParams
   );
-  // console.log(`Transaction hash: ${transactionHash}`);
   const result = await web3quorum.priv.waitForTransactionReceipt(
     transactionHash
   );
-  return result;
+  const decodedResult = web3quorum.eth.abi.decodeParameters(
+    functionAbi.outputs,
+    result.output
+  );
+  console.log("decodedResult", decodedResult[0]);
+
+  return decodedResult[0];
+};
+const getInstituteAddress = async (name) => {
+  const web3 = new Web3(besu.member1.url);
+  const web3quorum = new Web3Quorum(web3, chainId);
+  const contract = new web3quorum.eth.Contract(contractAbiVerifyInst);
+  console.log("Contract ABI:", contract._jsonInterface);
+  const functionAbi = contract._jsonInterface.find((e) => {
+    return e.name === "getAddresByName";
+  });
+
+  console.log("functionAbi", functionAbi);
+
+  const functionArgs = web3quorum.eth.abi
+    .encodeParameters(functionAbi.inputs, [name])
+    .slice(2);
+  const functionParams = {
+    to: contractInformations.verifyInst.contractAddress,
+    data: functionAbi.signature + functionArgs,
+    privateKey: besu.member1.accountPrivateKey,
+    privateFrom: tessera.member1.publicKey,
+    privateFor: [tessera.member1.publicKey],
+  };
+  console.log("functionParams", functionParams);
+  const transactionHash = await web3quorum.priv.generateAndSendRawTransaction(
+    functionParams
+  );
+  const result = await web3quorum.priv.waitForTransactionReceipt(
+    transactionHash
+  );
+  const decodedResult = web3quorum.eth.abi.decodeParameters(
+    functionAbi.outputs,
+    result.output
+  );
+  console.log("decodedResult", decodedResult);
+
+  return decodedResult[0];
 };
 module.exports = {
   ListPendingInstitutes,
   VerifyInstitute,
   registerInstToPublic,
-  removePendingInst,
+  ListInstitutes,
+  getInstituteAddress,
 };

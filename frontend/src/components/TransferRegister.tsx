@@ -10,13 +10,14 @@ import {
 } from "@chakra-ui/react";
 import type { ChangeEvent } from "react";
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 interface Props {
   type: "transfer" | "register" | "fetch";
 }
 
 const TransferRegister = ({ type }: Props) => {
+  const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
   const account = sessionStorage.getItem("account") as string;
   const [formDataPending, setFormDataPending] = useState({
@@ -26,16 +27,18 @@ const TransferRegister = ({ type }: Props) => {
     student_address: "",
     new_institute_address: "",
   });
+  const [institutes, setInstitutes] = useState<string[]>([]);
 
   async function handleSubmittoPending(
     e: React.FormEvent<HTMLFormElement>
   ): Promise<void> {
+    console.log(searchTerm);
     e.preventDefault();
     const result = await axios.post(
       "http://localhost:5000/regStudToInstPending",
       {
         student_address: account,
-        institute_address: formDataPending.institute_address,
+        institute_name: searchTerm,
       }
     );
     if (result.status === 200) {
@@ -53,7 +56,7 @@ const TransferRegister = ({ type }: Props) => {
       {
         student_address: formDataTransfer.student_address,
         current_institute_address: account,
-        new_institute_address: formDataTransfer.new_institute_address,
+        new_institute_name: searchTerm,
       }
     );
     if (result.status === 200) {
@@ -71,12 +74,19 @@ const TransferRegister = ({ type }: Props) => {
       [e.target.name]: e.target.value,
     });
   }
-  const [searchTerm, setSearchTerm] = useState("");
-  const words = ["apple", "banana", "cherry", "date", "grape", "mango"];
 
-  const filteredWords = words.filter((word) =>
+  useEffect(() => {
+    const fetchInstitutes = async () => {
+      const institutes = await axios.get("http://localhost:5000/getInstList");
+      setInstitutes(institutes.data);
+    };
+    fetchInstitutes();
+  }, []);
+
+  const filteredWords = institutes.filter((word) =>
     word.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
   return (
     <Box width={{ base: "full", md: "700px" }}>
       <form
@@ -104,7 +114,7 @@ const TransferRegister = ({ type }: Props) => {
             </Card.Description>
           </Card.Header>
           <Card.Body>
-            {/* {type === "transfer" && (
+            {type === "transfer" && (
               <Field.Root>
                 <Field.Label>Student Address:</Field.Label>
                 <Input
@@ -123,61 +133,50 @@ const TransferRegister = ({ type }: Props) => {
                   ? "Fetch from:"
                   : "Transfer to:"}
               </Field.Label>
-              {type === "transfer" && (
-                <Input
-                  name="new_institute_address"
-                  placeholder="New Institute Address"
-                  value={formDataTransfer.new_institute_address}
-                  onChange={handleChangeTransfer}
-                />
+              {(type === "transfer" || type === "register") && (
+                <>
+                  <Input
+                    placeholder="Type to search..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    mb={4}
+                  />
+                  <List.Root variant="plain" width="full">
+                    <VStack
+                      width="full"
+                      alignItems="start"
+                      overflowY="scroll"
+                      height="200px"
+                      p={2}
+                    >
+                      {filteredWords.length > 0 ? (
+                        filteredWords.map((word, index) => (
+                          <List.Item
+                            width="full"
+                            key={index}
+                            bg="gray.100"
+                            p={2}
+                            rounded="md"
+                            gap={2}
+                            onClick={() => setSearchTerm(word)}
+                          >
+                            {word}
+                          </List.Item>
+                        ))
+                      ) : (
+                        <Text color="gray.500">No results found.</Text>
+                      )}
+                    </VStack>
+                  </List.Root>
+                </>
               )}
-              {type === "register" && (
-                <Input
-                  name="institute_address"
-                  placeholder="Institute Address"
-                  value={formDataPending.institute_address}
-                  onChange={handleChangepending}
-                />
-              )}
+
               {type === "fetch" && (
                 <Input name="fetch_stud_info" placeholder="Student Address" />
               )}
-            </Field.Root> */}
+            </Field.Root>
 
             {/* New with Search bar */}
-            <Input
-              placeholder="Type to search..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              mb={4}
-            />
-            <List.Root variant="plain">
-              <VStack
-                width="full"
-                alignItems="start"
-                overflowY="scroll"
-                height="200px"
-                p={2}
-              >
-                {filteredWords.length > 0 ? (
-                  filteredWords.map((word, index) => (
-                    <List.Item
-                      width="full"
-                      key={index}
-                      bg="gray.100"
-                      p={2}
-                      rounded="md"
-                      gap={2}
-                      onClick={() => setSearchTerm(word)}
-                    >
-                      {word}
-                    </List.Item>
-                  ))
-                ) : (
-                  <Text color="gray.500">No results found.</Text>
-                )}
-              </VStack>
-            </List.Root>
           </Card.Body>
           <Card.Footer>
             <Button type="submit">
