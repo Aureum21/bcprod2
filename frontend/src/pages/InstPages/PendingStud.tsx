@@ -1,35 +1,34 @@
 import { HStack, VStack, Text, Box, Spinner } from "@chakra-ui/react";
 import Pending, { type Data } from "../../components/Pending";
-import { useColorMode } from "../../components/ui/color-mode";
 import { useEffect, useState } from "react";
 import axios from "axios";
 const PendingStud = () => {
-  const colorMode = useColorMode().colorMode;
-  const [pendings, setPendings] = useState<Data[]>([]);
-  const [transfer, setTransfer] = useState<Data[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const transferRes = await axios.get(
-          "http://localhost:5000/listTransferStudents"
-        );
-        console.log("transferRes.data: ", transferRes.data);
-        console.log(transferRes.data);
-        setTransfer(
-          Array.isArray(transferRes.data)
-            ? transferRes.data
-            : [transferRes.data]
-        );
+        setIsLoading(true);
+        await axios
+          .get("http://localhost:5000/listTransferStudents")
+          .then((res) => {
+            sessionStorage.setItem(
+              "transfer",
+              JSON.stringify(res.data as Data[])
+            );
+          });
 
-        const pendingRes = await axios.get(
-          "http://localhost:5000/listPendingStudents"
-        );
-        console.log(pendingRes.data);
-        setPendings(
-          Array.isArray(pendingRes.data) ? pendingRes.data : [pendingRes.data]
-        );
+        await axios
+          .get("http://localhost:5000/listPendingStudents")
+          .then((res) => {
+            sessionStorage.setItem(
+              "pending",
+              JSON.stringify(res.data as Data[])
+            );
+          });
       } catch (error) {
         console.error("Error fetching data:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -55,11 +54,19 @@ const PendingStud = () => {
             <Text fontWeight="bold" padding={2}>
               Registration Pending Students
             </Text>
-            {/* there are multiple pending students */}
-            {pendings.length === 0 ? (
-              <Spinner />
+            {JSON.parse(sessionStorage.getItem("pending") as string).length ===
+            0 ? (
+              isLoading ? (
+                <Spinner />
+              ) : (
+                <Text>No Pending Students</Text>
+              )
             ) : (
-              pendings.map((pending, index) =>
+              (
+                JSON.parse(
+                  sessionStorage.getItem("pending") as string
+                ) as Data[]
+              ).map((pending, index) =>
                 pending.address !==
                 "0x0000000000000000000000000000000000000000" ? (
                   <Pending key={index} data={pending} type="pending"></Pending>
@@ -83,11 +90,19 @@ const PendingStud = () => {
             <Text fontWeight="bold" padding={2}>
               Transfer Pending Students
             </Text>
-            {/* there are multiple transfer students */}
-            {transfer.length === 0 ? (
-              <Spinner />
+            {JSON.parse(sessionStorage.getItem("transfer") as string).length ===
+            0 ? (
+              isLoading ? (
+                <Spinner />
+              ) : (
+                <Text>No Transfer Students</Text>
+              )
             ) : (
-              transfer.map((transfer, index) =>
+              (
+                JSON.parse(
+                  sessionStorage.getItem("transfer") as string
+                ) as Data[]
+              ).map((transfer, index) =>
                 transfer.address !==
                 "0x0000000000000000000000000000000000000000" ? (
                   <Pending

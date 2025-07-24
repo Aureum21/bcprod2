@@ -51,7 +51,7 @@ const Signup = () => {
             }
           );
           if (result.status === 200) {
-            navigate("/Student-home");
+            navigate("/student/home");
           } else if (result.status === 500) {
             navigate("/signup");
           }
