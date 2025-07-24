@@ -17,6 +17,9 @@ import InstHome from "./pages/InstPages/InstHome";
 import PendingStud from "./pages/InstPages/PendingStud";
 import Transfer from "./pages/InstPages/Transfer";
 import AddOfficialCert from "./pages/InstPages/AddOfficialCert";
+import RecLayout from "./layouts/RecLayout";
+import RecHome from "./pages/RecruiterPages/RecHome";
+import Status from "./pages/InstPages/Status";
 const routes = createBrowserRouter([
   {
     path: "/",
@@ -55,7 +58,13 @@ const routes = createBrowserRouter([
       { path: "pending-students", element: <PendingStud /> },
       { path: "transfer-students", element: <Transfer /> },
       { path: "add-certificate", element: <AddOfficialCert /> },
+      { path: "status", element: <Status /> },
     ],
+  },
+  {
+    path: "/rec",
+    element: <RecLayout></RecLayout>,
+    children: [{ index: true, element: <RecHome /> }],
   },
 ]);
 export default routes;

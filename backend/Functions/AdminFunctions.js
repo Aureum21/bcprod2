@@ -5,6 +5,7 @@ const path = require("path");
 const fs = require("fs-extra");
 const { verify } = require("crypto");
 const { contractInformations, besu, tessera } = require("../Files/keys.js");
+const { formatCurrentDate } = require("./InstFunctions.js");
 const contractJsonRegInstPath = path.resolve(
   __dirname,
   "../Files",
@@ -220,6 +221,42 @@ const VerifyInstitute = async (info) => {
   return result;
 };
 
+const updateInstStatus = async (value) => {
+  const verDate = formatCurrentDate();
+  const host = besu.rpcnode.url;
+  const web3 = new Web3(host);
+  const account = web3.eth.accounts.privateKeyToAccount(
+    besu.member1.accountPrivateKey
+  );
+  const fromAddress = account.address;
+
+  const contractInstance = new web3.eth.Contract(
+    contractAbiPublicData,
+    contractInformations.publicdata.contractAddress
+  );
+
+  // Encode function call
+  const data = contractInstance.methods
+    .verifyInstitute(value, verDate)
+    .encodeABI();
+
+  const tx = {
+    to: contractInformations.publicdata.contractAddress,
+    data: data,
+    gas: 150000, // or tune it
+    gasPrice: "0x0", // for Besu/Quorum, no fees
+    from: fromAddress,
+  };
+
+  const signed = await web3.eth.accounts.signTransaction(
+    tx,
+    besu.member1.accountPrivateKey
+  );
+  const receipt = await web3.eth.sendSignedTransaction(signed.rawTransaction);
+
+  return receipt;
+};
+
 const registerInstToPublic = async (value) => {
   const host = besu.rpcnode.url;
   const web3 = new Web3(host);
@@ -253,8 +290,10 @@ const registerInstToPublic = async (value) => {
     besu.member2.accountPrivateKey
   );
   const receipt = await web3.eth.sendSignedTransaction(signed.rawTransaction);
-
-  return receipt;
+  if (receipt.status === true) {
+    const stat = await updateInstStatus(value[0]);
+    return stat;
+  }
 };
 
 const ListInstitutes = async () => {

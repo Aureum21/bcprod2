@@ -118,6 +118,7 @@ app.post("/registerInstituteToPending", async (req, res) => {
   console.log("name", name);
   console.log("institute_address", institute_address);
   console.log("id", id);
+
   const resultPrivate = await RegisterInstitutePrivateToPending([
     institute_address,
     name,
@@ -125,7 +126,7 @@ app.post("/registerInstituteToPending", async (req, res) => {
   ]);
 
   console.log(resultPrivate);
-  if (resultPrivate.status === "0x1") {
+  if (resultPrivate.status === true) {
     res.status(200).json({ message: "Institute registered successfully" });
   } else {
     res.status(500).json({ message: "Failed to register institute" });

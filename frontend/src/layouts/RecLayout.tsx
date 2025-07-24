@@ -17,7 +17,9 @@ const RecLayout = () => {
         </HStack>
       </GridItem>
       <GridItem area="main" padding={2}>
-        <Outlet></Outlet>
+        <center>
+          <Outlet></Outlet>
+        </center>
       </GridItem>
     </Grid>
   );

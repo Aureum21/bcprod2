@@ -29,6 +29,7 @@ const InstLayout = () => {
               "Pending Students",
               "Transfer Students",
               "Add Certificate",
+              "Status",
             ]}
             type="Institution"
           ></NavBar>

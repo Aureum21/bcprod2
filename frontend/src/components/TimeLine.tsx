@@ -1,37 +1,64 @@
-import { Card, Text, Timeline } from "@chakra-ui/react";
-import { LuCheck, LuPackage } from "react-icons/lu";
+import { Card, Timeline } from "@chakra-ui/react";
+import { useState, useContext, useEffect } from "react";
+import { LuPackage, LuCheck } from "react-icons/lu";
 import { MdOutlinePendingActions } from "react-icons/md";
+import { Web3Context } from "../Web3ContextProvider";
 
-const timelineEvents = [
-  {
-    title: "Registerd To Pending",
-    description: "18th May 2021",
-    icon: MdOutlinePendingActions,
-    status: "completed",
-  },
-  {
-    title: "Waiting For Verification By MOE",
-    description: "18th May 2021",
-    icon: LuPackage,
-    status: "completed",
-  },
-  {
-    title: "Account Verified",
-    description: "20th May 2021, 10:30am",
-    icon: LuCheck,
-    status: "pending",
-  },
-];
+interface TimelineEvent {
+  title: string;
+  description: string;
+  icon: any;
+  status: string;
+}
 const getColor = (status: string) =>
   status === "completed" ? "white" : "gray";
 const getTextColor = (status: string) => {
   return status === "completed" ? "Black" : "gray";
 };
-
 const TimeLine = () => {
+  const [timelineEvents, setTimelineEvents] = useState<TimelineEvent[]>([]);
+  const { getStatus } = useContext(Web3Context);
+
+  useEffect(() => {
+    const fetchStatusAndSetTimeline = async () => {
+      const account = sessionStorage.getItem("account");
+      if (!account) return;
+
+      await getStatus(account); // fetches status and stores in sessionStorage
+
+      const Status = JSON.parse(sessionStorage.getItem("Status") || "{}");
+
+      const events: TimelineEvent[] = [
+        {
+          title: "Registerd To Pending",
+          description: Status?.registrationDate || "Not available",
+          icon: MdOutlinePendingActions,
+          status: "completed",
+        },
+        {
+          title: "Waiting For Verification By MOE",
+          description: Status?.verificationDate || "Not available",
+          icon: LuPackage,
+          status: "completed",
+        },
+        {
+          title: "Account Verified",
+          description: Status?.isVerified ? "Verified" : "Pending",
+          icon: LuCheck,
+          status: Status?.isVerified ? "completed" : "pending",
+        },
+      ];
+
+      setTimelineEvents(events);
+    };
+
+    fetchStatusAndSetTimeline();
+  }, []);
+
   const latestCompleted = [...timelineEvents]
     .reverse()
     .find((event) => event.status === "completed");
+
   return (
     <Card.Root>
       <Card.Header>
@@ -47,7 +74,7 @@ const TimeLine = () => {
                 <Timeline.Connector>
                   <Timeline.Separator />
                   <Timeline.Indicator color={getColor(event.status)}>
-                    <IconComponent></IconComponent>
+                    <IconComponent />
                   </Timeline.Indicator>
                 </Timeline.Connector>
                 <Timeline.Content>
@@ -66,4 +93,5 @@ const TimeLine = () => {
     </Card.Root>
   );
 };
+
 export default TimeLine;

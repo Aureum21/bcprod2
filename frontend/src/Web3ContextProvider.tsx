@@ -24,6 +24,7 @@ interface Web3ContextType {
   check: (account: string) => Promise<UserData>;
   studentContractAddress: string;
   instituteContractAddress: string;
+  getStatus: (account: string) => Promise<void>;
 }
 
 export const Web3Context = createContext<Web3ContextType>({
@@ -36,12 +37,13 @@ export const Web3Context = createContext<Web3ContextType>({
   },
   studentContractAddress: "",
   instituteContractAddress: "",
+  getStatus: async (account: string) => {},
 });
 
 interface Web3ProviderProps {
   children: ReactNode;
 }
-
+type InstDetails = [boolean, string, string];
 export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
   const [studentContractAddress, setStudentContractAddress] =
     useState<string>("");
@@ -143,6 +145,46 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
     console.log("Redirecting to REC, no other roles found, account: ");
     return { type: "rec", contAddress: "", node: "" };
   };
+  const getStatus = async (account: string) => {
+    const web3Instance = new Web3(window.ethereum);
+    const contractInstance = new web3Instance.eth.Contract(
+      publicdata.abi,
+      contInfo.publicdata.contractAddress
+    );
+
+    if (sessionStorage.getItem("type") === "student") {
+      const result = await contractInstance.methods
+        .getStudDetails(account)
+        .call({ from: besu.member3.accountAddress });
+
+      console.log("studStatus", result);
+
+      // Ensure it's an array before destructuring
+      if (Array.isArray(result)) {
+        const [isVerified, registrationDate, verificationDate] = result;
+        // use them as needed
+        sessionStorage.setItem(
+          "Status",
+          JSON.stringify({ isVerified, registrationDate, verificationDate })
+        );
+      } else {
+        console.error("getStudDetails did not return an array:", result);
+      }
+    } else {
+      const result: string[] = await contractInstance.methods
+        .getInstDetails(account)
+        .call({ from: besu.member2.accountAddress });
+
+      console.log("instituteStatus", result);
+      const isVerified = result[0];
+      const registrationDate = result[1];
+      const verificationDate = result[2];
+      sessionStorage.setItem(
+        "Status",
+        JSON.stringify({ isVerified, registrationDate, verificationDate })
+      );
+    }
+  };
 
   return (
     <Web3Context.Provider
@@ -154,6 +196,7 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
         check,
         studentContractAddress,
         instituteContractAddress,
+        getStatus,
       }}
     >
       {children}
