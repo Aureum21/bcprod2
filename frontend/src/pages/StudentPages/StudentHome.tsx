@@ -1,7 +1,6 @@
 import StudentInfomation, {
   type StudentInfo,
 } from "../../components/StudentInfomation";
-import { useColorMode } from "../../components/ui/color-mode";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import InfoSkeleton from "../../components/InfoSkeleton";
@@ -17,8 +16,8 @@ const StudentHome = () => {
   const studentContractAddress = sessionStorage.getItem(
     "studentContractAddress"
   );
+  const [studentInfo, setStudentInfo] = useState<StudentInfo | null>(null);
   console.log("studentContractAddress from this", studentContractAddress);
-  const [data, setData] = useState<StudentInfo | undefined>(undefined);
   useEffect(() => {
     !JSON.parse(sessionStorage.getItem("studentInfo") as string)
       ? axios
@@ -28,8 +27,8 @@ const StudentHome = () => {
             },
           })
           .then((res) => {
+            setStudentInfo(res.data);
             sessionStorage.setItem("studentInfo", JSON.stringify(res.data));
-            setData(res.data);
           })
       : null;
   }, []);

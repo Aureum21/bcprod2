@@ -27,7 +27,15 @@ const TransferRegister = ({ type }: Props) => {
     student_address: "",
     new_institute_address: "",
   });
-  const [institutes, setInstitutes] = useState<string[]>([]);
+  const [institutes, setInstitutes] = useState<string[]>(() => {
+    const stored = sessionStorage.getItem("instituteList");
+    try {
+      return stored ? JSON.parse(stored) : [];
+    } catch (err) {
+      console.error("Failed to parse instituteList from sessionStorage", err);
+      return [];
+    }
+  });
 
   async function handleSubmittoPending(
     e: React.FormEvent<HTMLFormElement>
@@ -44,7 +52,7 @@ const TransferRegister = ({ type }: Props) => {
     if (result.status === 200) {
       navigate("/waiting-for-verification");
     } else if (result.status === 500) {
-      navigate("/Student-register-institution");
+      navigate("/Student/register-institution");
     }
   }
   async function handleSubmitTransfer(
@@ -60,9 +68,9 @@ const TransferRegister = ({ type }: Props) => {
       }
     );
     if (result.status === 200) {
-      navigate("/institution-home");
+      navigate("/institution/home");
     } else if (result.status === 500) {
-      navigate("/institution-transfer-students");
+      navigate("/institution/transfer-students");
     }
   }
   function handleChangepending(e: ChangeEvent<HTMLInputElement>): void {
@@ -78,7 +86,10 @@ const TransferRegister = ({ type }: Props) => {
   useEffect(() => {
     const fetchInstitutes = async () => {
       const institutes = await axios.get("http://localhost:5000/getInstList");
-      setInstitutes(institutes.data);
+      sessionStorage.setItem("instituteList", JSON.stringify(institutes.data));
+      setInstitutes(
+        JSON.parse(sessionStorage.getItem("instituteList") as string)
+      );
     };
     fetchInstitutes();
   }, []);

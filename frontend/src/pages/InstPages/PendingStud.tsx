@@ -4,6 +4,13 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 const PendingStud = () => {
   const [isLoading, setIsLoading] = useState(true);
+  const [transfer, setTransfer] = useState<Data[]>(
+    JSON.parse(sessionStorage.getItem("transfer") || "[]")
+  );
+  const [pending, setPending] = useState<Data[]>(
+    JSON.parse(sessionStorage.getItem("pending") || "[]")
+  );
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -11,18 +18,18 @@ const PendingStud = () => {
         await axios
           .get("http://localhost:5000/listTransferStudents")
           .then((res) => {
-            sessionStorage.setItem(
-              "transfer",
-              JSON.stringify(res.data as Data[])
+            sessionStorage.setItem("transfer", JSON.stringify(res.data));
+            setTransfer(
+              JSON.parse(sessionStorage.getItem("transfer") as string) as Data[]
             );
           });
 
         await axios
           .get("http://localhost:5000/listPendingStudents")
           .then((res) => {
-            sessionStorage.setItem(
-              "pending",
-              JSON.stringify(res.data as Data[])
+            sessionStorage.setItem("pending", JSON.stringify(res.data));
+            setPending(
+              JSON.parse(sessionStorage.getItem("pending") as string) as Data[]
             );
           });
       } catch (error) {
@@ -54,19 +61,14 @@ const PendingStud = () => {
             <Text fontWeight="bold" padding={2}>
               Registration Pending Students
             </Text>
-            {JSON.parse(sessionStorage.getItem("pending") as string).length ===
-            0 ? (
+            {pending.length === 0 ? (
               isLoading ? (
                 <Spinner />
               ) : (
                 <Text>No Pending Students</Text>
               )
             ) : (
-              (
-                JSON.parse(
-                  sessionStorage.getItem("pending") as string
-                ) as Data[]
-              ).map((pending, index) =>
+              pending.map((pending, index) =>
                 pending.address !==
                 "0x0000000000000000000000000000000000000000" ? (
                   <Pending key={index} data={pending} type="pending"></Pending>
@@ -90,19 +92,14 @@ const PendingStud = () => {
             <Text fontWeight="bold" padding={2}>
               Transfer Pending Students
             </Text>
-            {JSON.parse(sessionStorage.getItem("transfer") as string).length ===
-            0 ? (
+            {transfer.length === 0 ? (
               isLoading ? (
                 <Spinner />
               ) : (
                 <Text>No Transfer Students</Text>
               )
             ) : (
-              (
-                JSON.parse(
-                  sessionStorage.getItem("transfer") as string
-                ) as Data[]
-              ).map((transfer, index) =>
+              transfer.map((transfer, index) =>
                 transfer.address !==
                 "0x0000000000000000000000000000000000000000" ? (
                   <Pending
@@ -111,9 +108,7 @@ const PendingStud = () => {
                     type="transfer"
                   ></Pending>
                 ) : (
-                  <>
-                    <Text>No Transfer Students</Text>
-                  </>
+                  <></>
                 )
               )
             )}

@@ -8,15 +8,12 @@ import {
   Text,
 } from "@chakra-ui/react";
 import user from "../assets/Institution.jpg";
-export type InstituteInfo = {
+export interface InstituteInfo {
   instAddress: string;
   name: string;
   id: string;
-};
-interface Props {
-  data: InstituteInfo;
 }
-const InstituteInformation = ({ data }: Props) => {
+const InstituteInformation = ({ data }: { data: InstituteInfo }) => {
   return (
     <Center>
       <Card.Root flexDirection="row" overflow="hidden" maxW="3xl" minW="3xl">

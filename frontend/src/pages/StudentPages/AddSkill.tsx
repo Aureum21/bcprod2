@@ -58,13 +58,13 @@ const AddSkill = () => {
   return (
     <>
       <VStack gap={10} alignItems="center">
-        {skills.map((item) => {
-          return <ShowData type="Skill" data={item}></ShowData>;
-        })}
         <UploadCertificate
           onSubmit={handleUpload}
           type="skill"
         ></UploadCertificate>
+        {skills.map((item) => {
+          return <ShowData type="Skill" data={item}></ShowData>;
+        })}
       </VStack>
     </>
   );

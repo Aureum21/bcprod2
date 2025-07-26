@@ -7,6 +7,7 @@ export interface Data {
   address: string;
   email: string;
   id: string;
+  institute_address: string;
   index: number;
 }
 interface PendingProps {

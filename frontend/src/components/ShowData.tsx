@@ -29,25 +29,43 @@ const ShowData = ({ type, data }: Props) => {
             <Card.Title mb="2"></Card.Title>
 
             {type === "Skill" && (
-              <Box shadow="md" p={2} mb={2} borderRadius="md">
-                <VStack alignItems="left">
-                  <HStack>
-                    <Text fontWeight="300">Skill Name:</Text>
-                    <Text>{data.name}</Text>
-                  </HStack>
-                  <HStack>
-                    <Text fontWeight="300">Experience:</Text>
-                    <Text>{data.experience}</Text>
-                  </HStack>
-                </VStack>
-              </Box>
+              <VStack alignItems="left">
+                <HStack>
+                  <Text fontWeight="bold">Skill Name:</Text>
+                  <Text>{data.skillName}</Text>
+                </HStack>
+                <HStack>
+                  <Text fontWeight="bold">Experience:</Text>
+                  <Text>{data.experience}</Text>
+                </HStack>
+                <HStack>
+                  <Text fontWeight="bold">Endorsed:</Text>
+                  <Text>{data.endorsed ? "Yes" : "No"}</Text>
+                </HStack>
+                {data.endorsed && (
+                  <>
+                    <HStack>
+                      <Text fontWeight="bold">Endorsed By:</Text>
+                      <Text>{data.endorsedBy}</Text>
+                    </HStack>
+                    <HStack>
+                      <Text fontWeight="bold">Review:</Text>
+                      <Text>{data.review}</Text>
+                    </HStack>
+                  </>
+                )}
+                <HStack>
+                  <Text fontWeight="bold">Visible:</Text>
+                  <Text>{data.visible ? "Yes" : "No"}</Text>
+                </HStack>
+              </VStack>
             )}
             {type === "Certificate" && (
               <VStack alignItems={"left"}>
                 {type === "Certificate" && (
                   <HStack>
-                    <Text fontWeight="bold">Name:</Text>
-                    <Text>{data.name}</Text>
+                    <Text fontWeight="bold">Certificate Name:</Text>
+                    <Text>{data.certificate_name}</Text>
                   </HStack>
                 )}
                 <HStack>
@@ -77,6 +95,26 @@ const ShowData = ({ type, data }: Props) => {
                 <HStack>
                   <Text fontWeight="bold">Institute Address:</Text>
                   <Text>{data.institute}</Text>
+                </HStack>
+                <HStack>
+                  <Text fontWeight="bold">Employer:</Text>
+                  <Text>{data.employer}</Text>
+                </HStack>
+                <HStack>
+                  <Text fontWeight="bold">Verified:</Text>
+                  <Text>{data.verified ? "Yes" : "No"}</Text>
+                </HStack>
+                <HStack>
+                  <Text fontWeight="bold">Visible:</Text>
+                  <Text>{data.visible ? "Yes" : "No"}</Text>
+                </HStack>
+                <HStack>
+                  <Text fontWeight="bold">Description:</Text>
+                  <Text>{data.description}</Text>
+                </HStack>
+                <HStack>
+                  <Text fontWeight="bold">Certificate Hash:</Text>
+                  <Text>{data.cert_hash}</Text>
                 </HStack>
               </VStack>
             )}
