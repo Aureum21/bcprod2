@@ -70,6 +70,9 @@ contract registerInst {
             institute.MOE_address
         );
     }
+    function getPendingInstList() public view returns (pendingInstitutes[] memory) {
+        return pendingInstitutesarray;
+    }
 
     function removePendingInstitute(bytes32 key, uint256 index) public {
         delete pendingInstitutesMap[key];

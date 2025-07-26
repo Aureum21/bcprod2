@@ -26,10 +26,16 @@ contract publicdata{
         node2 = _node2;
         node3 = _node3;
     }
+    struct user {
+        bool isVerified;
+        string registrationDate;
+        string verificationDate;
+    }
    
     mapping(address => address) public studAddressToStudContract;
     mapping(address => address) public instAddressToInstContract;
-   
+    mapping(address => user) public instAddressToInstDetails;
+    mapping(address => user) public studAddressToStudDetails;
     function moecontractaddresses(uint256 id) public onlyMOE view returns(address, string memory) {
         if(id ==1 ){
             return (regStudContractAddress, node1);
@@ -59,6 +65,45 @@ contract publicdata{
     {
         return (instAddressToInstContract[_instAddress], node2);
     }
+
+    function addInstToPending(address _instAddress, string memory _registrationDate) public onlyNode2 {
+        user memory newinstitute;
+        newinstitute.isVerified = false;
+        newinstitute.registrationDate = _registrationDate;
+        newinstitute.verificationDate = "";
+        instAddressToInstDetails[_instAddress] = newinstitute;
+    }
+    function verifyInstitute(address _instAddress, string memory _verificationDate) public onlyMOE {
+        user storage inst = instAddressToInstDetails[_instAddress];
+        require(!inst.isVerified, "Institute already verified");
+        inst.isVerified = true;
+        inst.verificationDate = _verificationDate;
+    }
+
+    function getInstDetails(address _instAddress) public view returns (bool, string memory, string memory) {
+        user memory inst = instAddressToInstDetails[_instAddress];
+        return (inst.isVerified, inst.registrationDate, inst.verificationDate);
+    }
+
+    function addStudToPending(address _studAddress, string memory _registrationDate) public onlyNode2 {
+        user memory newstudent;
+        newstudent.isVerified = false;
+        newstudent.registrationDate = _registrationDate;
+        newstudent.verificationDate = "";
+        studAddressToStudDetails[_studAddress] = newstudent;
+    }
+    function verifyStudent(address _studAddress, string memory _verificationDate) public onlyMOE {
+        user storage stud = studAddressToStudDetails[_studAddress];
+        require(!stud.isVerified, "Student already verified");
+        stud.isVerified = true;
+        stud.verificationDate = _verificationDate;
+    }
+
+    function getStudDetails(address _studAddress) public view returns (bool, string memory, string memory) {
+        user memory stud = studAddressToStudDetails[_studAddress];
+        return (stud.isVerified, stud.registrationDate, stud.verificationDate);
+    }
+
     function ismoe() public view onlyMOE returns(bool){
         return (msg.sender==MOE);
     }

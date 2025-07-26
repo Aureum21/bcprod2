@@ -26,11 +26,11 @@ contract verifystud {
     }
 
     struct pendingstudents {
-        string name;
-        address student_address;
-        string email;
-        string id;
-        address instAddress;
+            string name;
+            address student_address;
+            string email;
+            string id;
+            address instAddress;
     }
     pendingstudents[] public pendingStudentsarray;
     pendingstudents[] public transferStudentsarray;
@@ -135,6 +135,9 @@ contract verifystud {
     );
     }
 
+    function getPendingStudentsList () public view returns (pendingstudents[] memory) {
+        return pendingStudentsarray;
+    }
     function getTransferStudentByindex(
         uint256 index
     )
@@ -153,6 +156,10 @@ contract verifystud {
         studentinfo.id,
         studentinfo.instAddress
     );
+    }
+
+    function getTransferStudentsList () public view returns (pendingstudents[] memory) {
+        return transferStudentsarray;
     }
 
     function isStudent(address _studentAddress) public view returns (bool) {

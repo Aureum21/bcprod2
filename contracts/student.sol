@@ -82,6 +82,7 @@ contract student {
     // the key is the certificate name eg bachelors and the value is the struct and the name inside is the employee name.
     mapping(string => certificationInfo) certificationmap;
     string[] certifications;
+    certificationInfo[] certificationList;
 
     function addCertification(
         string memory _name,
@@ -98,6 +99,7 @@ contract student {
         newcertificationInfo.visible = true;
         certificationmap[_certificate_name] = newcertificationInfo;
         certifications.push(_certificate_name);
+        certificationList.push(newcertificationInfo);
     }
     // gotta check the security. security barely passed
     function verifyCertification(string memory _certname) public {
@@ -127,7 +129,11 @@ contract student {
     ) public view returns (string memory, address, string memory, string memory, bool, bool) {
         return getCertificationBycertName(certifications[_index]);
     }
-    // to be used in the front end  to say if i wanna show the certificate or not
+
+    function getCertificateList() public view returns (certificationInfo[] memory) {
+        return certificationList;
+    }
+
     function deleteCertification(string memory _certname) public OnlyStudent {
         certificationmap[_certname].visible = !certificationmap[_certname]
             .visible;
@@ -149,6 +155,7 @@ contract student {
     // try using mapping to map(same institution different roles)
     mapping(address => workexpInfo) workexpmap;
     address[] workexps;
+    workexpInfo[] workexpList;
 
     function addWorkExp(
         string memory _role,
@@ -169,6 +176,7 @@ contract student {
         newworkexp.description = _description;
         workexpmap[_institute] = newworkexp;
         workexps.push(_institute);
+        workexpList.push(newworkexp);
     }
 
     function verifyWorkExp(address _institute) public {
@@ -227,6 +235,10 @@ contract student {
         return getWorkExpByAddress(workexps[_index]);
     }
 
+    function getWorkExpList() public view returns (workexpInfo[] memory) {
+        return workexpList;
+    }
+
     function deleteWorkExp(address org) public OnlyStudent {
         workexpmap[org].visible = false;
     }
@@ -249,6 +261,7 @@ contract student {
     // the first string is the skill eg programming  the value is the struct and the name inside is the student name, eg abekebe
     mapping(string => skillInfo) skillmap;
     string[] skills;
+    skillInfo[] skillList;
 
     function addSkill(
         string memory _name,
@@ -265,6 +278,7 @@ contract student {
         employeeSkillSet.visible = true;
         skillmap[_name] = employeeSkillSet;
         skills.push(_name);
+        skillList.push(employeeSkillSet);
     }
 
     function endorseSkill(string memory _name, string memory _review) public {
@@ -318,6 +332,10 @@ contract student {
         )
     {
         return getSkillByName(skills[_index]);
+    }
+
+    function getSkillList() public view returns (skillInfo[] memory) {
+        return skillList;
     }
 
     function deleteSkill(string memory _name) public OnlyStudent {

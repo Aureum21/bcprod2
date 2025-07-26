@@ -21,15 +21,15 @@ contract verifyinst {
     mapping(string =>address) public instNameToAddress;
     address[] registeredinstitutes;
 
-    function verifyInstitution(bytes32 key, uint256 index,address newinst) public onlyMOE {
-        (
-            string memory institute_name,
-            address institute_address,,
-        ) = instreg.getPendingInstituteByKey(key);
+    function verifyInstitution(address instContractAddress, string memory institute_name, address institute_address) public onlyMOE {
+        // (
+        //     string memory institute_name,
+        //     address institute_address,,
+        // ) = instreg.getPendingInstituteByKey(key);
         
-        registeredinstitutesmap[institute_address] = newinst;
+        registeredinstitutesmap[institute_address] = instContractAddress;
         registeredinstitutes.push(institute_address);
-        instreg.removePendingInstitute(key, index);
+        // instreg.removePendingInstitute(key, index);
         instNameToAddress[institute_name]=institute_address;
         institution_names.push(institute_name);
     }
@@ -43,6 +43,9 @@ contract verifyinst {
         uint256 index
     ) public view returns (string memory) {
         return institution_names[index];
+    }
+    function getInstList() public view returns (string[] memory) {
+        return institution_names;
     }
 
     function getPendingInstitutesCount() public view returns (uint256) {
