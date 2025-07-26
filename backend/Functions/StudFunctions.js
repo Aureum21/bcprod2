@@ -355,51 +355,48 @@ const getSkillCount = async (contractAddress) => {
   return count;
 };
 const ListSkills = async (contractAddress) => {
-  const skills = [];
   const web3 = new Web3(besu.member3.url);
   const web3quorum = new Web3Quorum(web3, chainId);
   const contract = new web3quorum.eth.Contract(contractAbiStudent);
 
   const functionAbi = contract._jsonInterface.find((e) => {
-    return e.name === "getSkillByIndex";
+    return e.name === "getSkillList";
   });
-  const count = await getSkillCount(contractAddress);
-  for (let i = 0; i < count; i++) {
-    const functionArgs = web3quorum.eth.abi
-      .encodeParameter(functionAbi.inputs[0], i)
-      .slice(2);
-    console.log("functionArgs", functionArgs);
-    const functionParams = {
-      to: contractAddress,
-      data: functionAbi.signature + functionArgs,
-      privateKey: besu.member3.accountPrivateKey,
-      privateFrom: tessera.member3.publicKey,
-      privateFor: [tessera.member1.publicKey],
-    };
-    console.log("functionParams", functionParams);
-    const transactionHash = await web3quorum.priv.generateAndSendRawTransaction(
-      functionParams
-    );
-    const result = await web3quorum.priv.waitForTransactionReceipt(
-      transactionHash
-    );
-    const decoded = web3quorum.eth.abi.decodeParameters(
-      ["string", "string", "bool", "address", "string", "bool"],
-      result.output
-    );
-    console.log(decoded);
+  const functionParams = {
+    to: contractAddress,
+    data: functionAbi.signature,
+    privateKey: besu.member3.accountPrivateKey,
+    privateFrom: tessera.member3.publicKey,
+    privateFor: [tessera.member1.publicKey],
+  };
+  console.log("functionParams", functionParams);
+  const transactionHash = await web3quorum.priv.generateAndSendRawTransaction(
+    functionParams
+  );
+  const result = await web3quorum.priv.waitForTransactionReceipt(
+    transactionHash
+  );
+  const decoded = web3quorum.eth.abi.decodeParameters(
+    functionAbi.outputs,
+    result.output
+  );
+  const skills = decoded[0];
+  const skillList = [];
+  for (let i = 0; i < skills.length; i++) {
     const skill = {
-      name: decoded[0],
-      experience: decoded[1],
-      endorsed: decoded[2],
-      endorsedBy: decoded[3],
-      review: decoded[4],
-      visible: decoded[5],
+      skillName: skills[i][0],
+      studentName: skills[i][1],
+      experience: skills[i][2],
+      endorsed: skills[i][3],
+      endorsedBy: skills[i][4],
+      review: skills[i][5],
+      visible: skills[i][6],
+      cert_hash: skills[i][7],
     };
-    skills.push(skill);
+    skillList.push(skill);
   }
-  console.log("decoded", skills);
-  return skills;
+  console.log("skillList", skillList);
+  return skillList;
 };
 
 module.exports = {

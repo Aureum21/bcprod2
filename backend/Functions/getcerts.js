@@ -62,102 +62,87 @@ async function getUnOfficialCert(student_contract_address) {
   const web3 = new Web3(besu.member3.url);
   const web3quorum = new Web3Quorum(web3, chainId);
   const contract = new web3quorum.eth.Contract(contractAbiStud);
-  const certCount = await getCertCount(
-    "getCertificationCount",
-    student_contract_address
-  );
-  console.log("certCount", certCount);
   const functionAbi = contract._jsonInterface.find((e) => {
-    return e.name === "getCertificationByIndex";
+    return e.name === "getCertificateList";
   });
-  const certs = [];
-  for (let i = 0; i < certCount; i++) {
-    console.log("started listing transfer students", i);
-    const functionArgs = web3quorum.eth.abi
-      .encodeParameter(functionAbi.inputs[0], i)
-      .slice(2);
-    const functionParams = {
-      to: student_contract_address,
-      data: functionAbi.signature + functionArgs,
-      privateKey: besu.member3.accountPrivateKey,
-      privateFrom: tessera.member3.publicKey,
-      privateFor: [tessera.member1.publicKey],
-    };
-    const transactionHash = await web3quorum.priv.generateAndSendRawTransaction(
-      functionParams
-    );
-    const result = await web3quorum.priv.waitForTransactionReceipt(
-      transactionHash
-    );
-    const decoded = web3quorum.eth.abi.decodeParameters(
-      functionAbi.outputs,
-      result.output
-    );
-    console.log(decoded);
+  const functionParams = {
+    to: student_contract_address,
+    data: functionAbi.signature,
+    privateKey: besu.member3.accountPrivateKey,
+    privateFrom: tessera.member3.publicKey,
+    privateFor: [tessera.member1.publicKey],
+  };
+  const transactionHash = await web3quorum.priv.generateAndSendRawTransaction(
+    functionParams
+  );
+  const result = await web3quorum.priv.waitForTransactionReceipt(
+    transactionHash
+  );
+  const decoded = web3quorum.eth.abi.decodeParameters(
+    functionAbi.outputs,
+    result.output
+  );
+  const certs = decoded[0];
+  const certList = [];
+  for (let i = 0; i < certs.length; i++) {
     const intermediate = {
-      name: decoded[0],
-      institute: decoded[1],
-      certificate_name: decoded[2],
-      cert_hash: decoded[3],
-      verified: decoded[4],
-      visible: decoded[5],
+      name: certs[i][0],
+      institute: certs[i][1],
+      certificate_name: certs[i][2],
+      verified: certs[i][3],
+      visible: certs[i][4],
+      cert_hash: certs[i][5],
     };
-    certs.push(intermediate);
+    certList.push(intermediate);
   }
-  console.log("certs", certs);
-  return certs;
+  console.log("certList", certList);
+  return certList;
 }
 
 async function getWorkExp(student_contract_address) {
   const web3 = new Web3(besu.member3.url);
   const web3quorum = new Web3Quorum(web3, chainId);
   const contract = new web3quorum.eth.Contract(contractAbiStud);
-  const workExpCount = await getCertCount(
-    "getWorkExpCount",
-    student_contract_address
-  );
-  console.log("workExpCount", workExpCount);
   const functionAbi = contract._jsonInterface.find((e) => {
-    return e.name === "getWorkExpByIndex";
+    return e.name === "getWorkExpList";
   });
-  const workExps = [];
-  for (let i = 0; i < workExpCount; i++) {
+  const functionParams = {
+    to: student_contract_address,
+    data: functionAbi.signature,
+    privateKey: besu.member3.accountPrivateKey,
+    privateFrom: tessera.member3.publicKey,
+    privateFor: [tessera.member1.publicKey],
+  };
+  const transactionHash = await web3quorum.priv.generateAndSendRawTransaction(
+    functionParams
+  );
+  const result = await web3quorum.priv.waitForTransactionReceipt(
+    transactionHash
+  );
+  const decoded = web3quorum.eth.abi.decodeParameters(
+    functionAbi.outputs,
+    result.output
+  );
+
+  const workExps = decoded[0];
+  const workExpList = [];
+  for (let i = 0; i < workExps.length; i++) {
     console.log("started listing transfer students", i);
-    const functionArgs = web3quorum.eth.abi
-      .encodeParameter(functionAbi.inputs[0], i)
-      .slice(2);
-    const functionParams = {
-      to: student_contract_address,
-      data: functionAbi.signature + functionArgs,
-      privateKey: besu.member3.accountPrivateKey,
-      privateFrom: tessera.member3.publicKey,
-      privateFor: [tessera.member1.publicKey],
-    };
-    const transactionHash = await web3quorum.priv.generateAndSendRawTransaction(
-      functionParams
-    );
-    const result = await web3quorum.priv.waitForTransactionReceipt(
-      transactionHash
-    );
-    const decoded = web3quorum.eth.abi.decodeParameters(
-      functionAbi.outputs,
-      result.output
-    );
-    console.log(decoded);
     const intermediate = {
-      role: decoded[0],
-      cert_hash: decoded[1],
-      institute: decoded[2],
-      startdate: decoded[3],
-      enddate: decoded[4],
-      description: decoded[5],
-      visible: decoded[6],
+      role: workExps[i][0],
+      institute: workExps[i][1],
+      employer: workExps[i][2],
+      startdate: workExps[i][3],
+      enddate: workExps[i][4],
+      verified: workExps[i][5],
+      description: workExps[i][6],
+      visible: workExps[i][7],
+      cert_hash: workExps[i][8],
     };
-    console.log("decoded", decoded);
-    workExps.push(intermediate);
+    workExpList.push(intermediate);
   }
-  console.log("workExps", workExps);
-  return workExps;
+  console.log("workExpList", workExpList);
+  return workExpList;
 }
 
 module.exports = {

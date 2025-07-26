@@ -103,7 +103,6 @@ const RegInstPublicToPending = async (value) => {
     contractInformations.publicdata.contractAddress
   );
 
-  // Encode function call
   const data = contractInstance.methods
     .addInstToPending(value, currentDate)
     .encodeABI();
@@ -249,47 +248,7 @@ const getInstituteInfo = async (address) => {
 
   return InstInfo;
 };
-const ListInstitutes = async () => {
-  const web3 = new Web3(besu.member2.url);
-  const web3quorum = new Web3Quorum(web3, chainId);
-  console.log("address", address);
-  const contract = new web3quorum.eth.Contract(contractAbiInstitute);
-  console.log("Contract ABI:", contract._jsonInterface);
-  const functionAbi = contract._jsonInterface.find((e) => {
-    return e.name === "getInstInfo";
-  });
-  if (!functionAbi) {
-    console.error("Function ABI for 'getInstInfo' not found.");
-    return { error: "Function ABI not found" };
-  }
-  console.log("functionAbi", functionAbi);
 
-  const functionParams = {
-    to: address,
-    data: functionAbi.signature,
-    privateKey: besu.member2.accountPrivateKey,
-    privateFrom: tessera.member2.publicKey,
-    privateFor: [tessera.member1.publicKey],
-  };
-  console.log("functionParams", functionParams);
-  const transactionHash = await web3quorum.priv.generateAndSendRawTransaction(
-    functionParams
-  );
-  const result = await web3quorum.priv.waitForTransactionReceipt(
-    transactionHash
-  );
-  const decodedResult = web3quorum.eth.abi.decodeParameters(
-    functionAbi.outputs,
-    result.output
-  );
-  const InstInfo = {
-    instAddress: decodedResult[0],
-    name: decodedResult[1],
-    id: decodedResult[2],
-  };
-
-  return InstInfo;
-};
 module.exports = {
   RegisterInstitutePrivateToPending,
   RegisterStudentPrivateTransfer,

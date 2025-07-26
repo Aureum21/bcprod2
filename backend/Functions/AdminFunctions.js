@@ -74,40 +74,36 @@ const ListPendingInstitutes = async () => {
   const web3 = new Web3(besu.member2.url);
   const web3quorum = new Web3Quorum(web3, chainId);
   const contract = new web3quorum.eth.Contract(contractAbiRegInst);
-  // eslint-disable-next-line no-underscore-dangle
-  const number = await PendingInstituteCount();
   const functionAbi = contract._jsonInterface.find((e) => {
-    return e.name === "getPendingInstituteByIndex";
+    return e.name === "getPendingInstList";
   });
+  const functionParams = {
+    to: contractInformations.registerInst.contractAddress,
+    data: functionAbi.signature,
+    privateKey: besu.member2.accountPrivateKey,
+    privateFrom: tessera.member2.publicKey,
+    privateFor: [tessera.member1.publicKey],
+  };
+  const transactionHash = await web3quorum.priv.generateAndSendRawTransaction(
+    functionParams
+  );
+  // console.log(`Transaction hash: ${transactionHash}`);
+  const result = await web3quorum.priv.waitForTransactionReceipt(
+    transactionHash
+  );
+
+  const decoded = web3quorum.eth.abi.decodeParameters(
+    functionAbi.outputs,
+    result.output
+  );
+  console.log("decoded", decoded);
+  const inst = decoded[0];
   const institutes = [];
-  for (let i = 0; i < number; i++) {
-    const functionArgs = web3quorum.eth.abi
-      .encodeParameter(functionAbi.inputs[0], i)
-      .slice(2);
-
-    const functionParams = {
-      to: contractInformations.registerInst.contractAddress,
-      data: functionAbi.signature + functionArgs,
-      privateKey: besu.member2.accountPrivateKey,
-      privateFrom: tessera.member2.publicKey,
-      privateFor: [tessera.member1.publicKey],
-    };
-    const transactionHash = await web3quorum.priv.generateAndSendRawTransaction(
-      functionParams
-    );
-    // console.log(`Transaction hash: ${transactionHash}`);
-    const result = await web3quorum.priv.waitForTransactionReceipt(
-      transactionHash
-    );
-
-    const decoded = web3quorum.eth.abi.decodeParameters(
-      ["string", "address", "string", "address"],
-      result.output
-    );
+  for (let i = 0; i < inst.length; i++) {
     institutes.push({
-      name: decoded[0],
-      address: decoded[1],
-      id: decoded[2],
+      name: inst[i][0],
+      address: inst[i][1],
+      id: inst[i][2],
     });
   }
   return institutes;
