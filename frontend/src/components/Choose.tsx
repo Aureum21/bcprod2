@@ -25,7 +25,8 @@ const Choose = () => {
       if (data.type === "moe") navigate("/admin");
       else if (data.type === "institute") navigate("/institution/home");
       else if (data.type === "student") navigate("/student/home");
-      else if (data.type === "rec") navigate("/rec");
+      else if (data.type === "employer") navigate("/rec");
+      else navigate("/signup");
     }
   };
   return (

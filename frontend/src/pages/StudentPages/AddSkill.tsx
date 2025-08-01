@@ -6,7 +6,7 @@ import ShowData from "../../components/ShowData";
 import { useColorMode } from "../../components/ui/color-mode";
 import type { data } from "../../components/UploadCertificate";
 import UploadCertificate from "../../components/UploadCertificate";
-interface Skill {
+export interface Skill {
   name: string;
   experience: string;
   endorsed: boolean;
@@ -14,6 +14,7 @@ interface Skill {
   review: string;
   visible: boolean;
 }
+
 const AddSkill = () => {
   const [skills, setSkills] = useState<Skill[]>([]);
 
@@ -41,17 +42,23 @@ const AddSkill = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const skills = await axios.get("http://localhost:5000/listSkills", {
-          params: {
-            contractAddress: studentContractAddress,
-          },
-        });
-        console.log(skills.data);
-        setSkills(skills.data);
+        axios
+          .get("http://localhost:5000/listSkills", {
+            params: {
+              contractAddress: studentContractAddress,
+            },
+          })
+          .then((res) => {
+            sessionStorage.setItem("skills", JSON.stringify(res.data));
+            setSkills(
+              JSON.parse(sessionStorage.getItem("skills") as string) as Skill[]
+            );
+          });
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
+
     fetchData();
   }, []);
 

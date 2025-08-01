@@ -10,6 +10,7 @@ export const pages = [
   "Add Skill",
   "Add Certificate",
   "Add Work Experience",
+  "Application",
 ];
 
 const StudentHome = () => {

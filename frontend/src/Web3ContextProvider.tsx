@@ -24,6 +24,7 @@ interface Web3ContextType {
   check: (account: string) => Promise<UserData>;
   studentContractAddress: string;
   instituteContractAddress: string;
+  employerContractAddress: string;
   getStatus: (account: string) => Promise<void>;
 }
 
@@ -37,6 +38,7 @@ export const Web3Context = createContext<Web3ContextType>({
   },
   studentContractAddress: "",
   instituteContractAddress: "",
+  employerContractAddress: "",
   getStatus: async (account: string) => {},
 });
 
@@ -49,6 +51,8 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
     useState<string>("");
   const [instituteContractAddress, setInstituteContractAddress] =
     useState<string>("");
+  const [employerContractAddress, setEmployerContractAddress] =
+    useState<string>("");
   const [web3, setWeb3] = useState<Web3 | null>(null);
   const [account, setAccount] = useState<string | undefined>(undefined);
   const [trigger, setTrigger] = useState<boolean>(false);
@@ -56,13 +60,16 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
     const storedAccount = sessionStorage.getItem("account");
     const storedStud = sessionStorage.getItem("studentContractAddress");
     const storedInst = sessionStorage.getItem("instituteContractAddress");
+    const storedEmp = sessionStorage.getItem("employerContractAddress");
     console.log("storedAccount", storedAccount);
     console.log("storedStud", storedStud);
     console.log("storedInst", storedInst);
+    console.log("storedEmp", storedEmp);
 
     if (storedAccount) setAccount(storedAccount);
     if (storedStud) setStudentContractAddress(storedStud);
     if (storedInst) setInstituteContractAddress(storedInst);
+    if (storedEmp) setEmployerContractAddress(storedEmp);
   }, []);
 
   const connect = async () => {
@@ -87,6 +94,7 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
     setAccount(undefined);
     setStudentContractAddress("");
     setInstituteContractAddress("");
+    setEmployerContractAddress("");
     setTrigger(false);
   };
 
@@ -98,6 +106,7 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
     );
     sessionStorage.removeItem("studentContractAddress");
     sessionStorage.removeItem("instituteContractAddress");
+    sessionStorage.removeItem("employerContractAddress");
     try {
       const isMoe = await contractInstance.methods
         .ismoe()
@@ -140,6 +149,22 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
       }
     } catch (err) {
       console.log("Not Student");
+    }
+
+    try {
+      const value4: string[] = await contractInstance.methods
+        .getEmployerContractAddress(account)
+        .call({ from: besu.member4.accountAddress });
+      console.log("value4", value4);
+
+      if (value4[0] !== ZERO_ADDRESS) {
+        setEmployerContractAddress(value4[0]);
+        sessionStorage.setItem("employerContractAddress", value4[0]);
+        sessionStorage.setItem("type", "employer");
+        return { type: "employer", contAddress: value4[0], node: value4[1] };
+      }
+    } catch (err) {
+      console.log("Not Employer");
     }
 
     console.log("Redirecting to REC, no other roles found, account: ");
@@ -196,6 +221,7 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
         check,
         studentContractAddress,
         instituteContractAddress,
+        employerContractAddress,
         getStatus,
       }}
     >

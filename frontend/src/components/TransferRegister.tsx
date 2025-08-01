@@ -156,7 +156,7 @@ const TransferRegister = ({ type }: Props) => {
                     <VStack
                       width="full"
                       alignItems="start"
-                      overflowY="scroll"
+                      overflowY="auto"
                       height="200px"
                       p={2}
                     >

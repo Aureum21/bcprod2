@@ -1,5 +1,4 @@
-import { Box, Card, HStack, Image, VStack, Text } from "@chakra-ui/react";
-import user from "../assets/User.jpg";
+import { Box, Card, HStack, VStack, Text } from "@chakra-ui/react";
 export interface data {
   studentName: string;
   studentAddress: string;
@@ -121,9 +120,6 @@ const ShowData = ({ type, data }: Props) => {
           </Card.Body>
           <Card.Footer></Card.Footer>
         </Box>
-        {type !== "Skill" && (
-          <Image objectFit="cover" maxW="200px" src={user} alt="Caffe Latte" />
-        )}
       </Card.Root>
     </Box>
   );

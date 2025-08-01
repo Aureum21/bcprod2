@@ -38,7 +38,8 @@ const Signup = () => {
       if (
         data.type !== "moe" &&
         data.type !== "institute" &&
-        data.type !== "student"
+        data.type !== "student" &&
+        data.type !== "employer"
       ) {
         if (formData.role === "Student") {
           const result = await axios.post(
@@ -66,6 +67,20 @@ const Signup = () => {
           );
           if (result.status === 200) {
             navigate("/waiting-for-verification");
+          } else if (result.status === 500) {
+            navigate("/signup");
+          }
+        } else if (formData.role === "Employer") {
+          const result = await axios.post(
+            "http://localhost:5000/registerEmployer",
+            {
+              name: formData.name,
+              employer_address: account,
+              email: formData.email,
+            }
+          );
+          if (result.status === 200) {
+            navigate("/");
           } else if (result.status === 500) {
             navigate("/signup");
           }
@@ -97,7 +112,7 @@ const Signup = () => {
                       setFormData({ ...formData, role: e.target.value });
                     }}
                   >
-                    {["Student", "Institution"].map((item) => (
+                    {["Student", "Institution", "Employer"].map((item) => (
                       <option key={item} value={item}>
                         {item}
                       </option>
@@ -109,12 +124,16 @@ const Signup = () => {
 
               <Field.Root>
                 <Field.Label>
-                  {role === "Student" ? "Full Name" : "Institution Name"}
+                  {role === "Student" ? "Full Name" : "Institute Name"}
                 </Field.Label>
                 <Input name="name" onChange={(e) => handleChange(e)} />
               </Field.Root>
 
-              <Field.Root display={role === "Student" ? "block" : "none"}>
+              <Field.Root
+                display={
+                  role === "Student" || role === "Employer" ? "block" : "none"
+                }
+              >
                 <Field.Label>Email address</Field.Label>
                 <Input
                   name="email"
@@ -123,14 +142,16 @@ const Signup = () => {
                 />
               </Field.Root>
 
-              <Field.Root>
-                <Field.Label>User ID</Field.Label>
-                <Input
-                  name="id"
-                  type="text"
-                  onChange={(e) => handleChange(e)}
-                />
-              </Field.Root>
+              {(role === "Student" || role === "Institution") && (
+                <Field.Root>
+                  <Field.Label>User ID</Field.Label>
+                  <Input
+                    name="id"
+                    type="text"
+                    onChange={(e) => handleChange(e)}
+                  />
+                </Field.Root>
+              )}
             </Fieldset.Content>
 
             <Button type="submit" alignSelf="flex-start">

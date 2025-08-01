@@ -21,9 +21,9 @@ const AddWorkExp = () => {
     "studentContractAddress"
   ) as string;
   const [certData, setCertData] = useState<workExp[]>([]);
-  const onSubmit = (data: data, e: FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (data: data, e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const result = axios.post("http://localhost:5000/addWorkExp", {
+    const result = await axios.post("http://localhost:5000/addWorkExp", {
       role: data.jobTitle,
       instAddress: data.instituteAddress,
       startDate: data.startDate,
@@ -33,18 +33,27 @@ const AddWorkExp = () => {
       student_contract_address: studentContractAddress,
     });
     console.log(result);
+    showData();
   };
-  const showData = () => {
-    axios
-      .get("http://localhost:5000/getWorkExp", {
-        params: {
-          contractAddress: studentContractAddress,
-        },
-      })
-      .then((res) => {
-        console.log("res.data", res.data);
-        setCertData(res.data);
-      });
+  const showData = async () => {
+    try {
+      await axios
+        .get("http://localhost:5000/getWorkExp", {
+          params: {
+            contractAddress: studentContractAddress,
+          },
+        })
+        .then((res) => {
+          sessionStorage.setItem("certData", JSON.stringify(res.data));
+          setCertData(
+            JSON.parse(
+              sessionStorage.getItem("certData") as string
+            ) as workExp[]
+          );
+        });
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
   };
   useEffect(() => {
     showData();

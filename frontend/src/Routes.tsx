@@ -20,6 +20,7 @@ import AddOfficialCert from "./pages/InstPages/AddOfficialCert";
 import RecLayout from "./layouts/RecLayout";
 import RecHome from "./pages/RecruiterPages/RecHome";
 import Status from "./pages/InstPages/Status";
+import Application from "./pages/StudentPages/Application";
 const routes = createBrowserRouter([
   {
     path: "/",
@@ -43,6 +44,7 @@ const routes = createBrowserRouter([
       { path: "add-skill", element: <AddSkill /> },
       { path: "add-certificate", element: <AddCert /> },
       { path: "add-work-experience", element: <AddWorkExp /> },
+      { path: "application", element: <Application /> },
     ],
   },
   {

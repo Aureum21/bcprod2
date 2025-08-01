@@ -6,7 +6,7 @@ import ShowData from "../../components/ShowData";
 import type { data } from "../../components/UploadCertificate";
 import UploadCertificate from "../../components/UploadCertificate";
 import { useColorMode } from "../../components/ui/color-mode";
-interface addCert {
+export interface addCert {
   name: string;
   institute: string;
   certificate_name: string;
@@ -20,28 +20,36 @@ const AddCert = () => {
     "studentContractAddress"
   ) as string;
   const [certData, setCertData] = useState<addCert[]>([]);
-  const onSubmit = (data: data, e: FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (data: data, e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const result = axios.post("http://localhost:5000/addUnOfficialCert", {
+    const result = await axios.post("http://localhost:5000/addUnOfficialCert", {
       certificate_name: data.certificateName,
       institute_address: data.instituteAddress,
       student_contract_address: studentContractAddress,
       certificate_hash: data.certificateHash,
     });
     console.log(result);
+    showData();
   };
-  const showData = () => {
-    axios
-      .get("http://localhost:5000/getUnOfficialCert", {
-        params: {
-          contractAddress: studentContractAddress,
-        },
-      })
-      .then((res) => {
-        console.log(res.data);
-        setCertData(res.data);
-        console.log(certData);
-      });
+  const showData = async () => {
+    try {
+      await axios
+        .get("http://localhost:5000/getUnOfficialCert", {
+          params: {
+            contractAddress: studentContractAddress,
+          },
+        })
+        .then((res) => {
+          sessionStorage.setItem("certData", JSON.stringify(res.data));
+          setCertData(
+            JSON.parse(
+              sessionStorage.getItem("certData") as string
+            ) as addCert[]
+          );
+        });
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
   };
   useEffect(() => {
     showData();
@@ -54,7 +62,6 @@ const AddCert = () => {
           type="unOfficial"
         ></UploadCertificate>
         {certData.map((item) => {
-          console.log("item", item);
           return <ShowData type="Certificate" data={item}></ShowData>;
         })}
       </VStack>
