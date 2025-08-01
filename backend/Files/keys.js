@@ -10,38 +10,49 @@ module.exports = {
     member3: {
       publicKey: "1iTZde/ndBHvzhcl7V68x44Vx7pl8nwx9LqnM/AfJUg=",
     },
+    member4: {
+      publicKey: "UjKUPJGYPptm7fZ5XlC9qaRwZYc4PtH2l0UH3PRRy38=",
+    },
   },
   contractInformations: {
     registerStud: {
-      contractAddress: "0x7621050ba5ea7d77dd10d05b7f4c46b58269a5ba",
+      contractAddress: "0xa7c238a94e0b45d4f77539cacf91d0d4008e46e7",
       from: "0xf0e2db6c8dc6c681bb5d6ad121a107f300e9b2b5",
       fromName: "member1",
       for: "0xca843569e3427144cead5e4d5999a3d0ccf92b8e",
       forName: ["member2"],
     },
     registerInst: {
-      contractAddress: "0xee260781bc5a71abf4032c7c86ddb3d8a99c89ed",
+      contractAddress: "0x611a983684b68a0f3976311f97e57a78e8fde7d2",
       from: "0xf0e2db6c8dc6c681bb5d6ad121a107f300e9b2b5",
       fromName: "member1",
       for: "0x0fbdc686b912d7722dc86510934589e0aaf3b55a",
       forName: ["member3"],
     },
+    registerEmp: {
+      contractAddress: "0xf07643b6535ac7426547c992007cb79b9495f9ea",
+      from: "0xf0e2db6c8dc6c681bb5d6ad121a107f300e9b2b5",
+      fromName: "member1",
+      for: "0x58c4f9707bb5fc63139431fed6bf512cee2b7823",
+      forName: ["member4"],
+    },
+
     verifyInst: {
-      contractAddress: "0x50358d2820fbc4d11ea8d69c5b4ffa15ec102f82",
+      contractAddress: "0xaf0fac8b9bcfaf6e158dc29ceaad735ff8a1db2b",
       from: "0xf0e2db6c8dc6c681bb5d6ad121a107f300e9b2b5",
       fromName: "member1",
       for: "0xf0e2db6c8dc6c681bb5d6ad121a107f300e9b2b5",
       forName: ["member1"],
     },
     verifyStud: {
-      contractAddress: "0xd158ac5a7340d99c9602cfc0f8d9074c40037475",
+      contractAddress: "0x2edb29ffbcbe66b2731820074ae080191976c76d",
       from: "0xf0e2db6c8dc6c681bb5d6ad121a107f300e9b2b5",
       fromName: "member1",
       for: "0xca843569e3427144cead5e4d5999a3d0ccf92b8e",
       forName: ["member2"],
     },
     publicdata: {
-      contractAddress: "0xD35cae7EaA9f0e9E3022Bfeb8e5A6A8970919b78",
+      contractAddress: "0x31932FfbfA288AB8b04B646415a53f34c6805AE5",
       from: "c9c913c8c3c1cd416d80a0abf475db2062f161f6",
       fromName: "rpcnode",
     },
@@ -90,6 +101,17 @@ module.exports = {
       accountPrivateKey:
         "61dced5af778942996880120b303fc11ee28cc8e5036d2fdff619b5675ded3f0",
     },
+    member4: {
+      name: "member4",
+      url: "http://192.168.1.97:20006",
+      wsUrl: "ws://192.168.1.97:20007",
+      privateUrl: "http://192.168.1.97:9084",
+      nodekey:
+        "a9ed1a9ee0dd0f70c3a1e78d4888b2b4a50134ba88f18aa808967e63737aeae4",
+      accountAddress: "0x58c4f9707bb5fc63139431fed6bf512cee2b7823",
+      accountPrivateKey:
+        "d184da431c0db5237e52bcc1ce269c9ff35a8048d44aa6e4a9a2b05855c18694",
+    },
   },
   accounts: {
     a: {
@@ -106,6 +128,11 @@ module.exports = {
       address: "0xf17f52151EbEF6C7334FAD080c5704D77216b732",
       privateKey:
         "0xae6ae8e5ccbfb04590405997ee2d52d2b330726137b875053c36d94e974d162f",
+    },
+    d: {
+      address: "0xaddff942ebfddd154b9519a44997ba86daa64f3e",
+      privateKey:
+        "0x6417b4f788192420bd69a0915192a7d235817cad104e9989a49011a2b193df15",
     },
   },
 };

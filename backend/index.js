@@ -46,6 +46,12 @@ const {
   getInstituteAddress,
 } = require("./Functions/AdminFunctions.js");
 const { getUnOfficialCert, getWorkExp } = require("./Functions/getcerts.js");
+const {
+  RegisterEmployerPrivate,
+  ListEmployers,
+  applyForJob,
+  ListPendingEmployees,
+} = require("./Functions/employerFunctions.js");
 const chainId = 1337;
 
 const contractJsonRegStudPath = path.resolve(
@@ -403,6 +409,71 @@ app.get("/getInstList", async (req, res) => {
   console.log(institutes);
   res.status(200).json(institutes);
 });
+app.post("/registerEmployer", async (req, res) => {
+  const { name, employer_address, email } = req.body;
+  console.log("name", name);
+  console.log("employer_address", employer_address);
+  console.log("email", email);
+
+  const resultPrivate = await RegisterEmployerPrivate([
+    name,
+    employer_address,
+    email,
+    besu.member1.accountAddress,
+  ]);
+
+  console.log(resultPrivate);
+  if (resultPrivate.status === true) {
+    res.status(200).json({ message: "Employer registered successfully" });
+  } else {
+    res.status(500).json({ message: "Failed to register employer" });
+  }
+});
+
+app.get("/getEmpList", async (req, res) => {
+  const employers = await ListEmployers();
+  console.log(employers);
+  res.status(200).json(employers);
+});
+
+app.post("/applyForJob", async (req, res) => {
+  const { account, studentName, employerAddress, skill, cert, workExp } =
+    req.body;
+  console.log("account", account);
+  console.log("studentName", studentName);
+  console.log("employerAddress", employerAddress);
+  console.log("skill", skill);
+  console.log("cert", cert);
+  console.log("workExp", workExp);
+
+  const result = await applyForJob(
+    account,
+    studentName,
+    employerAddress,
+    skill,
+    cert,
+    workExp
+  );
+  console.log(result);
+  if (result.status === "0x1") {
+    res.status(200).json({ message: "Application submitted successfully" });
+  } else {
+    res.status(500).json({ message: "Failed to submit application" });
+  }
+});
+
+app.get("/getPendingEmployees", async (req, res) => {
+  const PendingEmployees = await ListPendingEmployees(
+    req.query.contractAddress
+  );
+  console.log(PendingEmployees);
+  if (PendingEmployees) {
+    res.status(200).json(PendingEmployees);
+  } else {
+    res.status(500).json({ message: "Failed to get pending employees" });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
