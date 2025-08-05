@@ -21,6 +21,7 @@ import RecLayout from "./layouts/RecLayout";
 import RecHome from "./pages/RecruiterPages/RecHome";
 import Status from "./pages/InstPages/Status";
 import Application from "./pages/StudentPages/Application";
+import PendingEmp from "./pages/RecruiterPages/PendingEmp";
 const routes = createBrowserRouter([
   {
     path: "/",
@@ -64,9 +65,12 @@ const routes = createBrowserRouter([
     ],
   },
   {
-    path: "/rec",
+    path: "/employer",
     element: <RecLayout></RecLayout>,
-    children: [{ index: true, element: <RecHome /> }],
+    children: [
+      { path: "home", element: <RecHome /> },
+      { path: "pending-employees", element: <PendingEmp /> },
+    ],
   },
 ]);
 export default routes;

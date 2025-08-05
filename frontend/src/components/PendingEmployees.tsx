@@ -16,11 +16,14 @@ export interface ApplicantData {
 
 interface PendingProps {
   data: ApplicantData[];
-  accept: (employee_address: string) => void;
-  reject: (employee_address: string) => void;
+  accept: (employee_address: string, employerContractAddress: string) => void;
+  reject: (employee_address: string, employerContractAddress: string) => void;
 }
 
 const PendingEmployees = ({ data, accept, reject }: PendingProps) => {
+  const employerContractAddress = sessionStorage.getItem(
+    "employerContractAddress"
+  ) as string;
   return (
     <Card.Root>
       <Card.Body>
@@ -36,6 +39,10 @@ const PendingEmployees = ({ data, accept, reject }: PendingProps) => {
                 <Text>Address:</Text>
                 <Text>{item.employee_address}</Text>
               </HStack>
+              <HStack>
+                <Text>Application Status:</Text>
+                <Text>{item.application_status}</Text>
+              </HStack>
               <DrawerComponent
                 skillData={item.skills}
                 workExpData={item.workexps}
@@ -45,14 +52,14 @@ const PendingEmployees = ({ data, accept, reject }: PendingProps) => {
               <HStack>
                 <Button
                   onClick={() => {
-                    accept(item.employee_address);
+                    accept(item.employee_address, employerContractAddress);
                   }}
                 >
                   Accept
                 </Button>
                 <Button
                   onClick={() => {
-                    reject(item.employee_address);
+                    reject(item.employee_address, employerContractAddress);
                   }}
                 >
                   Reject

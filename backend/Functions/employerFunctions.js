@@ -361,9 +361,207 @@ const ListPendingEmployees = async (contractAddress) => {
   return pendingEmployees;
 };
 
+const acceptEmployee = async (employeeAddress, employerContractAddress) => {
+  const web3 = new Web3(besu.member4.url);
+  const web3quorum = new Web3Quorum(web3, chainId);
+  const contract = new web3quorum.eth.Contract(contractAbiEmp);
+  const functionAbi = contract._jsonInterface.find((e) => {
+    return e.name === "acceptEmployee";
+  });
+
+  const functionArgs = web3quorum.eth.abi
+    .encodeParameters(functionAbi.inputs, [employeeAddress])
+    .slice(2);
+  const functionParams = {
+    to: employerContractAddress,
+    data: functionAbi.signature + functionArgs,
+    privateKey: besu.member4.accountPrivateKey,
+    privateFrom: tessera.member4.publicKey,
+    privateFor: [tessera.member1.publicKey],
+  };
+  const transactionHash = await web3quorum.priv.generateAndSendRawTransaction(
+    functionParams
+  );
+  const result = await web3quorum.priv.waitForTransactionReceipt(
+    transactionHash
+  );
+  return result;
+};
+const rejectEmployee = async (employeeAddress, employerContractAddress) => {
+  const web3 = new Web3(besu.member4.url);
+  const web3quorum = new Web3Quorum(web3, chainId);
+  const contract = new web3quorum.eth.Contract(contractAbiEmp);
+  const functionAbi = contract._jsonInterface.find((e) => {
+    return e.name === "rejectEmployee";
+  });
+
+  const functionArgs = web3quorum.eth.abi
+    .encodeParameters(functionAbi.inputs, [employeeAddress])
+    .slice(2);
+  const functionParams = {
+    to: employerContractAddress,
+    data: functionAbi.signature + functionArgs,
+    privateKey: besu.member4.accountPrivateKey,
+    privateFrom: tessera.member4.publicKey,
+    privateFor: [tessera.member1.publicKey],
+  };
+  const transactionHash = await web3quorum.priv.generateAndSendRawTransaction(
+    functionParams
+  );
+  const result = await web3quorum.priv.waitForTransactionReceipt(
+    transactionHash
+  );
+  return result;
+};
+
+const getEmployerInfo = async (employerContractAddress) => {
+  const web3 = new Web3(besu.member4.url);
+  const web3quorum = new Web3Quorum(web3, chainId);
+  const contract = new web3quorum.eth.Contract(contractAbiEmp);
+  const functionAbi = contract._jsonInterface.find((e) => {
+    return e.name === "getEmployerInfo";
+  });
+
+  const functionParams = {
+    to: employerContractAddress,
+    data: functionAbi.signature,
+    privateKey: besu.member4.accountPrivateKey,
+    privateFrom: tessera.member4.publicKey,
+    privateFor: [tessera.member1.publicKey],
+  };
+  const transactionHash = await web3quorum.priv.generateAndSendRawTransaction(
+    functionParams
+  );
+  const result = await web3quorum.priv.waitForTransactionReceipt(
+    transactionHash
+  );
+  const decodedResult = web3quorum.eth.abi.decodeParameters(
+    functionAbi.outputs,
+    result.output
+  );
+  const employerInfo = decodedResult;
+  const convertedEmployerInfo = {
+    employer_address: employerInfo[0],
+    employer_name: employerInfo[1],
+    email: employerInfo[2],
+  };
+
+  return convertedEmployerInfo;
+};
+const getNumberOfApplicants = async (employerContractAddress) => {
+  const web3 = new Web3(besu.member4.url);
+  const web3quorum = new Web3Quorum(web3, chainId);
+  const contract = new web3quorum.eth.Contract(contractAbiEmp);
+  const functionAbi = contract._jsonInterface.find((e) => {
+    return e.name === "getNumberOfApplicants";
+  });
+
+  const functionParams = {
+    to: employerContractAddress,
+    data: functionAbi.signature,
+    privateKey: besu.member4.accountPrivateKey,
+    privateFrom: tessera.member4.publicKey,
+    privateFor: [tessera.member1.publicKey],
+  };
+  const transactionHash = await web3quorum.priv.generateAndSendRawTransaction(
+    functionParams
+  );
+  const result = await web3quorum.priv.waitForTransactionReceipt(
+    transactionHash
+  );
+  const decodedResult = web3quorum.eth.abi.decodeParameters(
+    functionAbi.outputs,
+    result.output
+  );
+  const numberOfApplicants = {
+    rejected: decodedResult[0],
+    accepted: decodedResult[2],
+    pending: decodedResult[1],
+  };
+
+  return numberOfApplicants;
+};
+const getEmployeeInfo = async (employerContractAddress) => {
+  const web3 = new Web3(besu.member4.url);
+  const web3quorum = new Web3Quorum(web3, chainId);
+  const contract = new web3quorum.eth.Contract(contractAbiEmp);
+  const functionAbi = contract._jsonInterface.find((e) => {
+    return e.name === "getEmployeeInfo";
+  });
+
+  const functionParams = {
+    to: employerContractAddress,
+    data: functionAbi.signature,
+    privateKey: besu.member4.accountPrivateKey,
+    privateFrom: tessera.member4.publicKey,
+    privateFor: [tessera.member1.publicKey],
+  };
+  const transactionHash = await web3quorum.priv.generateAndSendRawTransaction(
+    functionParams
+  );
+  const result = await web3quorum.priv.waitForTransactionReceipt(
+    transactionHash
+  );
+  console.log(result);
+
+  const decodedResult = web3quorum.eth.abi.decodeParameters(
+    functionAbi.outputs,
+    result.output
+  );
+  console.log(decodedResult);
+  const employeeInfo = decodedResult[0].map((employee) => {
+    return {
+      employee_name: employee[0],
+      application_status: employee[1],
+      employee_address: employee[2],
+      role: employee[3],
+      institutes: employee[4],
+      skills: employee[5].map((skill) => {
+        return {
+          skillName: skill[0],
+          experience: skill[1],
+          endorsed: skill[2],
+          endorsedBy: skill[3],
+          review: skill[4],
+          visible: skill[5],
+          cert_hash: skill[6],
+        };
+      }),
+      workexps: employee[6].map((exp) => {
+        return {
+          role: exp[0],
+          institute: exp[1],
+          employer: exp[2],
+          startdate: exp[3],
+          enddate: exp[4],
+          verified: exp[5],
+          description: exp[6],
+          visible: exp[7],
+          cert_hash: exp[8],
+        };
+      }),
+      certifications: employee[7].map((cert) => {
+        return {
+          institute: cert[0],
+          certificate_name: cert[1],
+          visible: cert[2],
+          verified: cert[3],
+          cert_hash: cert[4],
+        };
+      }),
+    };
+  });
+
+  return employeeInfo;
+};
 module.exports = {
   RegisterEmployerPrivate,
   ListEmployers,
   applyForJob,
   ListPendingEmployees,
+  acceptEmployee,
+  rejectEmployee,
+  getEmployerInfo,
+  getNumberOfApplicants,
+  getEmployeeInfo,
 };

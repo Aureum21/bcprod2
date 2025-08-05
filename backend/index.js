@@ -51,6 +51,11 @@ const {
   ListEmployers,
   applyForJob,
   ListPendingEmployees,
+  acceptEmployee,
+  rejectEmployee,
+  getEmployerInfo,
+  getNumberOfApplicants,
+  getEmployeeInfo,
 } = require("./Functions/employerFunctions.js");
 const chainId = 1337;
 
@@ -472,6 +477,48 @@ app.get("/getPendingEmployees", async (req, res) => {
   } else {
     res.status(500).json({ message: "Failed to get pending employees" });
   }
+});
+
+app.post("/acceptEmployee", async (req, res) => {
+  const { employeeAddress, employerContractAddress } = req.body;
+
+  const result = await acceptEmployee(employeeAddress, employerContractAddress);
+  console.log(result);
+  if (result.status === "0x1") {
+    res.status(200).json({ message: "Application accepted successfully" });
+  } else {
+    res.status(500).json({ message: "Failed to accept application" });
+  }
+});
+
+app.post("/rejectEmployee", async (req, res) => {
+  const { employeeAddress, employerContractAddress } = req.body;
+
+  const result = await rejectEmployee(employeeAddress, employerContractAddress);
+  console.log(result);
+  if (result.status === "0x1") {
+    res.status(200).json({ message: "Application rejected successfully" });
+  } else {
+    res.status(500).json({ message: "Failed to reject application" });
+  }
+});
+
+app.get("/employerInfo", async (req, res) => {
+  const employerInfo = await getEmployerInfo(req.query.contractAddress);
+  console.log(employerInfo);
+  res.status(200).json(employerInfo);
+});
+app.get("/getNumberOfApplicants", async (req, res) => {
+  const numberOfApplicants = await getNumberOfApplicants(
+    req.query.contractAddress
+  );
+  console.log(numberOfApplicants);
+  res.status(200).json(numberOfApplicants);
+});
+app.get("/getEmployeeInfo", async (req, res) => {
+  const employeeInfo = await getEmployeeInfo(req.query.contractAddress);
+  console.log(employeeInfo);
+  res.status(200).json(employeeInfo);
 });
 
 app.listen(PORT, () => {

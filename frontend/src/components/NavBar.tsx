@@ -3,7 +3,7 @@ import { Link as RouterLink } from "react-router-dom";
 
 interface Props {
   pages: string[];
-  type: "Student" | "Institution";
+  type: "Student" | "Institution" | "Employer";
 }
 
 const NavBar = ({ pages, type }: Props) => {

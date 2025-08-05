@@ -10,8 +10,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@chakra-ui/charts": "^3.24.1",
     "@chakra-ui/react": "^3.21.1",
     "@emotion/react": "^11.14.0",
+    "@tanstack/react-query": "^5.84.1",
     "@types/node": "^24.0.10",
     "axios": "^1.10.0",
     "express": "^5.1.0",
@@ -20,6 +22,7 @@
     "react-dom": "^18.2.0",
     "react-icons": "^5.5.0",
     "react-router-dom": "^7.6.3",
+    "recharts": "^3.1.1",
     "web3": "^4.16.0",
     "web3js-quorum": "^22.4.0"
   },

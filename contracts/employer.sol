@@ -16,7 +16,6 @@ contract employer {
         email = _email;
         MOE_address = _MOE_address;
     }
-    
     function getEmployerInfo()
         public
         view
@@ -75,7 +74,6 @@ contract employer {
     }
     mapping(address => employeeInfo) pendingEmployeeInfoMap;
     address[] public pendingEmployeeAddresses;
-    employeeInfo[] public pendingEmployeeInfoList;
 
     function addpendingEmployeeInfo (
         string memory _employee_name,
@@ -103,11 +101,15 @@ contract employer {
         }
 
         pendingEmployeeAddresses.push(_employee_address);
-        pendingEmployeeInfoList.push(newpendingEmployeeInfo);
     }
 
 
     function getPendingEmployeeInfo() public view returns (employeeInfo[] memory) {
+        employeeInfo[] memory pendingEmployeeInfoList = new employeeInfo[](pendingEmployeeAddresses.length);
+        for (uint i = 0; i < pendingEmployeeAddresses.length; i++) {
+            employeeInfo storage newpendingEmployeeInfo = pendingEmployeeInfoMap[pendingEmployeeAddresses[i]];
+            pendingEmployeeInfoList[i] = newpendingEmployeeInfo;
+        }
         return pendingEmployeeInfoList;
     }
 
@@ -125,18 +127,59 @@ contract employer {
         employeeInfoMap[_employee_address] = newemployeeInfo;
         employeeAddresses.push(_employee_address);
         delete pendingEmployeeInfoMap[_employee_address];
+        for (uint i = 0; i < pendingEmployeeAddresses.length; i++) {
+            if (pendingEmployeeAddresses[i] == _employee_address) {
+                pendingEmployeeAddresses[i] = pendingEmployeeAddresses[pendingEmployeeAddresses.length - 1];
+                pendingEmployeeAddresses.pop();
+                break;
+            }
+        }
     }
+
+    function getEmployeeInfo() public view returns (employeeInfo[] memory) {
+        employeeInfo[] memory employeeInfoList = new employeeInfo[](employeeAddresses.length);
+        for (uint i = 0; i < employeeAddresses.length; i++) {
+            employeeInfo storage newemployeeInfo = employeeInfoMap[employeeAddresses[i]];
+            employeeInfoList[i] = newemployeeInfo;
+        }
+        return employeeInfoList;
+    }
+    
 
     function fireEmployee(address _employee_address) public {
         employeeInfo storage newemployeeInfo = employeeInfoMap[_employee_address];
         newemployeeInfo.application_status = "fired";
         delete employeeInfoMap[_employee_address];
+        for (uint i = 0; i < employeeAddresses.length; i++) {
+            if (employeeAddresses[i] == _employee_address) {
+                employeeAddresses[i] = employeeAddresses[employeeAddresses.length - 1];
+                employeeAddresses.pop();
+                break;
+            }
+        }
     }
     address[] public rejectedEmployeeAddresses;
+    mapping(address => employeeInfo) rejectedemployeeInfoMap;
+    address[] public rejectedemployeeAddresses;
     
     function rejectEmployee(address _employee_address) public {
         employeeInfo storage newemployeeInfo = pendingEmployeeInfoMap[_employee_address];
         newemployeeInfo.application_status = "rejected";
-        rejectedEmployeeAddresses.push(_employee_address);
+        rejectedemployeeAddresses.push(_employee_address);
+        rejectedemployeeInfoMap[_employee_address] = newemployeeInfo;
+        delete pendingEmployeeInfoMap[_employee_address];
+        for (uint i = 0; i < pendingEmployeeAddresses.length; i++) {
+            if (pendingEmployeeAddresses[i] == _employee_address) {
+                pendingEmployeeAddresses[i] = pendingEmployeeAddresses[pendingEmployeeAddresses.length - 1];
+                pendingEmployeeAddresses.pop();
+                break;
+            }
+        }
+    }
+
+    function getNumberOfApplicants() public view returns (uint, uint, uint) {
+        return (rejectedemployeeAddresses.length,
+                pendingEmployeeAddresses.length,
+                employeeAddresses.length);
     }
 }

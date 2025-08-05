@@ -13,6 +13,12 @@ export interface InstituteInfo {
   name: string;
   id: string;
 }
+interface EmployerInfo {
+  employerAddress: string;
+  name: string;
+  email: string;
+}
+
 const InstituteInformation = ({ data }: { data: InstituteInfo }) => {
   return (
     <Center>
