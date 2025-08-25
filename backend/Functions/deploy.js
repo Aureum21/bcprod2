@@ -16,6 +16,15 @@ const contractJsonInstPath = path.resolve(
 );
 const contractJsonInst = JSON.parse(fs.readFileSync(contractJsonInstPath));
 const contractBytecodeInst = contractJsonInst.evm.bytecode.object;
+const contractJsonInstPendingPath = path.resolve(
+  __dirname,
+  "../Files",
+  "institutePending.json"
+);
+const contractJsonInstPending = JSON.parse(
+  fs.readFileSync(contractJsonInstPendingPath)
+);
+const contractBytecodeInstPending = contractJsonInstPending.evm.bytecode.object;
 const contractJsonEmpPath = path.resolve(
   __dirname,
   "../Files",
@@ -28,10 +37,7 @@ async function createStudContract(value) {
   const web3 = new Web3(besu.member3.url);
   const web3quorum = new Web3Quorum(web3, chainId);
   const contractConstructorInit = web3.eth.abi
-    .encodeParameters(
-      ["string", "address", "string", "string", "address", "address"],
-      value
-    )
+    .encodeParameters(["string", "address", "string", "string"], value)
     .slice(2);
   const txOptions = {
     data: "0x" + contractBytecode + contractConstructorInit,
@@ -48,21 +54,26 @@ async function createStudContract(value) {
   console.log("Private Transaction Receipt: ", privateTxReceipt);
   return privateTxReceipt;
 }
-async function createInstContract(value) {
+async function createInstContract(value, type) {
+  console.log("Creating contract...", value);
   const web3 = new Web3(besu.member2.url);
   const web3quorum = new Web3Quorum(web3, chainId);
 
   const contractConstructorInit = web3.eth.abi
     .encodeParameters(["string", "address", "string", "address"], value)
     .slice(2);
-
+  console.log("contractConstructorInit", contractConstructorInit);
   const txOptions = {
-    data: "0x" + contractBytecodeInst + contractConstructorInit,
+    data:
+      "0x" +
+      (type === "Pending"
+        ? contractBytecodeInstPending
+        : contractBytecodeInst) +
+      contractConstructorInit,
     privateKey: besu.member2.accountPrivateKey,
     privateFrom: tessera.member2.publicKey,
     privateFor: [tessera.member1.publicKey],
   };
-  console.log("Creating contract...");
   const txHash = await web3quorum.priv.generateAndSendRawTransaction(txOptions);
   console.log("Getting contractAddress from txHash: ", txHash);
   const privateTxReceipt = await web3quorum.priv.waitForTransactionReceipt(
@@ -71,6 +82,7 @@ async function createInstContract(value) {
   console.log("Private Transaction Receipt: ", privateTxReceipt);
   return privateTxReceipt;
 }
+
 async function createEmpContract(value) {
   const web3 = new Web3(besu.member4.url);
   const web3quorum = new Web3Quorum(web3, chainId);

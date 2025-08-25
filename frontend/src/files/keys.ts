@@ -11,48 +11,37 @@ export default {
       publicKey: "1iTZde/ndBHvzhcl7V68x44Vx7pl8nwx9LqnM/AfJUg=",
     },
     member4: {
-      publicKey: "UjKUPJGYPptm7fZ5XlC9qaRwZYc4PtH2l0UH3PRRy38=",
+      publicKey: "ncsouM6CTJUfEFbV+aNZwsZ+X6PPN+mYRjigDJrKGTI=",
     },
   },
+
   contractInformations: {
     registerStud: {
-      contractAddress: "0xa7c238a94e0b45d4f77539cacf91d0d4008e46e7",
+      contractAddress: "0xa5ab4802f86bf9bc93081505a92c0d23345df277",
       from: "0xf0e2db6c8dc6c681bb5d6ad121a107f300e9b2b5",
       fromName: "member1",
       for: "0xca843569e3427144cead5e4d5999a3d0ccf92b8e",
       forName: ["member2"],
     },
-    registerInst: {
-      contractAddress: "0x611a983684b68a0f3976311f97e57a78e8fde7d2",
-      from: "0xf0e2db6c8dc6c681bb5d6ad121a107f300e9b2b5",
-      fromName: "member1",
-      for: "0x0fbdc686b912d7722dc86510934589e0aaf3b55a",
-      forName: ["member3"],
-    },
+
     registerEmp: {
-      contractAddress: "0xf07643b6535ac7426547c992007cb79b9495f9ea",
+      contractAddress: "0x3e6803c9854a58712ab4a0fba5b1ada7a4c8bf85",
       from: "0xf0e2db6c8dc6c681bb5d6ad121a107f300e9b2b5",
       fromName: "member1",
       for: "0x58c4f9707bb5fc63139431fed6bf512cee2b7823",
       forName: ["member4"],
     },
 
-    verifyInst: {
-      contractAddress: "0xaf0fac8b9bcfaf6e158dc29ceaad735ff8a1db2b",
+    admin: {
+      contractAddress: "0x80f4d2beecf9c2f831e0c3acd77492190f1ec633",
       from: "0xf0e2db6c8dc6c681bb5d6ad121a107f300e9b2b5",
       fromName: "member1",
       for: "0xf0e2db6c8dc6c681bb5d6ad121a107f300e9b2b5",
       forName: ["member1"],
     },
-    verifyStud: {
-      contractAddress: "0x2edb29ffbcbe66b2731820074ae080191976c76d",
-      from: "0xf0e2db6c8dc6c681bb5d6ad121a107f300e9b2b5",
-      fromName: "member1",
-      for: "0xca843569e3427144cead5e4d5999a3d0ccf92b8e",
-      forName: ["member2"],
-    },
+
     publicdata: {
-      contractAddress: "0x31932FfbfA288AB8b04B646415a53f34c6805AE5",
+      contractAddress: "0x00fFD3548725459255f1e78A61A07f1539Db0271",
       from: "c9c913c8c3c1cd416d80a0abf475db2062f161f6",
       fromName: "rpcnode",
     },
@@ -101,16 +90,17 @@ export default {
       accountPrivateKey:
         "61dced5af778942996880120b303fc11ee28cc8e5036d2fdff619b5675ded3f0",
     },
+
     member4: {
       name: "member4",
       url: "http://192.168.1.97:20006",
       wsUrl: "ws://192.168.1.97:20007",
       privateUrl: "http://192.168.1.97:9084",
       nodekey:
-        "a9ed1a9ee0dd0f70c3a1e78d4888b2b4a50134ba88f18aa808967e63737aeae4",
-      accountAddress: "0x58c4f9707bb5fc63139431fed6bf512cee2b7823",
+        "6f8dde18b89f78964666351312b0a796f7bf973462eeaa393c48e3ef4ebdc237",
+      accountAddress: "0x48fe1f6b7f8be3a4685ea82087511651458c8f30",
       accountPrivateKey:
-        "d184da431c0db5237e52bcc1ce269c9ff35a8048d44aa6e4a9a2b05855c18694",
+        "f8cbfeb9541aa12a7a617d105f59d2c0377ac024b2d5fc9f39b174512bd0ec56",
     },
   },
   accounts: {
@@ -130,7 +120,7 @@ export default {
         "0xae6ae8e5ccbfb04590405997ee2d52d2b330726137b875053c36d94e974d162f",
     },
     d: {
-      address: "0xaddff942ebfddd154b9519a44997ba86daa64f3e",
+      address: "0xAdDFf942EbfDDd154b9519a44997Ba86DAa64f3e",
       privateKey:
         "0x6417b4f788192420bd69a0915192a7d235817cad104e9989a49011a2b193df15",
     },

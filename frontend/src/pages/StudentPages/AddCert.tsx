@@ -1,4 +1,4 @@
-import { VStack } from "@chakra-ui/react";
+import { Box, Tabs, Text } from "@chakra-ui/react";
 import axios from "axios";
 import type { FormEvent } from "react";
 import { useEffect, useState } from "react";
@@ -6,6 +6,9 @@ import ShowData from "../../components/ShowData";
 import type { data } from "../../components/UploadCertificate";
 import UploadCertificate from "../../components/UploadCertificate";
 import { useColorMode } from "../../components/ui/color-mode";
+import { PiCertificate } from "react-icons/pi";
+import { CiViewList } from "react-icons/ci";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 export interface addCert {
   name: string;
   institute: string;
@@ -14,57 +17,88 @@ export interface addCert {
   verified: boolean;
   visible: boolean;
 }
+interface addCertData {
+  cert_name: string;
+  institute: string;
+
+  cert_hash: string;
+}
 const AddCert = () => {
   const colorMode = useColorMode().colorMode;
   const studentContractAddress = sessionStorage.getItem(
     "studentContractAddress"
   ) as string;
-  const [certData, setCertData] = useState<addCert[]>([]);
+  const queryClient = useQueryClient();
+  const { mutateAsync: addCert } = useMutation({
+    mutationFn: async (data: addCertData) => {
+      const result = await axios.post(
+        "http://localhost:5000/addUnOfficialCert",
+        {
+          certificate_name: data.cert_name,
+          institute_address: data.institute,
+          student_contract_address: studentContractAddress,
+          certificate_hash: data.cert_hash,
+        }
+      );
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["certs"],
+      });
+    },
+  });
+
   const onSubmit = async (data: data, e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const result = await axios.post("http://localhost:5000/addUnOfficialCert", {
-      certificate_name: data.certificateName,
-      institute_address: data.instituteAddress,
-      student_contract_address: studentContractAddress,
-      certificate_hash: data.certificateHash,
+    const result = await addCert({
+      cert_name: data.certificateName,
+      institute: data.instituteAddress,
+      cert_hash: data.certificateHash,
     });
     console.log(result);
-    showData();
   };
-  const showData = async () => {
-    try {
-      await axios
-        .get("http://localhost:5000/getUnOfficialCert", {
-          params: {
-            contractAddress: studentContractAddress,
-          },
-        })
-        .then((res) => {
-          sessionStorage.setItem("certData", JSON.stringify(res.data));
-          setCertData(
-            JSON.parse(
-              sessionStorage.getItem("certData") as string
-            ) as addCert[]
-          );
-        });
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
-  useEffect(() => {
-    showData();
-  }, []);
+  const { data: certData } = useQuery({
+    queryKey: ["certs"],
+    queryFn: () =>
+      axios.get<addCert[]>("http://localhost:5000/getUnOfficialCert", {
+        params: {
+          contractAddress: studentContractAddress,
+        },
+      }),
+  });
+
   return (
     <>
-      <VStack>
-        <UploadCertificate
-          onSubmit={onSubmit}
-          type="unOfficial"
-        ></UploadCertificate>
-        {certData.map((item) => {
-          return <ShowData type="Certificate" data={item}></ShowData>;
-        })}
-      </VStack>
+      <Tabs.Root variant="outline" mt={2} defaultValue="Upload Certificate">
+        <Tabs.List>
+          <Tabs.Trigger value="Upload Certificate">
+            <PiCertificate />
+            Upload Certificate
+          </Tabs.Trigger>
+          <Tabs.Trigger value="Show Certificates">
+            <CiViewList />
+            Show Certificates
+          </Tabs.Trigger>
+        </Tabs.List>
+        <Tabs.Content value="Upload Certificate">
+          <UploadCertificate
+            onSubmit={onSubmit}
+            type="unOfficial"
+          ></UploadCertificate>
+        </Tabs.Content>
+        <Tabs.Content value="Show Certificates">
+          <Box padding={2}>
+            <Text fontSize="2xl" fontWeight="bold">
+              Certificates
+            </Text>
+
+            {certData?.data.map((item) => {
+              return <ShowData type="Certificate" data={item}></ShowData>;
+            })}
+          </Box>
+        </Tabs.Content>
+      </Tabs.Root>
     </>
   );
 };

@@ -1,46 +1,80 @@
 import { type MouseEvent } from "react";
 import { Card, CardBody, VStack, Text, HStack, Button } from "@chakra-ui/react";
 import axios from "axios";
+import type { pending } from "../pages/InstPages/PendingStud";
+import DrawerComponent from "./DrawerComponent";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-export interface Data {
-  name: string;
-  address: string;
-  email: string;
-  id: string;
-  institute_address: string;
-  index: number;
-}
 interface PendingProps {
-  data: Data;
-  type: "pending" | "transfer";
+  data: pending;
 }
 
-const Pending = ({ data, type }: PendingProps) => {
+const Pending = ({ data }: PendingProps) => {
   const account = sessionStorage.getItem("account") as string;
-  const handleAccept = (_e: MouseEvent<HTMLButtonElement>) => {
-    axios.post("http://localhost:5000/acceptPendingStudent", {
-      name: data.name,
-      address: data.address,
-      email: data.email,
-      id: data.id,
-      index: data.index,
-      institute_address: account,
-    });
-  };
+  const queryClient = useQueryClient();
 
-  const handleTransfer = (_e: MouseEvent<HTMLButtonElement>) => {
-    axios.post("http://localhost:5000/acceptTransferStudent", {
+  const { mutate: acceptPendingStudent } = useMutation({
+    mutationFn: (data: any) =>
+      axios
+        .post("http://localhost:5000/acceptPendingStudent", data)
+        .then((res) => res.data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["pendingStudents"],
+      });
+    },
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+  const { mutate: rejectPendingStudent } = useMutation({
+    mutationFn: (student_address: string) =>
+      axios
+        .post("http://localhost:5000/rejectPendingStudent", {
+          student_address: student_address,
+          inst_Pending_contract_address: sessionStorage.getItem(
+            "pendingContractAddress"
+          ) as string,
+        })
+        .then((res) => res.data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["pendingStudents"],
+      });
+    },
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+  const handleAccept = (_e: MouseEvent<HTMLButtonElement>) => {
+    console.log("accepting");
+    console.log("data", data);
+    const payload = {
       name: data.name,
-      address: data.address,
+      index: data.index,
+      application_status: data.application_status,
+      student_address: data.student_address,
       email: data.email,
       id: data.id,
-      index: data.index,
-      institute_address: account,
-    });
+      registration_type: data.registration_type,
+      institutes: data.institutes,
+      skills: data.skills,
+      workexps: data.workexps,
+      certifications: data.certifications,
+      official_certifications: data.official_certifications,
+      institute_contract_address: sessionStorage.getItem(
+        "instituteContractAddress"
+      ) as string,
+      inst_address: account,
+      inst_Pending_contract_address: sessionStorage.getItem(
+        "pendingContractAddress"
+      ) as string,
+    };
+    acceptPendingStudent(payload);
   };
 
   const handleReject = (_e: MouseEvent<HTMLButtonElement>) => {
-    console.log("Rejected");
+    rejectPendingStudent(data.student_address);
   };
 
   return (
@@ -53,7 +87,7 @@ const Pending = ({ data, type }: PendingProps) => {
           </HStack>
           <HStack>
             <Text>Address:</Text>
-            <Text>{data.address}</Text>
+            <Text>{data.student_address}</Text>
           </HStack>
           <HStack>
             <Text>Email:</Text>
@@ -64,9 +98,15 @@ const Pending = ({ data, type }: PendingProps) => {
             <Text>{data.id}</Text>
           </HStack>
           <HStack>
-            <Button onClick={type == "pending" ? handleAccept : handleTransfer}>
-              Accept
-            </Button>
+            <DrawerComponent
+              trigger={<Button variant="subtle">Show More Info</Button>}
+              skillData={data.skills}
+              workExpData={data.workexps}
+              certData={data.certifications}
+            ></DrawerComponent>
+          </HStack>
+          <HStack>
+            <Button onClick={handleAccept}>Accept</Button>
             <Button onClick={handleReject}>Reject</Button>
           </HStack>
         </VStack>

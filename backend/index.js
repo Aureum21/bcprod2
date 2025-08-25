@@ -29,6 +29,8 @@ const {
   RegisterInstitutePrivateToPending,
   RegisterStudentPrivateTransfer,
   getInstituteInfo,
+  removePendingStudents,
+  getStudProfile,
 } = require("./Functions/InstFunctions.js");
 const {
   RegisterStudentPrivate,
@@ -39,11 +41,19 @@ const {
   ListSkills,
 } = require("./Functions/StudFunctions.js");
 const {
+  checkMoe,
+  getInstAddress,
+  getStudAddress,
+  getEmployerAddress,
+} = require("./Functions/AuthFunctions.js");
+const {
   ListPendingInstitutes,
   VerifyInstitute,
   registerInstToPublic,
   ListInstitutes,
   getInstituteAddress,
+  rejectInstitute,
+  getMoe,
 } = require("./Functions/AdminFunctions.js");
 const { getUnOfficialCert, getWorkExp } = require("./Functions/getcerts.js");
 const {
@@ -59,40 +69,6 @@ const {
 } = require("./Functions/employerFunctions.js");
 const chainId = 1337;
 
-const contractJsonRegStudPath = path.resolve(
-  __dirname,
-  "./Files",
-  "registerStud.json"
-);
-const contractJsonRegStud = JSON.parse(
-  fs.readFileSync(contractJsonRegStudPath)
-);
-
-const contractAbiRegStud = contractJsonRegStud.abi;
-
-// Public Data
-const contractJsonPublicDataPath = path.resolve(
-  __dirname,
-  "./Files",
-  "publicdata.json"
-);
-
-const contractJsonPublicData = JSON.parse(
-  fs.readFileSync(contractJsonPublicDataPath)
-);
-
-const contractAbiPublicData = contractJsonPublicData.abi;
-
-const contractJsonRegInstPath = path.resolve(
-  __dirname,
-  "./Files",
-  "registerInst.json"
-);
-const contractJsonRegInst = JSON.parse(
-  fs.readFileSync(contractJsonRegInstPath)
-);
-const contractAbiRegInst = contractJsonRegInst.abi;
-
 // Middleware
 app.use(cors());
 app.use(express.json());
@@ -106,8 +82,6 @@ app.post("/registerStudent", async (req, res) => {
     student_address,
     email,
     id,
-    contractInformations.verifyStud.contractAddress,
-    contractInformations.verifyInst.contractAddress,
   ]);
   console.log(contractInformations.publicdata.contractAddress);
   console.log(resultPrivate);
@@ -153,45 +127,48 @@ app.get("/listPendingInstitutes", async (req, res) => {
 app.post("/acceptInstitute", async (req, res) => {
   const { name, address, id, index } = req.body;
   const moeAddress = besu.member1.accountAddress;
-  const InstContract = await createInstContract([
-    name,
-    address,
-    id,
-    moeAddress,
-  ]);
+  const InstContract = await createInstContract(
+    [name, address, id, moeAddress],
+    "Institute"
+  );
+  const InstPendingContract = await createInstContract(
+    [name, address, id, moeAddress],
+    "Pending"
+  );
+  if (InstContract.status === "0x1") {
+    const InstContractAddress = InstContract.contractAddress;
+    const InstPendingContractAddress = InstPendingContract.contractAddress;
 
-  const InstContractAddress = InstContract.contractAddress;
-  console.log("InstContractAddress: ", InstContractAddress);
+    const resultPrivate = await VerifyInstitute({
+      name,
+      address,
+      id,
+      index,
+      InstContractAddress,
+      InstPendingContractAddress,
+    });
+    console.log("Private Registration Receipt", resultPrivate);
+    const resultPublic = await registerInstToPublic([
+      address,
+      InstContractAddress,
+      InstPendingContractAddress,
+    ]);
+    console.log("Public Registration Receipt", resultPublic);
 
-  const resultPrivate = await VerifyInstitute({
-    name,
-    address,
-    id,
-    index,
-    InstContractAddress,
-  });
-  console.log("Private Registration Receipt", resultPrivate);
-  const resultPublic = await registerInstToPublic([
-    address,
-    InstContractAddress,
-  ]);
-
-  if (resultPrivate.status === "0x1" && resultPublic.status === true) {
-    res.status(200).json({ message: "Institute verified successfully" });
+    if (resultPrivate.status === "0x1" && resultPublic.status === true) {
+      res.status(200).json({ message: "Institute verified successfully" });
+    } else {
+      res.status(500).json({ message: "Failed to verify institute" });
+    }
   } else {
-    res.status(500).json({ message: "Failed to verify institute" });
+    res.status(500).json({ message: "Failed to create institute" });
   }
 });
 
 app.post("/rejectInstitute", async (req, res) => {
   const { name, address, id, index } = req.body;
-  const resultPrivate = await removePendingInst(
-    besu.member1.url,
-    { name, address, id, index },
-    besu.member1.accountPrivateKey,
-    tessera.member1.publicKey,
-    tessera.member2.publicKey
-  );
+  const resultPrivate = await rejectInstitute(address, id);
+
   console.log(resultPrivate);
   if (resultPrivate.status === "0x1") {
     res.status(200).json({ message: "Institute rejected successfully" });
@@ -203,26 +180,17 @@ app.post("/rejectInstitute", async (req, res) => {
 app.get("/studentInformation", async (req, res) => {
   const { contractAddress } = req.query;
   console.log("contractAddress", contractAddress);
-  const studentInfo = await getStudentInformation(contractAddress);
+  const studentInfo = await getStudProfile(contractAddress);
   console.log(studentInfo);
-
-  const studentInformation = {
-    name: studentInfo[0],
-    accountAddress: studentInfo[1],
-    email: studentInfo[2],
-    id: studentInfo[3],
-    institution: studentInfo[4],
-  };
-
-  console.log(studentInformation);
-  console.log(contractAddress);
-  res.status(200).json(studentInformation);
+  res.status(200).json(studentInfo);
 });
 
 app.post("/regStudToInstPending", async (req, res) => {
   const { student_address, institute_name } = req.body;
+  console.log("student_address", student_address);
+  console.log("institute_name", institute_name);
   const institute_address = await getInstituteAddress(institute_name);
-
+  console.log("institute_address", institute_address);
   const resultPrivate = await RegisterStudentPrivateToPending([
     student_address,
     institute_address,
@@ -255,30 +223,71 @@ app.post("/regStudToInstTransfer", async (req, res) => {
   }
 });
 
-app.get("/listPendingStudents", async (req, res) => {
-  const PendingStudents = await ListPendingStudents();
+app.get("/getPendingStudents", async (req, res) => {
+  const PendingStudents = await ListPendingStudents(req.query.contractAddress);
   console.log(PendingStudents);
   res.status(200).json(PendingStudents);
 });
-app.get("/listTransferStudents", async (req, res) => {
-  const TransferStudents = await ListTransferStudents();
-  console.log(TransferStudents);
-  res.status(200).json(TransferStudents);
-});
+// app.get("/listTransferStudents", async (req, res) => {
+//   const TransferStudents = await ListTransferStudents(
+//     req.query.contractAddress
+//   );
+//   console.log(TransferStudents);
+//   res.status(200).json(TransferStudents);
+// });
 app.post("/acceptPendingStudent", async (req, res) => {
-  const { name, address, email, id, index, institute_address } = req.body;
-  const result = await VerifyPendingStudent(
+  const {
     name,
-    address,
+    index,
+    application_status,
+    student_address,
     email,
     id,
+    registration_type,
+    institutes,
+    skills,
+    workexps,
+    certifications,
+    official_certifications,
+    institute_contract_address,
+    inst_address,
+    inst_Pending_contract_address,
+  } = req.body;
+
+  const result = await VerifyPendingStudent(
+    name,
     index,
-    institute_address
+    application_status,
+    student_address,
+    email,
+    id,
+    registration_type,
+    institutes,
+    skills,
+    workexps,
+    certifications,
+    official_certifications,
+    institute_contract_address,
+    inst_address,
+    inst_Pending_contract_address
   );
   if (result) {
     res.status(200).json({ message: "Student accepted successfully" });
   } else {
     res.status(500).json({ message: "Failed to accept student" });
+  }
+});
+
+app.post("/rejectPendingStudent", async (req, res) => {
+  const { student_address, inst_Pending_contract_address } = req.body;
+  const result = await removePendingStudents(
+    student_address,
+    inst_Pending_contract_address
+  );
+  if (result) {
+    res.status(200).json({ message: "Student rejected successfully" });
+  } else {
+    res.status(500).json({ message: "Failed to reject student" });
   }
 });
 app.post("/acceptTransferStudent", async (req, res) => {
@@ -310,6 +319,18 @@ app.post("/addOfficialCert", async (req, res) => {
     endDate,
     description,
   } = req.body;
+  console.log(
+    "stRTED",
+    name,
+    student_address,
+    institute_address,
+    certificate_hash,
+    certificate_type,
+    institute_contract_address,
+    startDate,
+    endDate,
+    description
+  );
   const result = await addOfficialCert(
     name,
     student_address,
@@ -332,6 +353,7 @@ app.post("/addOfficialCert", async (req, res) => {
 });
 app.post("/addSkill", async (req, res) => {
   const { name, skill_name, experience, contractAddress } = req.body;
+  console.log(name, skill_name, experience, contractAddress);
   const result = await addSkill(skill_name, name, experience, contractAddress);
   console.log(result);
   if (result.status === "0x1") {
@@ -365,6 +387,7 @@ app.post("/addWorkExp", async (req, res) => {
   const {
     role,
     instAddress,
+    employer,
     startDate,
     endDate,
     description,
@@ -374,6 +397,7 @@ app.post("/addWorkExp", async (req, res) => {
   const result = await addWorkExp(
     role,
     instAddress,
+    employer,
     startDate,
     endDate,
     description,
@@ -519,6 +543,20 @@ app.get("/getEmployeeInfo", async (req, res) => {
   const employeeInfo = await getEmployeeInfo(req.query.contractAddress);
   console.log(employeeInfo);
   res.status(200).json(employeeInfo);
+});
+app.get("/getMoe", async (req, res) => {
+  const moe = await getMoe();
+  console.log(moe);
+  res.status(200).json(moe);
+});
+
+app.get("/checkAccount", async (req, res) => {
+  const moe = await checkMoe(req.query.account);
+  const instAddress = await getInstAddress(req.query.account);
+  const studAddress = await getStudAddress(req.query.account);
+  const employerAddress = await getEmployerAddress(req.query.account);
+  console.log(moe);
+  res.status(200).json({ moe, instAddress, studAddress, employerAddress });
 });
 
 app.listen(PORT, () => {

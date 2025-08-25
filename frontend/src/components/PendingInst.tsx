@@ -17,7 +17,7 @@ const PendingInst = ({ data, accept, reject }: PendingProps) => {
   return (
     <Card.Root>
       <Card.Body>
-        {data.map((item, index) =>
+        {data?.map((item, index) =>
           item.address !== "0x0000000000000000000000000000000000000000" ? (
             <VStack key={index}>
               <HStack>

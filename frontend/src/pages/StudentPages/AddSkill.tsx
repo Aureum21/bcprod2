@@ -1,4 +1,4 @@
-import { HStack, VStack } from "@chakra-ui/react";
+import { Box, HStack, Tabs, VStack, Text } from "@chakra-ui/react";
 import axios from "axios";
 import type { FormEvent } from "react";
 import { useEffect, useState } from "react";
@@ -6,6 +6,9 @@ import ShowData from "../../components/ShowData";
 import { useColorMode } from "../../components/ui/color-mode";
 import type { data } from "../../components/UploadCertificate";
 import UploadCertificate from "../../components/UploadCertificate";
+import { LuFolder } from "react-icons/lu";
+import { CiViewList } from "react-icons/ci";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 export interface Skill {
   name: string;
   experience: string;
@@ -14,14 +17,34 @@ export interface Skill {
   review: string;
   visible: boolean;
 }
-
+interface addSkillData {
+  name: string;
+  skill_name: string;
+  experience: string;
+  contractAddress: string;
+}
 const AddSkill = () => {
-  const [skills, setSkills] = useState<Skill[]>([]);
-
   const colorMode = useColorMode().colorMode;
+  const queryClient = useQueryClient();
   const studentContractAddress = sessionStorage.getItem(
     "studentContractAddress"
   ) as string;
+  const { mutateAsync: addSkill } = useMutation({
+    mutationFn: async (data: addSkillData) => {
+      const result = await axios.post("http://localhost:5000/addSkill", {
+        name: data.name,
+        skill_name: data.skill_name,
+        experience: data.experience,
+        contractAddress: studentContractAddress,
+      });
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["skills"],
+      });
+    },
+  });
   const handleUpload = async (data: data, e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log(
@@ -30,49 +53,57 @@ const AddSkill = () => {
       data.experience,
       studentContractAddress
     );
-    const result = await axios.post("http://localhost:5000/addSkill", {
+    const payload = {
       name: data.studentName,
       skill_name: data.skillName,
       experience: data.experience,
       contractAddress: studentContractAddress,
-    });
+    };
+    const result = await addSkill(payload as addSkillData);
     console.log(result);
   };
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        axios
-          .get("http://localhost:5000/listSkills", {
-            params: {
-              contractAddress: studentContractAddress,
-            },
-          })
-          .then((res) => {
-            sessionStorage.setItem("skills", JSON.stringify(res.data));
-            setSkills(
-              JSON.parse(sessionStorage.getItem("skills") as string) as Skill[]
-            );
-          });
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    fetchData();
-  }, []);
+  const { data: skillsData } = useQuery({
+    queryKey: ["skills"],
+    queryFn: () =>
+      axios.get("http://localhost:5000/listSkills", {
+        params: {
+          contractAddress: studentContractAddress,
+        },
+      }),
+  });
 
   return (
     <>
-      <VStack gap={10} alignItems="center">
-        <UploadCertificate
-          onSubmit={handleUpload}
-          type="skill"
-        ></UploadCertificate>
-        {skills.map((item) => {
-          return <ShowData type="Skill" data={item}></ShowData>;
-        })}
-      </VStack>
+      <Tabs.Root variant="outline" mt={2} defaultValue="Upload Skill">
+        <Tabs.List>
+          <Tabs.Trigger value="Upload Skill">
+            <LuFolder />
+            Upload Skill
+          </Tabs.Trigger>
+          <Tabs.Trigger value="Show Skills">
+            <CiViewList />
+            Show Skills
+          </Tabs.Trigger>
+        </Tabs.List>
+        <Tabs.Content value="Upload Skill">
+          <center>
+            <UploadCertificate
+              onSubmit={handleUpload}
+              type="skill"
+            ></UploadCertificate>
+          </center>
+        </Tabs.Content>
+        <Tabs.Content value="Show Skills">
+          <Box padding={2}>
+            <Text fontSize="2xl" fontWeight="bold">
+              Skills
+            </Text>
+            {skillsData?.data.map((item: Skill) => {
+              return <ShowData type="Skill" data={item}></ShowData>;
+            })}
+          </Box>
+        </Tabs.Content>
+      </Tabs.Root>
     </>
   );
 };

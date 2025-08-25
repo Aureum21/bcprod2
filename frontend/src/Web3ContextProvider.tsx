@@ -7,6 +7,7 @@ import React, {
 import Web3 from "web3";
 import publicdata from "./files/publicdata";
 import keys from "./files/keys";
+import axios from "axios";
 const contInfo = keys.contractInformations;
 const besu = keys.besu;
 interface UserData {
@@ -99,6 +100,13 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
   };
 
   const check = async (account: string) => {
+    const { data } = await axios.get("http://localhost:5000/checkAccount", {
+      params: { account },
+    });
+    console.log("moe", data.moe);
+    console.log("instAddress", data.instAddress);
+    // console.log("studAddress", data.studAddress);
+    console.log("employerAddress", data.employerAddress);
     const web3Instance = new Web3(window.ethereum);
     const contractInstance = new web3Instance.eth.Contract(
       publicdata.abi,
@@ -108,11 +116,9 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
     sessionStorage.removeItem("instituteContractAddress");
     sessionStorage.removeItem("employerContractAddress");
     try {
-      const isMoe = await contractInstance.methods
-        .ismoe()
-        .call({ from: account });
-      if (isMoe) {
+      if (data.moe) {
         sessionStorage.setItem("type", "moe");
+        console.log("isMoe", data.moe);
         return { type: "moe", contAddress: "", node: "" };
       }
     } catch (err) {
@@ -120,48 +126,59 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
     }
 
     try {
-      const value2: string[] = await contractInstance.methods
-        .getInstContractAddress(account)
-        .call({ from: besu.member2.accountAddress });
-      console.log("value2", value2);
-
-      if (value2[0] !== ZERO_ADDRESS) {
-        setInstituteContractAddress(value2[0]);
-        sessionStorage.setItem("instituteContractAddress", value2[0]);
+      if (
+        data.instAddress[0].length > 0 &&
+        data.instAddress[0][0] !== ZERO_ADDRESS
+      ) {
+        setInstituteContractAddress(data.instAddress[0][0]);
+        console.log("setInstituteContractAddress", data.instAddress[0][0]);
+        sessionStorage.setItem(
+          "instituteContractAddress",
+          data.instAddress[0][0]
+        );
+        sessionStorage.setItem(
+          "pendingContractAddress",
+          data.instAddress[0][1]
+        );
         sessionStorage.setItem("type", "institute");
-        return { type: "institute", contAddress: value2[0], node: value2[1] };
+        return {
+          type: "institute",
+          contAddress: data.instAddress[0][0],
+          node: data.instAddress[1],
+        };
       }
     } catch (err) {
       console.log("Not Institute");
     }
 
     try {
-      const value3: string[] = await contractInstance.methods
-        .getStudContractAddress(account)
-        .call({ from: besu.member3.accountAddress });
-      console.log("value3", value3);
-
-      if (value3[0] !== ZERO_ADDRESS) {
-        setStudentContractAddress(value3[0]);
-        sessionStorage.setItem("studentContractAddress", value3[0]);
+      if (data.studAddress[0] !== ZERO_ADDRESS) {
+        setStudentContractAddress(data.studAddress[0]);
+        sessionStorage.setItem("studentContractAddress", data.studAddress[0]);
         sessionStorage.setItem("type", "student");
-        return { type: "student", contAddress: value3[0], node: value3[1] };
+        return {
+          type: "student",
+          contAddress: data.studAddress[0],
+          node: data.studAddress[1],
+        };
       }
     } catch (err) {
       console.log("Not Student");
     }
 
     try {
-      const value4: string[] = await contractInstance.methods
-        .getEmployerContractAddress(account)
-        .call({ from: besu.member4.accountAddress });
-      console.log("value4", value4);
-
-      if (value4[0] !== ZERO_ADDRESS) {
-        setEmployerContractAddress(value4[0]);
-        sessionStorage.setItem("employerContractAddress", value4[0]);
+      if (data.employerAddress[0] !== ZERO_ADDRESS) {
+        setEmployerContractAddress(data.employerAddress[0]);
+        sessionStorage.setItem(
+          "employerContractAddress",
+          data.employerAddress[0]
+        );
         sessionStorage.setItem("type", "employer");
-        return { type: "employer", contAddress: value4[0], node: value4[1] };
+        return {
+          type: "employer",
+          contAddress: data.employerAddress[0],
+          node: data.employerAddress[1],
+        };
       }
     } catch (err) {
       console.log("Not Employer");

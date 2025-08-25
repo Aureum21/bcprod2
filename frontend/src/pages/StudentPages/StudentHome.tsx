@@ -4,6 +4,7 @@ import StudentInfomation, {
 import { useEffect, useState } from "react";
 import axios from "axios";
 import InfoSkeleton from "../../components/InfoSkeleton";
+import { useQuery } from "@tanstack/react-query";
 export const pages = [
   "Home",
   "Register Institution",
@@ -19,31 +20,25 @@ const StudentHome = () => {
   );
   const [studentInfo, setStudentInfo] = useState<StudentInfo | null>(null);
   console.log("studentContractAddress from this", studentContractAddress);
-  useEffect(() => {
-    !JSON.parse(sessionStorage.getItem("studentInfo") as string)
-      ? axios
-          .get("http://localhost:5000/studentInformation", {
-            params: {
-              contractAddress: studentContractAddress,
-            },
-          })
-          .then((res) => {
-            setStudentInfo(res.data);
-            sessionStorage.setItem("studentInfo", JSON.stringify(res.data));
-          })
-      : null;
-  }, []);
+  const { data } = useQuery({
+    queryKey: ["studentInfo", studentContractAddress],
+    queryFn: () =>
+      axios
+        .get("http://localhost:5000/studentInformation", {
+          params: {
+            contractAddress: studentContractAddress,
+          },
+        })
+        .then((res) => {
+          sessionStorage.setItem("studentInfo", JSON.stringify(res.data));
+          return res.data;
+        }),
+  });
 
   return (
     <>
-      {JSON.parse(sessionStorage.getItem("studentInfo") as string) ? (
-        <StudentInfomation
-          data={
-            JSON.parse(
-              sessionStorage.getItem("studentInfo") as string
-            ) as StudentInfo
-          }
-        />
+      {data ? (
+        <StudentInfomation data={data as StudentInfo} />
       ) : (
         <InfoSkeleton />
       )}

@@ -3,42 +3,77 @@ import { useEffect, useState } from "react";
 import type { data } from "../../components/PendingInst";
 import PendingInst from "../../components/PendingInst";
 import { useColorMode } from "../../components/ui/color-mode";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 const AdminHome = () => {
+  const queryClient = useQueryClient();
   const colorMode = useColorMode().colorMode;
   const [pending, setPending] = useState<data[]>([]);
-  useEffect(() => {
-    axios.get("http://localhost:5000/listPendingInstitutes").then((res) => {
-      console.log(res.data);
-      setPending(res.data as data[]);
-    });
-  }, []);
+  const { data: PendingInstitutes } = useQuery({
+    queryKey: ["PendingInstitutes"],
+    queryFn: () =>
+      axios
+        .get("http://localhost:5000/listPendingInstitutes")
+        .then((res) => res.data),
+  });
+
+  const { mutate: acceptMutation } = useMutation({
+    mutationFn: (vars: {
+      name: string;
+      address: string;
+      id: string;
+      index: number;
+    }) => {
+      return axios.post("http://localhost:5000/acceptInstitute", vars);
+    },
+    onSuccess: () => {
+      // Refetch institutes after accepting one
+      queryClient.invalidateQueries({ queryKey: ["PendingInstitutes"] });
+    },
+    onError: (error) => {
+      console.error("Error accepting institute:", error);
+    },
+  });
 
   const accept = (name: string, address: string, id: string, index: number) => {
-    axios.post("http://localhost:5000/acceptInstitute", {
+    acceptMutation({
       name,
       address,
       id,
       index,
     });
-    // axios.get("http://localhost:5000/listPendingInstitutes").then((res) => {
-    //   console.log(res.data);
-    //   setPending(res.data as data[]);
-    // });
   };
+  const { mutate: rejectMutation } = useMutation({
+    mutationFn: (vars: {
+      name: string;
+      address: string;
+      id: string;
+      index: number;
+    }) => {
+      return axios.post("http://localhost:5000/rejectInstitute", vars);
+    },
+    onSuccess: () => {
+      // Refetch institutes after accepting one
+      queryClient.invalidateQueries({ queryKey: ["PendingInstitutes"] });
+    },
+    onError: (error) => {
+      console.error("Error accepting institute:", error);
+    },
+  });
+
   const reject = (name: string, address: string, id: string, index: number) => {
-    axios.post("http://localhost:5000/rejectInstitute", {
+    rejectMutation({
       name,
       address,
       id,
       index,
     });
-    // axios.get("http://localhost:5000/listPendingInstitutes").then((res) => {
-    //   console.log(res.data);
-    //   setPending(res.data as data[]);
-    // });
   };
   return (
-    <PendingInst data={pending} accept={accept} reject={reject}></PendingInst>
+    <PendingInst
+      data={PendingInstitutes}
+      accept={accept}
+      reject={reject}
+    ></PendingInst>
   );
 };
 

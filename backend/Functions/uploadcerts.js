@@ -40,19 +40,21 @@ async function addOfficialCert(
   const contract = new web3quorum.eth.Contract(contractAbiInst);
 
   const functionAbi = contract._jsonInterface.find((e) => {
-    return e.name === "addEducation";
+    return e.name === "AddnewOfficialCert";
   });
+  const official_cert = {
+    student: student_address,
+    cert_type: certificate_type,
+    student_name: name,
+    institute: institute_address,
+    startdate: startDate,
+    enddate: endDate,
+    verified: false,
+    description: description,
+    cert_hash: certificate_hash,
+  };
   const functionArgs = web3quorum.eth.abi
-    .encodeParameters(functionAbi.inputs, [
-      name,
-      student_address,
-      startDate,
-      endDate,
-      description,
-      certificate_type,
-      institute_address,
-      certificate_hash,
-    ])
+    .encodeParameters(functionAbi.inputs, [student_address, official_cert])
     .slice(2);
   const functionParams = {
     to: institute_contract_address,
@@ -120,6 +122,7 @@ async function addUnOfficialCert(
 async function addWorkExp(
   role,
   instAddress,
+  employer,
   startDate,
   endDate,
   description,
@@ -129,6 +132,7 @@ async function addWorkExp(
   console.log("student_contract_address", student_contract_address);
   console.log("instAddress", instAddress);
   console.log("role", role);
+  console.log("employer", employer);
   console.log("startDate", startDate);
   console.log("endDate", endDate);
   console.log("description", description);
@@ -143,6 +147,7 @@ async function addWorkExp(
     .encodeParameters(functionAbi.inputs, [
       role,
       instAddress,
+      employer,
       startDate,
       endDate,
       description,

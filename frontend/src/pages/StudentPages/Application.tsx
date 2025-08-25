@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import SearchBar from "../../components/SearchBar";
 import axios from "axios";
-import { Button, HStack, VStack } from "@chakra-ui/react";
-import ShowDataApp from "../../components/showdataapp";
+import { Button, HStack, VStack, Text } from "@chakra-ui/react";
+import ShowDataApp from "../../components/ShowDataApp";
 import type { Skill } from "./AddSkill";
 import type { addCert } from "./AddCert";
 import type { workExp } from "./AddWorkExp";
@@ -26,12 +26,14 @@ const Application = () => {
   const account = sessionStorage.getItem("account");
   const studentName = JSON.parse(
     sessionStorage.getItem("studentInfo") as string
-  ).name;
+  )?.name;
 
   const [skills, setSkills] = useState<Skill[]>(() => {
-    const stored = sessionStorage.getItem("skills");
+    const stored = JSON.parse(
+      sessionStorage.getItem("studentInfo") as string
+    )?.skills;
     try {
-      return stored ? JSON.parse(stored) : [];
+      return stored ? stored : [];
     } catch (err) {
       console.error("Failed to parse skills from sessionStorage", err);
       return [];
@@ -47,24 +49,28 @@ const Application = () => {
     }
   });
   const [certData, setCertData] = useState<addCert[]>(() => {
-    const stored = sessionStorage.getItem("certData");
+    const stored = JSON.parse(
+      sessionStorage.getItem("studentInfo") as string
+    )?.certifications;
     try {
-      return stored ? JSON.parse(stored) : [];
+      return stored ? stored : [];
     } catch (err) {
       console.error("Failed to parse certData from sessionStorage", err);
       return [];
     }
   });
   const [workExp, setWorkExp] = useState<workExp[]>(() => {
-    const stored = sessionStorage.getItem("workExp");
+    const stored = JSON.parse(
+      sessionStorage.getItem("studentInfo") as string
+    )?.workexps;
     try {
-      return stored ? JSON.parse(stored) : [];
+      return stored ? stored : [];
     } catch (err) {
       console.error("Failed to parse workExp from sessionStorage", err);
       return [];
     }
   });
-  const filteredWords = employers.filter((word) =>
+  const filteredWords = employers?.filter((word) =>
     word.name.toLowerCase().includes(searchTerm.name.toLowerCase())
   );
 
@@ -77,70 +83,70 @@ const Application = () => {
         JSON.parse(sessionStorage.getItem("employerList") as string)
       );
     };
-    const getSkills = async () => {
-      try {
-        await axios
-          .get("http://localhost:5000/listSkills", {
-            params: {
-              contractAddress: studentContractAddress,
-            },
-          })
-          .then((res) => {
-            sessionStorage.setItem("skills", JSON.stringify(res.data));
-            setSkills(
-              JSON.parse(sessionStorage.getItem("skills") as string) as Skill[]
-            );
-          });
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-    const getunofficialcertificates = async () => {
-      try {
-        await axios
-          .get("http://localhost:5000/getUnOfficialCert", {
-            params: {
-              contractAddress: studentContractAddress,
-            },
-          })
-          .then((res) => {
-            sessionStorage.setItem("certData", JSON.stringify(res.data));
-            setCertData(
-              JSON.parse(
-                sessionStorage.getItem("certData") as string
-              ) as addCert[]
-            );
-          });
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-    const getWorkExp = async () => {
-      try {
-        await axios
-          .get("http://localhost:5000/getWorkExp", {
-            params: {
-              contractAddress: studentContractAddress,
-            },
-          })
-          .then((res) => {
-            sessionStorage.setItem("certData", JSON.stringify(res.data));
-            setWorkExp(
-              JSON.parse(
-                sessionStorage.getItem("certData") as string
-              ) as workExp[]
-            );
-          });
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
+    // const getSkills = async () => {
+    //   try {
+    //     await axios
+    //       .get("http://localhost:5000/listSkills", {
+    //         params: {
+    //           contractAddress: studentContractAddress,
+    //         },
+    //       })
+    //       .then((res) => {
+    //         sessionStorage.setItem("skills", JSON.stringify(res.data));
+    //         setSkills(
+    //           JSON.parse(sessionStorage.getItem("skills") as string) as Skill[]
+    //         );
+    //       });
+    //   } catch (error) {
+    //     console.error("Error fetching data:", error);
+    //   }
+    // };
+    // const getunofficialcertificates = async () => {
+    //   try {
+    //     await axios
+    //       .get("http://localhost:5000/getUnOfficialCert", {
+    //         params: {
+    //           contractAddress: studentContractAddress,
+    //         },
+    //       })
+    //       .then((res) => {
+    //         sessionStorage.setItem("certData", JSON.stringify(res.data));
+    //         setCertData(
+    //           JSON.parse(
+    //             sessionStorage.getItem("certData") as string
+    //           ) as addCert[]
+    //         );
+    //       });
+    //   } catch (error) {
+    //     console.error("Error fetching data:", error);
+    //   }
+    // };
+    // const getWorkExp = async () => {
+    //   try {
+    //     await axios
+    //       .get("http://localhost:5000/getWorkExp", {
+    //         params: {
+    //           contractAddress: studentContractAddress,
+    //         },
+    //       })
+    //       .then((res) => {
+    //         sessionStorage.setItem("certData", JSON.stringify(res.data));
+    //         setWorkExp(
+    //           JSON.parse(
+    //             sessionStorage.getItem("certData") as string
+    //           ) as workExp[]
+    //         );
+    //       });
+    //   } catch (error) {
+    //     console.error("Error fetching data:", error);
+    //   }
+    // };
 
     async function order() {
       await fetchEmployers();
-      await getSkills();
-      await getunofficialcertificates();
-      await getWorkExp();
+      // await getSkills();
+      // await getunofficialcertificates();
+      // await getWorkExp();
     }
     order();
   }, []);
@@ -154,14 +160,14 @@ const Application = () => {
         setSkillForApp([...skillForApp, data]);
       } else {
         setSkillForApp(
-          skillForApp.filter(
+          skillForApp?.filter(
             (item) =>
-              item.name !== data.name &&
-              item.experience !== data.experience &&
-              item.endorsed !== data.endorsed &&
-              item.endorsedBy !== data.endorsedBy &&
-              item.review !== data.review &&
-              item.visible !== data.visible
+              item?.name !== data.name &&
+              item?.experience !== data.experience &&
+              item?.endorsed !== data.endorsed &&
+              item?.endorsedBy !== data.endorsedBy &&
+              item?.review !== data.review &&
+              item?.visible !== data.visible
           )
         );
       }
@@ -174,7 +180,7 @@ const Application = () => {
         setCertForApp([...certForApp, data]);
       } else {
         setCertForApp(
-          certForApp.filter(
+          certForApp?.filter(
             (item) =>
               item.name !== data.name &&
               item.institute !== data.institute &&
@@ -193,7 +199,7 @@ const Application = () => {
         setWorkExpForApp([...workExpForApp, data]);
       } else {
         setWorkExpForApp(
-          workExpForApp.filter(
+          workExpForApp?.filter(
             (item) =>
               item.role !== data.role &&
               item.institute !== data.institute &&
@@ -249,13 +255,14 @@ const Application = () => {
       <SearchBar
         words={filteredWords}
         handleChange={handleChange}
-        searchTerm={searchTerm.name}
+        searchTerm={searchTerm?.name}
       />
+
       <HStack>
         <VStack>
-          {skills.map((skill) => (
+          {skills?.map((skill) => (
             <ShowDataApp
-              key={skill.name}
+              key={skill?.name}
               type="Skill"
               data={skill}
               handleCheckboxChange={handleCheckboxChange}
@@ -263,9 +270,9 @@ const Application = () => {
           ))}
         </VStack>
         <VStack>
-          {certData.map((cert) => (
+          {certData?.map((cert) => (
             <ShowDataApp
-              key={cert.name}
+              key={cert?.name}
               type="Certificate"
               data={cert}
               handleCheckboxChange={handleCheckboxChange}
@@ -273,9 +280,9 @@ const Application = () => {
           ))}
         </VStack>
         <VStack>
-          {workExp.map((work) => (
+          {workExp?.map((work) => (
             <ShowDataApp
-              key={work.role}
+              key={work?.role}
               type="Work EXperiance"
               data={work}
               handleCheckboxChange={handleCheckboxChange}

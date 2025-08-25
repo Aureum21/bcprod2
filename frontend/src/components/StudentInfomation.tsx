@@ -8,13 +8,21 @@ import {
   Center,
 } from "@chakra-ui/react";
 import user from "../assets/User.jpg";
+import type { Skill } from "../pages/StudentPages/AddSkill";
+import type { workExp } from "../pages/StudentPages/AddWorkExp";
+import type { addCert } from "../pages/StudentPages/AddCert";
+import type { OfficialCertification } from "../pages/InstPages/PendingStud";
 
 export interface StudentInfo {
   name: string;
   email: string;
   id: string;
-  accountAddress: string;
-  institution: string;
+  student_address: string;
+  institutes: string[];
+  skills: Skill[];
+  workexps: workExp[];
+  certifications: addCert[];
+  official_certifications: OfficialCertification[];
 }
 
 const StudentInfomation = ({ data }: { data: StudentInfo }) => {
@@ -42,12 +50,12 @@ const StudentInfomation = ({ data }: { data: StudentInfo }) => {
               </HStack>
               <VStack alignItems={"left"}>
                 <Text fontWeight="bold">Account Address:</Text>
-                <Text>{data.accountAddress}</Text>
+                <Text>{data.student_address}</Text>
               </VStack>
               <HStack>
                 <VStack alignItems={"left"}>
                   <Text fontWeight="bold">Institution:</Text>
-                  <Text>{data.institution}</Text>
+                  <Text>{data.institutes[-1] || "Not Registered"}</Text>
                 </VStack>
               </HStack>
             </VStack>

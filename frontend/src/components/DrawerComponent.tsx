@@ -3,7 +3,6 @@ import React from "react";
 import type { Skill } from "../pages/StudentPages/AddSkill";
 import type { workExp } from "../pages/StudentPages/AddWorkExp";
 import type { addCert } from "../pages/StudentPages/AddCert";
-import ShowDataApp from "./showdataapp";
 import ShowData from "./ShowData";
 
 interface DrawerProps {

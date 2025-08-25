@@ -2,6 +2,7 @@ const Web3 = require("web3");
 const path = require("path");
 const fs = require("fs-extra");
 const Web3Quorum = require("web3js-quorum");
+const { formatCurrentDate } = require("./InstFunctions");
 const chainId = 1337;
 const { besu, tessera, contractInformations } = require("../Files/keys");
 const { createStudContract } = require("./deploy");
@@ -10,6 +11,8 @@ const contractJsonRegStudPath = path.resolve(
   "../Files",
   "registerStud.json"
 );
+const { getInstAddress } = require("./AuthFunctions.js");
+
 const contractJsonRegStud = JSON.parse(
   fs.readFileSync(contractJsonRegStudPath)
 );
@@ -37,16 +40,27 @@ const contractJsonPublicData = JSON.parse(
 
 const contractAbiPublicData = contractJsonPublicData.abi;
 
-// Verify Stud contract
-const contractJsonVerifyStudPath = path.resolve(
+// pending institute contract
+const contractJsonInstitutePendingPath = path.resolve(
   __dirname,
   "../Files",
-  "verifystud.json"
+  "InstitutePending.json"
 );
-const contractJsonVerifyStud = JSON.parse(
-  fs.readFileSync(contractJsonVerifyStudPath)
+const contractJsonInstitutePending = JSON.parse(
+  fs.readFileSync(contractJsonInstitutePendingPath)
 );
-const contractAbiVerifyStud = contractJsonVerifyStud.abi;
+const contractAbiInstitutePending = contractJsonInstitutePending.abi;
+
+// Verify Stud contract
+const contractJsonInstitutePath = path.resolve(
+  __dirname,
+  "../Files",
+  "institute.json"
+);
+const contractJsonInstitute = JSON.parse(
+  fs.readFileSync(contractJsonInstitutePath)
+);
+const contractAbiInstitute = contractJsonInstitute.abi;
 
 async function getStudContract(accountAddress) {
   const web3 = new Web3(besu.member1.url);
@@ -98,15 +112,50 @@ async function getStudProfile(contractAddress) {
   const result = await web3quorum.priv.waitForTransactionReceipt(
     transactionHash
   );
-  const decoded = web3quorum.eth.abi.decodeParameters(
+  const studentInformation = web3quorum.eth.abi.decodeParameters(
     functionAbi.outputs,
     result.output
   );
+  const decoded = studentInformation[0];
   const studInfo = {
-    student_address: decoded[0],
-    name: decoded[1],
+    name: decoded[0],
+    student_address: decoded[1],
     email: decoded[2],
     id: decoded[3],
+    institutes: decoded[4],
+    skills: decoded[5].map((skill) => {
+      return {
+        skillName: skill[0],
+        experience: skill[2],
+        endorsed: skill[3],
+        endorsedBy: skill[4],
+        review: skill[5],
+        visible: skill[6],
+        cert_hash: skill[7],
+      };
+    }),
+    workexps: decoded[6].map((exp) => {
+      return {
+        role: exp[0],
+        institute: exp[1],
+        employer: exp[2],
+        startdate: exp[3],
+        enddate: exp[4],
+        verified: exp[5],
+        description: exp[6],
+        visible: exp[7],
+        cert_hash: exp[8],
+      };
+    }),
+    certifications: decoded[7].map((cert) => {
+      return {
+        institute: cert[1],
+        certificate_name: cert[2],
+        visible: cert[3],
+        verified: cert[4],
+        cert_hash: cert[5],
+      };
+    }),
   };
   console.log(studInfo);
   return studInfo;
@@ -124,6 +173,7 @@ async function RegisterStudentPrivate(value) {
     return e.name === "registerStudents";
   });
   console.log([...value, StudentContract.contractAddress]);
+  const currentDate = formatCurrentDate();
 
   const functionArgs = web3quorum.eth.abi
     .encodeParameters(functionAbi.inputs, [
@@ -132,6 +182,7 @@ async function RegisterStudentPrivate(value) {
       value[2],
       value[3],
       StudentContract.contractAddress,
+      currentDate,
     ])
     .slice(2);
   const functionParams = {
@@ -195,26 +246,39 @@ async function RegisterStudentPublic(contractAddress, value) {
   console.log("Result from Register:", receipt);
   return receipt;
 }
+
 async function RegisterStudentPrivateToPending(value) {
   const web3 = new Web3(besu.member2.url);
   const web3quorum = new Web3Quorum(web3, chainId);
-  const contract = new web3quorum.eth.Contract(contractAbiVerifyStud);
+  const contract = new web3quorum.eth.Contract(contractAbiInstitutePending);
   const studentcontract = await getStudContract(value[0]);
+
   const studInfo = await getStudProfile(studentcontract);
+  console.log("studInfo", studInfo);
+  const InstitutePendingContract = await getInstAddress(value[1]);
   const functionAbi = contract._jsonInterface.find((e) => {
-    return e.name === "addStudToPending";
+    return e.name === "AddStudInfoToPending";
   });
+  function safeString(val) {
+    return typeof val === "string" ? val : "";
+  }
   const functionArgs = web3quorum.eth.abi
     .encodeParameters(functionAbi.inputs, [
-      studInfo.name,
-      studInfo.student_address,
-      studInfo.email,
-      studInfo.id,
-      value[1],
+      safeString(studInfo.name),
+      safeString(studInfo.student_address),
+      safeString(studInfo.email),
+      safeString(studInfo.id),
+      "Pending",
+      safeString(value[1]),
+      studInfo.institutes || [],
+      studInfo.workexps || [],
+      studInfo.skills || [],
+      studInfo.certifications || [],
+      [],
     ])
     .slice(2);
   const functionParams = {
-    to: contractInformations.verifyStud.contractAddress,
+    to: InstitutePendingContract[0][1],
     data: functionAbi.signature + functionArgs,
     privateKey: besu.member2.accountPrivateKey,
     privateFrom: tessera.member2.publicKey,
@@ -228,6 +292,55 @@ async function RegisterStudentPrivateToPending(value) {
   );
   return result;
 }
+
+//   console.log("value", value);
+// const web3 = new Web3(besu.member2.url);
+// const web3quorum = new Web3Quorum(web3, chainId);
+// const contract = new web3quorum.eth.Contract(contractAbiInstitutePending);
+// console.log("Contract ABI:", contract._jsonInterface);
+// const studentcontract = await getStudContract(value[0]);
+// const studInfo = await getStudProfile(studentcontract);
+// const InstitutePendingContract = await getInstAddress(value[2]);
+// const functionAbi = contract._jsonInterface.find((e) => {
+//   return e.name === "AddStudInfoToPending";
+// });
+// if (!functionAbi) {
+//   console.error("Function ABI for 'addTransferStudToPending' not found.");
+//   return { error: "Function ABI not found" };
+// }
+// console.log("studentinfo from", studInfo);
+// const functionArgs = web3quorum.eth.abi
+//   .encodeParameters(functionAbi.inputs, [
+//     studInfo.name,
+//     studInfo.student_address,
+//     studInfo.email,
+//     studInfo.id,
+//     "Transfer",
+//     value[2],
+//     studInfo.institutes || [],
+//     studInfo.skills || [],
+//     studInfo.workexps || [],
+//     studInfo.certifications || [],
+//     studInfo.official_certifications || [],
+//   ])
+
+//   .slice(2);
+// const functionParams = {
+//   to: InstitutePendingContract[0][1],
+//   data: functionAbi.signature + functionArgs,
+//   privateKey: besu.member2.accountPrivateKey,
+//   privateFrom: tessera.member2.publicKey,
+//   privateFor: [tessera.member1.publicKey],
+// };
+// console.log("functionParams", functionParams);
+// const transactionHash = await web3quorum.priv.generateAndSendRawTransaction(
+//   functionParams
+// );
+// const result = await web3quorum.priv.waitForTransactionReceipt(
+//   transactionHash
+// );
+// console.log("result", result);
+// return result;
 
 const gentStudentInstitution = async (key) => {
   const web3 = new Web3(besu.member3.url);

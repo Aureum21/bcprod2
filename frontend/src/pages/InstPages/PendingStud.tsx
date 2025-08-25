@@ -1,46 +1,51 @@
 import { HStack, VStack, Text, Box, Spinner } from "@chakra-ui/react";
-import Pending, { type Data } from "../../components/Pending";
-import { useEffect, useState } from "react";
+import Pending from "../../components/Pending";
 import axios from "axios";
+import { useQuery } from "@tanstack/react-query";
+import type { Skill } from "../StudentPages/AddSkill";
+import type { workExp } from "../StudentPages/AddWorkExp";
+import type { addCert } from "../StudentPages/AddCert";
+
+export interface OfficialCertification {
+  institute: string;
+  certificate_name: string;
+  visible: string;
+  verified: string;
+  cert_hash: string;
+}
+
+export interface pending {
+  name: string;
+  index: number;
+  application_status: string;
+  student_address: string;
+  email: string;
+  id: string;
+  registration_type: string;
+  institutes: string[];
+  skills: Skill[];
+  workexps: workExp[];
+  certifications: addCert[];
+  official_certifications: OfficialCertification[];
+}
+interface PendingStud {
+  pendingStudents: pending[];
+  transferStudents: pending[];
+}
 const PendingStud = () => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [transfer, setTransfer] = useState<Data[]>(
-    JSON.parse(sessionStorage.getItem("transfer") || "[]")
+  const { data: pendingStudents, isLoading: pendingStudentsLoading } = useQuery(
+    {
+      queryKey: ["pendingStudents"],
+      queryFn: () =>
+        axios
+          .get<PendingStud>("http://localhost:5000/getPendingStudents", {
+            params: {
+              contractAddress: sessionStorage.getItem("pendingContractAddress"),
+            },
+          })
+          .then((res) => res.data),
+    }
   );
-  const [pending, setPending] = useState<Data[]>(
-    JSON.parse(sessionStorage.getItem("pending") || "[]")
-  );
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setIsLoading(true);
-        await axios
-          .get("http://localhost:5000/listTransferStudents")
-          .then((res) => {
-            sessionStorage.setItem("transfer", JSON.stringify(res.data));
-            setTransfer(
-              JSON.parse(sessionStorage.getItem("transfer") as string) as Data[]
-            );
-          });
-
-        await axios
-          .get("http://localhost:5000/listPendingStudents")
-          .then((res) => {
-            sessionStorage.setItem("pending", JSON.stringify(res.data));
-            setPending(
-              JSON.parse(sessionStorage.getItem("pending") as string) as Data[]
-            );
-          });
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
 
   return (
     <>
@@ -61,17 +66,17 @@ const PendingStud = () => {
             <Text fontWeight="bold" padding={2}>
               Registration Pending Students
             </Text>
-            {pending.length === 0 ? (
-              isLoading ? (
+            {pendingStudents?.pendingStudents.length === 0 ? (
+              pendingStudentsLoading ? (
                 <Spinner />
               ) : (
                 <Text>No Pending Students</Text>
               )
             ) : (
-              pending.map((pending, index) =>
-                pending.address !==
+              pendingStudents?.pendingStudents.map((pendingStudent, index) =>
+                pendingStudent.student_address !==
                 "0x0000000000000000000000000000000000000000" ? (
-                  <Pending key={index} data={pending} type="pending"></Pending>
+                  <Pending key={index} data={pendingStudent}></Pending>
                 ) : (
                   <>
                     <Text>No Pending Students</Text>
@@ -92,21 +97,17 @@ const PendingStud = () => {
             <Text fontWeight="bold" padding={2}>
               Transfer Pending Students
             </Text>
-            {transfer.length === 0 ? (
-              isLoading ? (
+            {pendingStudents?.transferStudents.length === 0 ? (
+              pendingStudentsLoading ? (
                 <Spinner />
               ) : (
                 <Text>No Transfer Students</Text>
               )
             ) : (
-              transfer.map((transfer, index) =>
-                transfer.address !==
+              pendingStudents?.transferStudents.map((transfer, index) =>
+                transfer.student_address !==
                 "0x0000000000000000000000000000000000000000" ? (
-                  <Pending
-                    key={index}
-                    data={transfer}
-                    type="transfer"
-                  ></Pending>
+                  <Pending key={index} data={transfer}></Pending>
                 ) : (
                   <></>
                 )

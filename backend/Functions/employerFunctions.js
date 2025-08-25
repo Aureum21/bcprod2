@@ -132,12 +132,9 @@ async function ListEmployers() {
   const web3 = new Web3(besu.member4.url);
   const web3quorum = new Web3Quorum(web3, chainId);
   const contract = new web3quorum.eth.Contract(contractAbiRegEmp);
-  console.log("Contract ABI:", contract._jsonInterface);
   const functionAbi = contract._jsonInterface.find((e) => {
     return e.name === "getRegisteredEmployerList";
   });
-
-  console.log("functionAbi", functionAbi);
 
   const functionParams = {
     to: contractInformations.registerEmp.contractAddress,
@@ -146,7 +143,6 @@ async function ListEmployers() {
     privateFrom: tessera.member4.publicKey,
     privateFor: [tessera.member1.publicKey],
   };
-  console.log("functionParams", functionParams);
   const transactionHash = await web3quorum.priv.generateAndSendRawTransaction(
     functionParams
   );

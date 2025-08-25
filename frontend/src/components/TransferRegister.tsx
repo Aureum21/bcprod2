@@ -12,6 +12,7 @@ import type { ChangeEvent } from "react";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useMutation, useQuery } from "@tanstack/react-query";
 interface Props {
   type: "transfer" | "register" | "fetch";
 }
@@ -27,14 +28,35 @@ const TransferRegister = ({ type }: Props) => {
     student_address: "",
     new_institute_address: "",
   });
-  const [institutes, setInstitutes] = useState<string[]>(() => {
-    const stored = sessionStorage.getItem("instituteList");
-    try {
-      return stored ? JSON.parse(stored) : [];
-    } catch (err) {
-      console.error("Failed to parse instituteList from sessionStorage", err);
-      return [];
-    }
+
+  const { mutateAsync: registerToPending } = useMutation({
+    mutationFn: async () => {
+      const result = await axios.post(
+        "http://localhost:5000/regStudToInstPending",
+        {
+          student_address: account,
+          institute_name: searchTerm,
+        }
+      );
+      return result;
+    },
+  });
+  const { mutateAsync: registerToTransfer } = useMutation({
+    mutationFn: async () => {
+      const result = await axios.post(
+        "http://localhost:5000/regStudToInstTransfer",
+        {
+          student_address: formDataTransfer.student_address,
+          current_institute_address: account,
+          new_institute_name: searchTerm,
+        }
+      );
+      return result;
+    },
+  });
+  const { data: InstList } = useQuery({
+    queryKey: ["InstList"],
+    queryFn: () => axios.get("http://localhost:5000/getInstList"),
   });
 
   async function handleSubmittoPending(
@@ -42,13 +64,7 @@ const TransferRegister = ({ type }: Props) => {
   ): Promise<void> {
     console.log(searchTerm);
     e.preventDefault();
-    const result = await axios.post(
-      "http://localhost:5000/regStudToInstPending",
-      {
-        student_address: account,
-        institute_name: searchTerm,
-      }
-    );
+    const result = await registerToPending();
     if (result.status === 200) {
       navigate("/waiting-for-verification");
     } else if (result.status === 500) {
@@ -59,14 +75,7 @@ const TransferRegister = ({ type }: Props) => {
     e: React.FormEvent<HTMLFormElement>
   ): Promise<void> {
     e.preventDefault();
-    const result = await axios.post(
-      "http://localhost:5000/regStudToInstTransfer",
-      {
-        student_address: formDataTransfer.student_address,
-        current_institute_address: account,
-        new_institute_name: searchTerm,
-      }
-    );
+    const result = await registerToTransfer();
     if (result.status === 200) {
       navigate("/institution/home");
     } else if (result.status === 500) {
@@ -83,18 +92,7 @@ const TransferRegister = ({ type }: Props) => {
     });
   }
 
-  useEffect(() => {
-    const fetchInstitutes = async () => {
-      const institutes = await axios.get("http://localhost:5000/getInstList");
-      sessionStorage.setItem("instituteList", JSON.stringify(institutes.data));
-      setInstitutes(
-        JSON.parse(sessionStorage.getItem("instituteList") as string)
-      );
-    };
-    fetchInstitutes();
-  }, []);
-
-  const filteredWords = institutes.filter((word) =>
+  const filteredWords = InstList?.data?.filter((word: string) =>
     word.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -160,8 +158,8 @@ const TransferRegister = ({ type }: Props) => {
                       height="200px"
                       p={2}
                     >
-                      {filteredWords.length > 0 ? (
-                        filteredWords.map((word, index) => (
+                      {filteredWords?.length > 0 ? (
+                        filteredWords.map((word: string, index: number) => (
                           <List.Item
                             width="full"
                             key={index}
