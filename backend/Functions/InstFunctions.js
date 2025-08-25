@@ -54,9 +54,10 @@ async function getStudProfile(contractAddress) {
     functionAbi.outputs,
     result.output
   );
+
   const decoded = studentInformation[0];
   const studInfo = {
-    name: decoded[0],
+    student_name: decoded[0],
     student_address: decoded[1],
     email: decoded[2],
     id: decoded[3],
@@ -64,10 +65,10 @@ async function getStudProfile(contractAddress) {
     skills: decoded[5]
       ? decoded[5].map((skill) => {
           return {
-            skillName: skill[0],
+            skill_name: skill[0],
             experience: skill[1],
             endorsed: skill[2],
-            endorsedBy: skill[3],
+            endorser_address: skill[3],
             review: skill[4],
             visible: skill[5],
             cert_hash: skill[6],
@@ -101,6 +102,7 @@ async function getStudProfile(contractAddress) {
         })
       : [],
   };
+
   console.log(studInfo);
   return studInfo;
 }
@@ -298,15 +300,15 @@ const RegisterStudentPrivateTransfer = async (value) => {
   console.log("studentinfo from", studInfo);
   const functionArgs = web3quorum.eth.abi
     .encodeParameters(functionAbi.inputs, [
-      studInfo.name,
+      studInfo.student_name,
       studInfo.student_address,
       studInfo.email,
       studInfo.id,
       "Transfer",
       value[2],
       studInfo.institutes || [],
-      studInfo.skills || [],
       studInfo.workexps || [],
+      studInfo.skills || [],
       studInfo.certifications || [],
       studInfo.official_certifications || [],
     ])
