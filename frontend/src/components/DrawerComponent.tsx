@@ -1,4 +1,11 @@
-import { Button, Drawer, Portal, CloseButton, HStack } from "@chakra-ui/react";
+import {
+  Button,
+  Drawer,
+  Portal,
+  CloseButton,
+  HStack,
+  VStack,
+} from "@chakra-ui/react";
 import React from "react";
 import type { Skill } from "../pages/StudentPages/AddSkill";
 import type { workExp } from "../pages/StudentPages/AddWorkExp";
@@ -30,24 +37,30 @@ const DrawerComponent = ({
                 <Drawer.Title>Drawer Title</Drawer.Title>
               </Drawer.Header>
               <Drawer.Body>
-                <HStack>
-                  {skillData.map((item, index) => (
-                    <ShowData key={index} type="Skill" data={item}></ShowData>
-                  ))}
-                  {workExpData.map((item, index) => (
-                    <ShowData
-                      key={index}
-                      type="Work EXperiance"
-                      data={item}
-                    ></ShowData>
-                  ))}
-                  {certData.map((item, index) => (
-                    <ShowData
-                      key={index}
-                      type="Certificate"
-                      data={item}
-                    ></ShowData>
-                  ))}
+                <HStack align="start">
+                  <VStack>
+                    {skillData.map((item, index) => (
+                      <ShowData key={index} type="Skill" data={item}></ShowData>
+                    ))}
+                  </VStack>
+                  <VStack>
+                    {workExpData.map((item, index) => (
+                      <ShowData
+                        key={index}
+                        type="Work EXperiance"
+                        data={item}
+                      ></ShowData>
+                    ))}
+                  </VStack>
+                  <VStack>
+                    {certData.map((item, index) => (
+                      <ShowData
+                        key={index}
+                        type="Certificate"
+                        data={item}
+                      ></ShowData>
+                    ))}
+                  </VStack>
                 </HStack>
               </Drawer.Body>
               <Drawer.Footer>

@@ -1,4 +1,12 @@
-import { Box, Card, HStack, VStack, Text, Badge } from "@chakra-ui/react";
+import {
+  Box,
+  Card,
+  HStack,
+  VStack,
+  Text,
+  Badge,
+  Button,
+} from "@chakra-ui/react";
 
 export interface data {
   studentName: string;
@@ -21,6 +29,13 @@ interface Props {
 }
 
 const ShowData = ({ type, data }: Props) => {
+  const handleDownload = (hash: string) => {
+    const link = document.createElement("a");
+    link.href = `http://localhost:3000/download/${hash}`;
+    link.download = "";
+    link.click();
+  };
+
   return (
     <Box minWidth={"500px"} py={4}>
       <Card.Root
@@ -44,138 +59,158 @@ const ShowData = ({ type, data }: Props) => {
 
             {/* Skill Section */}
             {type === "Skill" && (
-              <VStack align="start" gap={3}>
-                <HStack>
-                  <Text fontWeight="semibold" color="gray.600">
-                    Skill Name:
-                  </Text>
-                  <Badge colorScheme="blue" px={3} py={1} rounded="md">
-                    {data.skillName}
-                  </Badge>
-                </HStack>
-                <HStack>
-                  <Text fontWeight="semibold" color="gray.600">
-                    Experience:
-                  </Text>
-                  <Text>{data.experience}</Text>
-                </HStack>
-                <HStack>
-                  <Text fontWeight="semibold" color="gray.600">
-                    Endorsed:
-                  </Text>
-                  <Text>{data.endorsed ? "✅ Yes" : "❌ No"}</Text>
-                </HStack>
-                {data.endorsed && (
-                  <>
-                    <HStack>
-                      <Text fontWeight="semibold" color="gray.600">
-                        Endorsed By:
-                      </Text>
-                      <Text>{data.endorsedBy}</Text>
-                    </HStack>
-                    <HStack>
-                      <Text fontWeight="semibold" color="gray.600">
-                        Review:
-                      </Text>
-                      <Text>{data.review}</Text>
-                    </HStack>
-                  </>
-                )}
-                <HStack>
-                  <Text fontWeight="semibold" color="gray.600">
-                    Visible:
-                  </Text>
-                  <Text>{data.visible ? "Yes" : "No"}</Text>
-                </HStack>
-              </VStack>
+              <>
+                <VStack align="start" gap={3}>
+                  <HStack>
+                    <Text fontWeight="semibold" color="gray.600">
+                      Skill Name:
+                    </Text>
+                    <Badge colorScheme="blue" px={3} py={1} rounded="md">
+                      {data.skillName}
+                    </Badge>
+                  </HStack>
+                  <HStack>
+                    <Text fontWeight="semibold" color="gray.600">
+                      Experience:
+                    </Text>
+                    <Text>{data.experience}</Text>
+                  </HStack>
+                  <HStack>
+                    <Text fontWeight="semibold" color="gray.600">
+                      Endorsed:
+                    </Text>
+                    <Text>{data.endorsed ? "✅ Yes" : "❌ No"}</Text>
+                  </HStack>
+                  {data.endorsed && (
+                    <>
+                      <HStack>
+                        <Text fontWeight="semibold" color="gray.600">
+                          Endorsed By:
+                        </Text>
+                        <Text>{data.endorsedBy}</Text>
+                      </HStack>
+                      <HStack>
+                        <Text fontWeight="semibold" color="gray.600">
+                          Review:
+                        </Text>
+                        <Text>{data.review}</Text>
+                      </HStack>
+                    </>
+                  )}
+                  <HStack>
+                    <Text fontWeight="semibold" color="gray.600">
+                      Visible:
+                    </Text>
+                    <Text>{data.visible ? "Yes" : "No"}</Text>
+                  </HStack>
+                </VStack>
+                {/* <button onClick={handleDownload}>Download</button> */}
+              </>
             )}
 
             {/* Certificate Section */}
             {type === "Certificate" && (
-              <VStack align="start" gap={3}>
-                <HStack>
-                  <Text fontWeight="semibold" color="gray.600">
-                    Certificate Name:
-                  </Text>
-                  <Badge colorScheme="purple" px={3} py={1} rounded="md">
-                    {data.certificate_name}
-                  </Badge>
-                </HStack>
-                <HStack>
-                  <Text fontWeight="semibold" color="gray.600">
-                    Institute Address:
-                  </Text>
-                  <Text>{data.institute}</Text>
-                </HStack>
-                <HStack>
-                  <Text fontWeight="semibold" color="gray.600">
-                    Verified:
-                  </Text>
-                  <Text>{data.verified ? "✅ Yes" : "❌ No"}</Text>
-                </HStack>
-                <HStack>
-                  <Text fontWeight="semibold" color="gray.600">
-                    Visible:
-                  </Text>
-                  <Text>{data.visible ? "Yes" : "No"}</Text>
-                </HStack>
-              </VStack>
+              <>
+                <VStack align="start" gap={3}>
+                  <HStack>
+                    <Text fontWeight="semibold" color="gray.600">
+                      Certificate Name:
+                    </Text>
+                    <Badge colorScheme="purple" px={3} py={1} rounded="md">
+                      {data.certificate_name}
+                    </Badge>
+                  </HStack>
+                  <HStack>
+                    <Text fontWeight="semibold" color="gray.600">
+                      Institute Address:
+                    </Text>
+                    <Text>{data.institute}</Text>
+                  </HStack>
+                  <HStack>
+                    <Text fontWeight="semibold" color="gray.600">
+                      Verified:
+                    </Text>
+                    <Text>{data.verified ? "✅ Yes" : "❌ No"}</Text>
+                  </HStack>
+                  <HStack>
+                    <Text fontWeight="semibold" color="gray.600">
+                      Visible:
+                    </Text>
+                    <Text>{data.visible ? "Yes" : "No"}</Text>
+                  </HStack>
+                </VStack>
+
+                <Button
+                  colorPalette="blue"
+                  onClick={() => handleDownload(data.cert_hash)}
+                >
+                  Download
+                </Button>
+              </>
             )}
 
             {/* Work Experience Section */}
             {type === "Work EXperiance" && (
-              <VStack align="start" gap={3}>
-                <HStack>
-                  <Text fontWeight="semibold" color="gray.600">
-                    Start Date:
-                  </Text>
-                  <Text>{data.startdate}</Text>
-                </HStack>
-                <HStack>
-                  <Text fontWeight="semibold" color="gray.600">
-                    End Date:
-                  </Text>
-                  <Text>{data.enddate}</Text>
-                </HStack>
-                <HStack>
-                  <Text fontWeight="semibold" color="gray.600">
-                    Institute Address:
-                  </Text>
-                  <Text>{data.institute}</Text>
-                </HStack>
-                <HStack>
-                  <Text fontWeight="semibold" color="gray.600">
-                    Employer:
-                  </Text>
-                  <Text>{data.employer}</Text>
-                </HStack>
-                <HStack>
-                  <Text fontWeight="semibold" color="gray.600">
-                    Verified:
-                  </Text>
-                  <Text>{data.verified ? "✅ Yes" : "❌ No"}</Text>
-                </HStack>
-                <HStack>
-                  <Text fontWeight="semibold" color="gray.600">
-                    Visible:
-                  </Text>
-                  <Text>{data.visible ? "Yes" : "No"}</Text>
-                </HStack>
-                <HStack align="start">
-                  <Text fontWeight="semibold" color="gray.600">
-                    Description:
-                  </Text>
-                  <Text maxW="md">{data.description}</Text>
-                </HStack>
-                <HStack>
-                  <Text fontWeight="semibold" color="gray.600">
-                    Certificate Hash:
-                  </Text>
-                  <Text fontSize="sm" color="gray.500">
-                    {data.cert_hash}
-                  </Text>
-                </HStack>
-              </VStack>
+              <>
+                <VStack align="start" gap={3}>
+                  <HStack>
+                    <Text fontWeight="semibold" color="gray.600">
+                      Start Date:
+                    </Text>
+                    <Text>{data.startdate}</Text>
+                  </HStack>
+                  <HStack>
+                    <Text fontWeight="semibold" color="gray.600">
+                      End Date:
+                    </Text>
+                    <Text>{data.enddate}</Text>
+                  </HStack>
+                  <HStack>
+                    <Text fontWeight="semibold" color="gray.600">
+                      Institute Address:
+                    </Text>
+                    <Text>{data.institute}</Text>
+                  </HStack>
+                  <HStack>
+                    <Text fontWeight="semibold" color="gray.600">
+                      Employer:
+                    </Text>
+                    <Text>{data.employer}</Text>
+                  </HStack>
+                  <HStack>
+                    <Text fontWeight="semibold" color="gray.600">
+                      Verified:
+                    </Text>
+                    <Text>{data.verified ? "✅ Yes" : "❌ No"}</Text>
+                  </HStack>
+                  <HStack>
+                    <Text fontWeight="semibold" color="gray.600">
+                      Visible:
+                    </Text>
+                    <Text>{data.visible ? "Yes" : "No"}</Text>
+                  </HStack>
+                  <HStack align="start">
+                    <Text fontWeight="semibold" color="gray.600">
+                      Description:
+                    </Text>
+                    <Text maxW="md">{data.description}</Text>
+                  </HStack>
+                  <HStack>
+                    <Text fontWeight="semibold" color="gray.600">
+                      Certificate Hash:
+                    </Text>
+                    <Text fontSize="sm" color="gray.500">
+                      {data.cert_hash}
+                    </Text>
+                  </HStack>
+                </VStack>
+                <Button
+                  colorPalette="blue"
+                  onClick={() => handleDownload(data.cert_hash)}
+                >
+                  Download
+                </Button>
+              </>
             )}
           </Card.Body>
 

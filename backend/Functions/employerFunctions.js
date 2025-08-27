@@ -173,46 +173,46 @@ async function applyForJob(
   cert,
   workExp
 ) {
-  function safeString(val) {
-    return typeof val === "string" ? val : "";
-  }
+  // function safeString(val) {
+  //   return typeof val === "string" ? val : "";
+  // }
 
-  const convertedSkills = skill.map((skill) => {
-    return {
-      skill_name: safeString(skill.skillName),
-      experience: safeString(skill.experience),
-      endorsed: !!skill.endorsed,
-      endorser_address:
-        skill.endorsedBy || "0x0000000000000000000000000000000000000000",
-      review: safeString(skill.review),
-      visible: skill.visible !== undefined ? skill.visible : true,
-      cert_hash: safeString(skill.cert_hash),
-    };
-  });
+  // const convertedSkills = skill.map((skill) => {
+  //   return {
+  //     skill_name: safeString(skill.skillName),
+  //     experience: safeString(skill.experience),
+  //     endorsed: !!skill.endorsed,
+  //     endorser_address:
+  //       skill.endorsedBy || "0x0000000000000000000000000000000000000000",
+  //     review: safeString(skill.review),
+  //     visible: skill.visible !== undefined ? skill.visible : true,
+  //     cert_hash: safeString(skill.cert_hash),
+  //   };
+  // });
 
-  const convertedWorkExp = workExp.map((exp) => {
-    return {
-      role: safeString(exp.role),
-      institute: exp.institute || "0x0000000000000000000000000000000000000000", // or pass actual address
-      employer: "",
-      startdate: safeString(exp.startdate),
-      enddate: safeString(exp.enddate),
-      verified: false,
-      description: safeString(exp.description),
-      visible: exp.visible !== undefined ? exp.visible : true,
-      cert_hash: safeString(exp.cert_hash),
-    };
-  });
+  // const convertedWorkExp = workExp.map((exp) => {
+  //   return {
+  //     role: safeString(exp.role),
+  //     institute: exp.institute || "0x0000000000000000000000000000000000000000", // or pass actual address
+  //     employer: "",
+  //     startdate: safeString(exp.startdate),
+  //     enddate: safeString(exp.enddate),
+  //     verified: false,
+  //     description: safeString(exp.description),
+  //     visible: exp.visible !== undefined ? exp.visible : true,
+  //     cert_hash: safeString(exp.cert_hash),
+  //   };
+  // });
 
-  const convertedCerts = cert.map((cert) => {
-    return {
-      institute: cert.institute || "0x0000000000000000000000000000000000000000",
-      certificate_name: safeString(cert.certificate_name),
-      visible: cert.visible !== undefined ? cert.visible : true,
-      verified: cert.verified !== undefined ? cert.verified : false,
-      cert_hash: safeString(cert.cert_hash),
-    };
-  });
+  // const convertedCerts = cert.map((cert) => {
+  //   return {
+  //     institute: cert.institute || "0x0000000000000000000000000000000000000000",
+  //     certificate_name: safeString(cert.certificate_name),
+  //     visible: cert.visible !== undefined ? cert.visible : true,
+  //     verified: cert.verified !== undefined ? cert.verified : false,
+  //     cert_hash: safeString(cert.cert_hash),
+  //   };
+  // });
 
   const contractAddress = await getEmployerContractAddress(employerAddress);
   console.log("contractAddress", contractAddress);
@@ -228,9 +228,9 @@ async function applyForJob(
       employeeName,
       "applied",
       employeeAddress,
-      convertedWorkExp,
-      convertedSkills,
-      convertedCerts,
+      workExp,
+      skill,
+      cert,
     ])
     .slice(2);
   console.log(functionArgs);

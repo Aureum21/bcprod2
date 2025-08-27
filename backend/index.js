@@ -473,14 +473,51 @@ app.post("/applyForJob", async (req, res) => {
   console.log("skill", skill);
   console.log("cert", cert);
   console.log("workExp", workExp);
+  function safeString(val) {
+    return typeof val === "string" ? val : "";
+  }
+  const newskill = skill.map((skills) => {
+    return {
+      skill_name: safeString(skills.name),
+      experience: safeString(skills.experience),
+      endorsed: !!skills.endorsed,
+      endorser_address:
+        skills.endorsedBy || "0x0000000000000000000000000000000000000000",
+      review: safeString(skills.review),
+      visible: !!skills.visible,
+      cert_hash: "",
+    };
+  });
+  const newcert = cert.map((certification) => {
+    return {
+      institute: safeString(certification.institute),
+      certificate_name: safeString(certification.certificate_name),
+      visible: !!certification.visible,
+      verified: !!certification.verified,
+      cert_hash: safeString(certification.cert_hash),
+    };
+  });
+  const newWorkExp = workExp.map((work) => {
+    return {
+      role: safeString(work.role),
+      institute: safeString(work.institute),
+      employer: safeString(work.employer),
+      startdate: safeString(work.startdate),
+      enddate: safeString(work.enddate),
+      verified: false,
+      description: safeString(work.description),
+      visible: !!work.visible,
+      cert_hash: safeString(work.certificate_hash),
+    };
+  });
 
   const result = await applyForJob(
     account,
     studentName,
     employerAddress,
-    skill,
-    cert,
-    workExp
+    newskill,
+    newcert,
+    newWorkExp
   );
   console.log(result);
   if (result.status === "0x1") {
