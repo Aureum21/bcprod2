@@ -85,7 +85,7 @@ async function addUnOfficialCert(
   console.log("institute_address", institute_address);
   console.log("certificate_name", certificate_name);
   const studentProfile = await getStudProfile(student_contract_address);
-  console.log("studentProfile name", studentProfile.name);
+  console.log("studentProfile name", studentProfile.student_name);
   const web3 = new Web3(besu.member3.url);
   const web3quorum = new Web3Quorum(web3, chainId);
   const contract = new web3quorum.eth.Contract(contractAbiStud);
@@ -94,7 +94,7 @@ async function addUnOfficialCert(
   });
   const functionArgs = web3quorum.eth.abi
     .encodeParameters(functionAbi.inputs, [
-      studentProfile.name,
+      studentProfile.student_name,
       institute_address,
       certificate_name,
       certificate_hash,

@@ -26,7 +26,7 @@ const Application = () => {
   const account = sessionStorage.getItem("account");
   const studentName = JSON.parse(
     sessionStorage.getItem("studentInfo") as string
-  )?.name;
+  )?.student_name;
 
   const [skills, setSkills] = useState<Skill[]>(() => {
     const stored = JSON.parse(
