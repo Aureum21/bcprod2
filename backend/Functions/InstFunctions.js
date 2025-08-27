@@ -66,12 +66,12 @@ async function getStudProfile(contractAddress) {
       ? decoded[5].map((skill) => {
           return {
             skill_name: skill[0],
-            experience: skill[1],
-            endorsed: skill[2],
-            endorser_address: skill[3],
-            review: skill[4],
-            visible: skill[5],
-            cert_hash: skill[6],
+            experience: skill[2],
+            endorsed: skill[3],
+            endorser_address: skill[4],
+            review: skill[5],
+            visible: skill[6],
+            cert_hash: skill[7],
           };
         })
       : [],
@@ -93,11 +93,11 @@ async function getStudProfile(contractAddress) {
     certifications: decoded[7]
       ? decoded[7].map((cert) => {
           return {
-            institute: cert[0],
-            certificate_name: cert[1],
-            visible: cert[2],
-            verified: cert[3],
-            cert_hash: cert[4],
+            institute: cert[1],
+            certificate_name: cert[2],
+            visible: cert[3],
+            verified: cert[4],
+            cert_hash: cert[5],
           };
         })
       : [],

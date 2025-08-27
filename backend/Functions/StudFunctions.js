@@ -116,47 +116,55 @@ async function getStudProfile(contractAddress) {
     functionAbi.outputs,
     result.output
   );
+
   const decoded = studentInformation[0];
   const studInfo = {
-    name: decoded[0],
+    student_name: decoded[0],
     student_address: decoded[1],
     email: decoded[2],
     id: decoded[3],
     institutes: decoded[4],
-    skills: decoded[5].map((skill) => {
-      return {
-        skillName: skill[0],
-        experience: skill[2],
-        endorsed: skill[3],
-        endorsedBy: skill[4],
-        review: skill[5],
-        visible: skill[6],
-        cert_hash: skill[7],
-      };
-    }),
-    workexps: decoded[6].map((exp) => {
-      return {
-        role: exp[0],
-        institute: exp[1],
-        employer: exp[2],
-        startdate: exp[3],
-        enddate: exp[4],
-        verified: exp[5],
-        description: exp[6],
-        visible: exp[7],
-        cert_hash: exp[8],
-      };
-    }),
-    certifications: decoded[7].map((cert) => {
-      return {
-        institute: cert[1],
-        certificate_name: cert[2],
-        visible: cert[3],
-        verified: cert[4],
-        cert_hash: cert[5],
-      };
-    }),
+    skills: decoded[5]
+      ? decoded[5].map((skill) => {
+          return {
+            skill_name: skill[0],
+            experience: skill[2],
+            endorsed: skill[3],
+            endorser_address: skill[4],
+            review: skill[5],
+            visible: skill[6],
+            cert_hash: skill[7],
+          };
+        })
+      : [],
+    workexps: decoded[6]
+      ? decoded[6].map((exp) => {
+          return {
+            role: exp[0],
+            institute: exp[1],
+            employer: exp[2],
+            startdate: exp[3],
+            enddate: exp[4],
+            verified: exp[5],
+            description: exp[6],
+            visible: exp[7],
+            cert_hash: exp[8],
+          };
+        })
+      : [],
+    certifications: decoded[7]
+      ? decoded[7].map((cert) => {
+          return {
+            institute: cert[1],
+            certificate_name: cert[2],
+            visible: cert[3],
+            verified: cert[4],
+            cert_hash: cert[5],
+          };
+        })
+      : [],
   };
+
   console.log(studInfo);
   return studInfo;
 }
@@ -259,23 +267,26 @@ async function RegisterStudentPrivateToPending(value) {
   const functionAbi = contract._jsonInterface.find((e) => {
     return e.name === "AddStudInfoToPending";
   });
-  function safeString(val) {
-    return typeof val === "string" ? val : "";
+  if (!functionAbi) {
+    console.error("Function ABI for 'addTransferStudToPending' not found.");
+    return { error: "Function ABI not found" };
   }
+  console.log("studentinfo from", studInfo);
   const functionArgs = web3quorum.eth.abi
     .encodeParameters(functionAbi.inputs, [
-      safeString(studInfo.name),
-      safeString(studInfo.student_address),
-      safeString(studInfo.email),
-      safeString(studInfo.id),
+      studInfo.student_name,
+      studInfo.student_address,
+      studInfo.email,
+      studInfo.id,
       "Pending",
-      safeString(value[1]),
+      value[1],
       studInfo.institutes || [],
       studInfo.workexps || [],
       studInfo.skills || [],
       studInfo.certifications || [],
-      [],
+      studInfo.official_certifications || [],
     ])
+
     .slice(2);
   const functionParams = {
     to: InstitutePendingContract[0][1],
@@ -284,12 +295,14 @@ async function RegisterStudentPrivateToPending(value) {
     privateFrom: tessera.member2.publicKey,
     privateFor: [tessera.member1.publicKey],
   };
+  console.log("functionParams", functionParams);
   const transactionHash = await web3quorum.priv.generateAndSendRawTransaction(
     functionParams
   );
   const result = await web3quorum.priv.waitForTransactionReceipt(
     transactionHash
   );
+  console.log("result", result);
   return result;
 }
 
