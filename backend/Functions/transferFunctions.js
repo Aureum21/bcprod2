@@ -151,7 +151,6 @@ const ListPendingStudents = async (contractAddress) => {
     functionAbi.outputs,
     result.output
   );
-  console.log(decoded);
 
   const pendingStudentList = decoded[0].map((student, index) => {
     return {
@@ -174,7 +173,7 @@ const ListPendingStudents = async (contractAddress) => {
           cert_hash: skill[6],
         };
       }),
-      workexps: student[7].map((exp) => {
+      workexps: student[8].map((exp) => {
         return {
           role: exp[0],
           institute: exp[1],
@@ -187,7 +186,7 @@ const ListPendingStudents = async (contractAddress) => {
           cert_hash: exp[8],
         };
       }),
-      certifications: student[8].map((cert) => {
+      certifications: student[9].map((cert) => {
         return {
           institute: cert[0],
           certificate_name: cert[1],
@@ -196,13 +195,17 @@ const ListPendingStudents = async (contractAddress) => {
           cert_hash: cert[4],
         };
       }),
-      official_certifications: student[9].map((cert) => {
+      official_certifications: student[10].map((cert) => {
         return {
-          institute: cert[0],
-          certificate_name: cert[1],
-          visible: cert[2],
-          verified: cert[3],
-          cert_hash: cert[4],
+          student: cert[0],
+          cert_type: cert[1],
+          student_name: cert[2],
+          institute: cert[3],
+          startdate: cert[4],
+          enddate: cert[5],
+          verified: cert[6],
+          description: cert[7],
+          cert_hash: cert[8],
         };
       }),
     };
@@ -308,6 +311,8 @@ const verifystudent = async (
   const functionAbi = contract._jsonInterface.find((e) => {
     return e.name === functionName;
   });
+  console.log("Step2 stud info  ..", studentInfo);
+
   const functionArgs = web3quorum.eth.abi
     .encodeParameters(functionAbi.inputs, [studentInfo])
     .slice(2);
@@ -370,14 +375,63 @@ const VerifyPendingStudent = async (
   id,
   registration_type,
   institutes,
-  skills,
-  workexps,
-  certifications,
-  official_certifications,
+  newskills,
+  newworkexps,
+  newcertifications,
+  newofficial_certifications,
   institute_contract_address,
   inst_address,
   inst_Pending_contract_address
 ) => {
+  const skills = newskills.map((skill) => {
+    return {
+      skill_name: skill.skillName,
+      experience: skill.experience,
+      endorsed: skill.endorsed,
+      endorser_address: skill.endorsedBy,
+      review: skill.review,
+      visible: skill.visible,
+      cert_hash: skill.cert_hash,
+    };
+  });
+  const workexps = newworkexps.map((workexp) => {
+    return {
+      role: workexp.role,
+      institute: workexp.institute,
+      employer: workexp.employer,
+      startdate: workexp.startdate,
+      enddate: workexp.enddate,
+      verified: workexp.verified,
+      description: workexp.description,
+      visible: true,
+      cert_hash: "",
+    };
+  });
+  const certifications = newcertifications.map((certification) => {
+    return {
+      institute: certification.institute,
+      certificate_name: certification.certificate_name,
+      visible: certification.visible,
+      verified: certification.verified,
+      cert_hash: certification.cert_hash,
+    };
+  });
+
+  const official_certifications = newofficial_certifications.map(
+    (official_certification) => {
+      return {
+        student: official_certification.student,
+        cert_type: official_certification.cert_type,
+        student_name: official_certification.student_name,
+        institute: official_certification.institute,
+        start_date: official_certification.startdate,
+        end_date: official_certification.enddate,
+        verified: official_certification.verified,
+        description: official_certification.description,
+        cert_hash: official_certification.cert_hash,
+      };
+    }
+  );
   const studentInfo = {
     student_name,
     application_status,
@@ -398,6 +452,7 @@ const VerifyPendingStudent = async (
   const key = web3.utils.soliditySha3(student_address, id);
   console.log("key", key);
   const result1 = await addInstTostudInfo(key, inst_address);
+  console.log("result1 done");
   const result2 = await verifystudent(
     studentInfo,
     "verifystudent",

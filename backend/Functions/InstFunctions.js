@@ -414,5 +414,4 @@ module.exports = {
   getInstituteInfo,
   formatCurrentDate,
   removePendingStudents,
-  getStudProfile,
 };

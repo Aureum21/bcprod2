@@ -7,10 +7,14 @@ import type { workExp } from "../StudentPages/AddWorkExp";
 import type { addCert } from "../StudentPages/AddCert";
 
 export interface OfficialCertification {
+  student: string;
+  cert_type: string;
+  student_name: string;
   institute: string;
-  certificate_name: string;
-  visible: string;
-  verified: string;
+  startdate: string;
+  enddate: string;
+  verified: boolean;
+  description: string;
   cert_hash: string;
 }
 

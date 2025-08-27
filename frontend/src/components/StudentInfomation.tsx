@@ -73,7 +73,7 @@ const StudentInfomation = ({ data }: { data: StudentInfo }) => {
                   borderRadius="md"
                 >
                   <Text fontWeight="bold">Name:</Text>
-                  <Text>{data.student_name}</Text>
+                  <Text>{data?.student_name}</Text>
                 </HStack>
                 <HStack
                   bg={colorMode === "dark" ? "gray.700" : "gray.100"}
@@ -81,7 +81,7 @@ const StudentInfomation = ({ data }: { data: StudentInfo }) => {
                   borderRadius="md"
                 >
                   <Text fontWeight="bold">Email:</Text>
-                  <Text>{data.email}</Text>
+                  <Text>{data?.email}</Text>
                 </HStack>
                 <HStack
                   bg={colorMode === "dark" ? "gray.700" : "gray.100"}
@@ -89,7 +89,7 @@ const StudentInfomation = ({ data }: { data: StudentInfo }) => {
                   borderRadius="md"
                 >
                   <Text fontWeight="bold">ID:</Text>
-                  <Text>{data.id}</Text>
+                  <Text>{data?.id}</Text>
                 </HStack>
                 <VStack
                   alignItems={"left"}
@@ -98,7 +98,7 @@ const StudentInfomation = ({ data }: { data: StudentInfo }) => {
                   borderRadius="md"
                 >
                   <Text fontWeight="bold">Account Address:</Text>
-                  <Text>{data.student_address}</Text>
+                  <Text>{data?.student_address}</Text>
                 </VStack>
                 <VStack
                   alignItems={"left"}
@@ -111,9 +111,9 @@ const StudentInfomation = ({ data }: { data: StudentInfo }) => {
 
                   <Badge
                     width="fit-content"
-                    colorPalette={data.institutes[-1] ? "green" : "red"}
+                    colorPalette={data?.institutes.at(-1) ? "green" : "red"}
                   >
-                    {data.institutes[-1] || "Not Registered"}
+                    {data?.institutes.at(-1) || "Not Registered"}
                   </Badge>
                 </VStack>
               </VStack>

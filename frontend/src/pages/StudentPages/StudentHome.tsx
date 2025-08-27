@@ -20,36 +20,25 @@ const StudentHome = () => {
   );
   const [studentInfo, setStudentInfo] = useState<StudentInfo | null>(null);
   console.log("studentContractAddress from this", studentContractAddress);
-  // const { data } = useQuery({
-  //   queryKey: ["studentInfo", studentContractAddress],
-  //   queryFn: () =>
-  //     axios
-  //       .get("http://localhost:5000/studentInformation", {
-  //         params: {
-  //           contractAddress: studentContractAddress,
-  //         },
-  //       })
-  //       .then((res) => {
-  //         sessionStorage.setItem("studentInfo", JSON.stringify(res.data));
-  //         return res.data;
-  //       }),
-  // });
-  const ExampleStudentInfo: StudentInfo = {
-    student_name: "Student-1",
-    email: "H005406@hct.ac.ae",
-    id: "1234",
-    student_address: "0x0fBDc686b912d7722dc86510934589E0AAf3b55A",
-    institutes: [],
-    skills: [],
-    workexps: [],
-    certifications: [],
-    official_certifications: [],
-  };
+  const { data, isLoading: studentLoading } = useQuery({
+    queryKey: ["studentInfo", studentContractAddress],
+    queryFn: () =>
+      axios
+        .get("http://localhost:5000/studentInformation", {
+          params: {
+            contractAddress: studentContractAddress,
+          },
+        })
+        .then((res) => {
+          sessionStorage.setItem("studentInfo", JSON.stringify(res.data));
+          return res.data;
+        }),
+  });
 
   return (
     <>
-      {studentContractAddress ? (
-        <StudentInfomation data={ExampleStudentInfo as StudentInfo} />
+      {!studentLoading ? (
+        <StudentInfomation data={data as StudentInfo} />
       ) : (
         <InfoSkeleton />
       )}

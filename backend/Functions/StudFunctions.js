@@ -271,7 +271,7 @@ async function RegisterStudentPrivateToPending(value) {
     console.error("Function ABI for 'addTransferStudToPending' not found.");
     return { error: "Function ABI not found" };
   }
-  console.log("studentinfo from", studInfo);
+  console.log("certification value", studInfo.certifications);
   const functionArgs = web3quorum.eth.abi
     .encodeParameters(functionAbi.inputs, [
       studInfo.student_name,

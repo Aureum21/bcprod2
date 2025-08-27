@@ -30,7 +30,6 @@ const {
   RegisterStudentPrivateTransfer,
   getInstituteInfo,
   removePendingStudents,
-  getStudProfile,
 } = require("./Functions/InstFunctions.js");
 const {
   RegisterStudentPrivate,
@@ -38,6 +37,7 @@ const {
   RegisterStudentPublic,
   RegisterStudentPrivateToPending,
   addSkill,
+  getStudProfile,
   ListSkills,
 } = require("./Functions/StudFunctions.js");
 const {
@@ -225,7 +225,6 @@ app.post("/regStudToInstTransfer", async (req, res) => {
 
 app.get("/getPendingStudents", async (req, res) => {
   const PendingStudents = await ListPendingStudents(req.query.contractAddress);
-  console.log(PendingStudents);
   res.status(200).json(PendingStudents);
 });
 // app.get("/listTransferStudents", async (req, res) => {
