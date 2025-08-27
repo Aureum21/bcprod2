@@ -30,6 +30,7 @@ interface addWorkExpData {
 }
 const AddWorkExp = () => {
   const colorMode = useColorMode().colorMode;
+  const [isLoading, setIsLoading] = useState(false);
   const studentContractAddress = sessionStorage.getItem(
     "studentContractAddress"
   ) as string;
@@ -57,6 +58,7 @@ const AddWorkExp = () => {
 
   const onSubmit = async (data: data, e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsLoading(true);
     const result = await addWorkExp({
       role: data.jobTitle,
       institute: data.instituteAddress,
@@ -67,6 +69,7 @@ const AddWorkExp = () => {
       cert_hash: data.certificateHash,
     });
     console.log(result);
+    setIsLoading(false);
   };
   const { data: certData } = useQuery({
     queryKey: ["certData"],
@@ -95,6 +98,7 @@ const AddWorkExp = () => {
           <UploadCertificate
             onSubmit={onSubmit}
             type="workExperiance"
+            isLoading={isLoading}
           ></UploadCertificate>
         </Tabs.Content>
         <Tabs.Content value="Show Work Experiance">

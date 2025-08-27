@@ -24,6 +24,7 @@ interface addSkillData {
   contractAddress: string;
 }
 const AddSkill = () => {
+  const [isLoading, setIsLoading] = useState(false);
   const colorMode = useColorMode().colorMode;
   const queryClient = useQueryClient();
   const studentContractAddress = sessionStorage.getItem(
@@ -47,6 +48,7 @@ const AddSkill = () => {
   });
   const handleUpload = async (data: data, e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsLoading(true);
     console.log(
       data.studentName,
       data.skillName,
@@ -61,6 +63,7 @@ const AddSkill = () => {
     };
     const result = await addSkill(payload as addSkillData);
     console.log(result);
+    setIsLoading(false);
   };
   const { data: skillsData } = useQuery({
     queryKey: ["skills"],
@@ -89,6 +92,7 @@ const AddSkill = () => {
           <center>
             <UploadCertificate
               onSubmit={handleUpload}
+              isLoading={isLoading}
               type="skill"
             ></UploadCertificate>
           </center>

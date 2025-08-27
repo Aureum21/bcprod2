@@ -5,6 +5,7 @@ import {
   Field,
   Input,
   List,
+  Spinner,
   Text,
   VStack,
 } from "@chakra-ui/react";
@@ -18,6 +19,7 @@ interface Props {
 }
 
 const TransferRegister = ({ type }: Props) => {
+  const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
   const account = sessionStorage.getItem("account") as string;
@@ -64,7 +66,9 @@ const TransferRegister = ({ type }: Props) => {
   ): Promise<void> {
     console.log(searchTerm);
     e.preventDefault();
+    setIsLoading(true);
     const result = await registerToPending();
+    setIsLoading(false);
     if (result.status === 200) {
       navigate("/waiting-for-verification");
     } else if (result.status === 500) {
@@ -75,7 +79,9 @@ const TransferRegister = ({ type }: Props) => {
     e: React.FormEvent<HTMLFormElement>
   ): Promise<void> {
     e.preventDefault();
+    setIsLoading(true);
     const result = await registerToTransfer();
+    setIsLoading(false);
     if (result.status === 200) {
       navigate("/institution/home");
     } else if (result.status === 500) {
@@ -188,12 +194,16 @@ const TransferRegister = ({ type }: Props) => {
             {/* New with Search bar */}
           </Card.Body>
           <Card.Footer>
-            <Button type="submit">
-              {type === "register"
-                ? "Register"
-                : type === "transfer"
-                ? "Transfer"
-                : "Fetch"}
+            <Button type="submit" minW="100px">
+              {isLoading ? (
+                <Spinner />
+              ) : type === "register" ? (
+                "Register"
+              ) : type === "transfer" ? (
+                "Transfer"
+              ) : (
+                "Fetch"
+              )}
             </Button>
           </Card.Footer>
         </Card.Root>

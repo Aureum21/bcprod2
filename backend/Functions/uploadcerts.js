@@ -94,7 +94,7 @@ async function addUnOfficialCert(
   });
   const functionArgs = web3quorum.eth.abi
     .encodeParameters(functionAbi.inputs, [
-      studentProfile.name,
+      studentProfile.student_name,
       institute_address,
       certificate_name,
       certificate_hash,

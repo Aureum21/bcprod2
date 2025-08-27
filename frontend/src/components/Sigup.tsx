@@ -5,6 +5,7 @@ import {
   Fieldset,
   Input,
   NativeSelect,
+  Spinner,
 } from "@chakra-ui/react";
 import axios from "axios";
 import { useContext, useState } from "react";
@@ -12,6 +13,7 @@ import { Web3Context } from "../Web3ContextProvider";
 import { useNavigate } from "react-router-dom";
 
 const Signup = () => {
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { connect, check } = useContext(Web3Context);
   const [role, setRole] = useState<string>("Student");
@@ -42,6 +44,7 @@ const Signup = () => {
         data.type !== "employer"
       ) {
         if (formData.role === "Student") {
+          setIsLoading(true);
           const result = await axios.post(
             "http://localhost:5000/registerStudent",
             {
@@ -51,12 +54,14 @@ const Signup = () => {
               id: formData.id,
             }
           );
+          setIsLoading(false);
           if (result.status === 200) {
             navigate("/student/home");
           } else if (result.status === 500) {
             navigate("/signup");
           }
         } else if (formData.role === "Institution") {
+          setIsLoading(true);
           const result = await axios.post(
             "http://localhost:5000/registerInstituteToPending",
             {
@@ -65,12 +70,14 @@ const Signup = () => {
               id: formData.id,
             }
           );
+          setIsLoading(false);
           if (result.status === 200) {
             navigate("/waiting-for-verification");
           } else if (result.status === 500) {
             navigate("/signup");
           }
         } else if (formData.role === "Employer") {
+          setIsLoading(true);
           const result = await axios.post(
             "http://localhost:5000/registerEmployer",
             {
@@ -79,6 +86,7 @@ const Signup = () => {
               email: formData.email,
             }
           );
+          setIsLoading(false);
           if (result.status === 200) {
             navigate("/");
           } else if (result.status === 500) {
@@ -155,7 +163,7 @@ const Signup = () => {
             </Fieldset.Content>
 
             <Button type="submit" alignSelf="flex-start">
-              Submit
+              {isLoading ? <Spinner /> : "Submit"}
             </Button>
           </Fieldset.Root>
         </Card.Body>

@@ -6,6 +6,7 @@ import {
   Fieldset,
   Input,
   NativeSelect,
+  Spinner,
   Textarea,
 } from "@chakra-ui/react";
 import { useState, type FormEvent } from "react";
@@ -29,9 +30,10 @@ export interface data {
 interface Props {
   type: CertificateType;
   onSubmit: (data: data, e: FormEvent<HTMLFormElement>) => void;
+  isLoading: boolean;
 }
 
-const UploadCertificate = ({ type, onSubmit }: Props) => {
+const UploadCertificate = ({ type, onSubmit, isLoading }: Props) => {
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
@@ -285,8 +287,8 @@ const UploadCertificate = ({ type, onSubmit }: Props) => {
                 </Field.Root>
               </Fieldset.Content>
 
-              <Button type="submit" alignSelf="flex-start" mt={4}>
-                Submit
+              <Button type="submit" alignSelf="flex-start" mt={4} minW="100px">
+                {isLoading ? <Spinner /> : "Submit"}
               </Button>
             </Fieldset.Root>
           </Card.Body>

@@ -24,6 +24,7 @@ interface addCertData {
   cert_hash: string;
 }
 const AddCert = () => {
+  const [isLoading, setIsLoading] = useState(false);
   const colorMode = useColorMode().colorMode;
   const studentContractAddress = sessionStorage.getItem(
     "studentContractAddress"
@@ -51,11 +52,13 @@ const AddCert = () => {
 
   const onSubmit = async (data: data, e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsLoading(true);
     const result = await addCert({
       cert_name: data.certificateName,
       institute: data.instituteAddress,
       cert_hash: data.certificateHash,
     });
+    setIsLoading(false);
     console.log(result);
   };
   const { data: certData } = useQuery({
@@ -85,6 +88,7 @@ const AddCert = () => {
           <UploadCertificate
             onSubmit={onSubmit}
             type="unOfficial"
+            isLoading={isLoading}
           ></UploadCertificate>
         </Tabs.Content>
         <Tabs.Content value="Show Certificates">
