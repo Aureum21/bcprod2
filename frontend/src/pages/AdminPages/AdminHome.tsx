@@ -6,6 +6,7 @@ import { useColorMode } from "../../components/ui/color-mode";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 const AdminHome = () => {
   const queryClient = useQueryClient();
+  const [isLoading, setIsLoading] = useState(false);
   const colorMode = useColorMode().colorMode;
   const [pending, setPending] = useState<data[]>([]);
   const { data: PendingInstitutes } = useQuery({
@@ -32,9 +33,13 @@ const AdminHome = () => {
     onError: (error) => {
       console.error("Error accepting institute:", error);
     },
+    onSettled: () => {
+      setIsLoading(false);
+    },
   });
 
   const accept = (name: string, address: string, id: string, index: number) => {
+    setIsLoading(true);
     acceptMutation({
       name,
       address,
@@ -58,9 +63,13 @@ const AdminHome = () => {
     onError: (error) => {
       console.error("Error accepting institute:", error);
     },
+    onSettled: () => {
+      setIsLoading(false);
+    },
   });
 
   const reject = (name: string, address: string, id: string, index: number) => {
+    setIsLoading(true);
     rejectMutation({
       name,
       address,
@@ -70,6 +79,7 @@ const AdminHome = () => {
   };
   return (
     <PendingInst
+      isLoading={isLoading}
       data={PendingInstitutes}
       accept={accept}
       reject={reject}

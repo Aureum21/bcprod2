@@ -70,7 +70,7 @@ const TransferRegister = ({ type }: Props) => {
     const result = await registerToPending();
     setIsLoading(false);
     if (result.status === 200) {
-      navigate("/waiting-for-verification");
+      navigate("/Student/register-institution");
     } else if (result.status === 500) {
       navigate("/Student/register-institution");
     }

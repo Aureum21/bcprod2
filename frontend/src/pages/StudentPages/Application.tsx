@@ -258,7 +258,7 @@ const Application = () => {
         searchTerm={searchTerm?.name}
       />
 
-      <HStack>
+      <HStack alignItems="start">
         <VStack>
           {skills?.map((skill) => (
             <ShowDataApp

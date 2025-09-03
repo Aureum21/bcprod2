@@ -17,7 +17,7 @@ export default {
 
   contractInformations: {
     registerStud: {
-      contractAddress: "0xa5ab4802f86bf9bc93081505a92c0d23345df277",
+      contractAddress: "0x34ecdba3555cbebb52dabc7c021b4e9db92567f0",
       from: "0xf0e2db6c8dc6c681bb5d6ad121a107f300e9b2b5",
       fromName: "member1",
       for: "0xca843569e3427144cead5e4d5999a3d0ccf92b8e",
@@ -25,7 +25,7 @@ export default {
     },
 
     registerEmp: {
-      contractAddress: "0x3e6803c9854a58712ab4a0fba5b1ada7a4c8bf85",
+      contractAddress: "0x9cc48daeb3e8dae51c12ea85829d28761c27ed54",
       from: "0xf0e2db6c8dc6c681bb5d6ad121a107f300e9b2b5",
       fromName: "member1",
       for: "0x58c4f9707bb5fc63139431fed6bf512cee2b7823",
@@ -33,7 +33,7 @@ export default {
     },
 
     admin: {
-      contractAddress: "0x80f4d2beecf9c2f831e0c3acd77492190f1ec633",
+      contractAddress: "0x8ac0a87cc4eaffd6946cd192d626156fa86c46db",
       from: "0xf0e2db6c8dc6c681bb5d6ad121a107f300e9b2b5",
       fromName: "member1",
       for: "0xf0e2db6c8dc6c681bb5d6ad121a107f300e9b2b5",
@@ -41,7 +41,7 @@ export default {
     },
 
     publicdata: {
-      contractAddress: "0x00fFD3548725459255f1e78A61A07f1539Db0271",
+      contractAddress: "0x2FB52Ef60fb8f38c6e3B9c1160868969773C8223",
       from: "c9c913c8c3c1cd416d80a0abf475db2062f161f6",
       fromName: "rpcnode",
     },
