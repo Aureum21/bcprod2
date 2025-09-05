@@ -3,6 +3,7 @@ import { VStack, Heading, SimpleGrid, Box, Center } from "@chakra-ui/react";
 import { useColorModeValue } from "./ui/color-mode";
 import StatDisplay from "./StatDisplay";
 import Piechart from "./Piechart";
+import StatsSkeleton from "./StatsSkeleton";
 
 interface Props {
   totalNumberOfApplicants: number;
@@ -11,11 +12,13 @@ interface Props {
     rejected: string;
     pending: string;
   };
+  isLoading: boolean;
 }
 
 const EmployerDashboard = ({
   totalNumberOfApplicants,
   numberOfApplicants,
+  isLoading,
 }: Props) => {
   const cardBg = useColorModeValue("white", "gray.800");
   return (
@@ -34,11 +37,20 @@ const EmployerDashboard = ({
       </Heading>
 
       <SimpleGrid columns={{ base: 2, md: 2 }} gap={6} w="full">
-        <StatDisplay value={totalNumberOfApplicants} Title="Total Applicants" />
-        <StatDisplay
-          value={parseInt(numberOfApplicants?.accepted)}
-          Title="Accepted Applicants"
-        />
+        {isLoading ? (
+          <StatsSkeleton />
+        ) : (
+          <>
+            <StatDisplay
+              value={totalNumberOfApplicants}
+              Title="Total Applicants"
+            />
+            <StatDisplay
+              value={parseInt(numberOfApplicants?.accepted)}
+              Title="Accepted Applicants"
+            />
+          </>
+        )}
       </SimpleGrid>
 
       <Box ml={20}>

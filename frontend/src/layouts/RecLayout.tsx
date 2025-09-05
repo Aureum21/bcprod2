@@ -10,7 +10,15 @@ const RecLayout = () => {
   const colorMode = useColorMode().colorMode;
   return (
     <Grid templateAreas={{ base: `"nav" "main"` }}>
-      <GridItem area="nav" justifyContent={"space-between"}>
+      <GridItem
+        area="nav"
+        justifyContent={"space-between"}
+        overflowX={"revert"}
+        position="sticky"
+        top={0}
+        zIndex={1}
+        bg={colorMode === "dark" ? "black" : "white"}
+      >
         <HStack justifyContent="space-between" padding={2}>
           <Image src={colorMode === "dark" ? logoWhite : logoBlack} />
           <HStack>
@@ -19,7 +27,7 @@ const RecLayout = () => {
           </HStack>
         </HStack>
       </GridItem>
-      <GridItem area="main" padding={2}>
+      <GridItem area="main" padding={2} overflow={"auto"}>
         <center>
           <Outlet></Outlet>
         </center>

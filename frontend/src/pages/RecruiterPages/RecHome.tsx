@@ -20,7 +20,7 @@ import EmployerDashboard from "../../components/EmployerDashboard";
 const MotionBox = motion(Box);
 
 const RecHome = () => {
-  const { data: employerInfo } = useQuery({
+  const { data: employerInfo, isLoading: employerInfoLoading } = useQuery({
     queryKey: ["employer-info"],
     queryFn: () =>
       axios
@@ -32,19 +32,22 @@ const RecHome = () => {
         .then((res) => res.data),
   });
 
-  const { data: numberOfApplicants } = useQuery({
-    queryKey: ["number-of-applicants"],
-    queryFn: () =>
-      axios
-        .get("http://localhost:5000/getNumberOfApplicants", {
-          params: {
-            contractAddress: sessionStorage.getItem("employerContractAddress"),
-          },
-        })
-        .then((res) => res.data),
-  });
+  const { data: numberOfApplicants, isLoading: numberOfApplicantsLoading } =
+    useQuery({
+      queryKey: ["number-of-applicants"],
+      queryFn: () =>
+        axios
+          .get("http://localhost:5000/getNumberOfApplicants", {
+            params: {
+              contractAddress: sessionStorage.getItem(
+                "employerContractAddress"
+              ),
+            },
+          })
+          .then((res) => res.data),
+    });
 
-  const { data: employeeInfo } = useQuery({
+  const { data: employeeInfo, isLoading: employeeInfoLoading } = useQuery({
     queryKey: ["employee-info"],
     queryFn: () =>
       axios
@@ -68,21 +71,23 @@ const RecHome = () => {
       {/* Employer Info */}
       <HStack alignItems={"start"}>
         <EmployerInformation
+          isLoading={employerInfoLoading}
           data={employerInfo}
           totalNumberOfApplicants={totalNumberOfApplicants}
           numberOfApplicants={numberOfApplicants}
         />
         <EmployerDashboard
+          isLoading={numberOfApplicantsLoading}
           totalNumberOfApplicants={totalNumberOfApplicants}
           numberOfApplicants={numberOfApplicants}
         />
       </HStack>
 
-      {/* <HStack align="start" gap={8} flexWrap="wrap">
+      <HStack align="start" gap={8} flexWrap="wrap">
         <Box flex="1" minW="md">
           <ListOfEmployees data={employeeInfo} />
         </Box>
-      </HStack> */}
+      </HStack>
     </Box>
   );
 };

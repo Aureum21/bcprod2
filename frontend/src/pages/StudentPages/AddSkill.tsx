@@ -81,7 +81,7 @@ const AddSkill = () => {
   return (
     <>
       <Tabs.Root variant="outline" mt={2} defaultValue="Upload Skill">
-        <Tabs.List>
+        <Tabs.List justifyContent="flex-start" position="sticky">
           <Tabs.Trigger value="Upload Skill">
             <LuFolder />
             Upload Skill

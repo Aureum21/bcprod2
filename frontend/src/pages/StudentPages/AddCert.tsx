@@ -83,7 +83,12 @@ const AddCert = () => {
         message="Your Certificate has been added successfully!"
       />
       <Tabs.Root variant="outline" mt={2} defaultValue="Upload Certificate">
-        <Tabs.List>
+        <Tabs.List
+          justifyContent="flex-start"
+          zIndex={1}
+          position="sticky"
+          overflowX="revert"
+        >
           <Tabs.Trigger value="Upload Certificate">
             <PiCertificate />
             Upload Certificate
@@ -93,7 +98,7 @@ const AddCert = () => {
             Show Certificates
           </Tabs.Trigger>
         </Tabs.List>
-        <Tabs.Content value="Upload Certificate">
+        <Tabs.Content value="Upload Certificate" overflow="auto">
           <UploadCertificate
             onSubmit={onSubmit}
             type="unOfficial"

@@ -2,23 +2,27 @@ import { useEffect, useState } from "react";
 import type { ApplicantData } from "../../components/PendingEmployees";
 import axios from "axios";
 import PendingEmployees from "../../components/PendingEmployees";
+import { useQuery } from "@tanstack/react-query";
 
 const PendingEmp = () => {
-  const [data, setData] = useState<ApplicantData[]>([]);
+  const [isAcceptLoading, setIsAcceptLoading] = useState(false);
+  const [isRejectLoading, setIsRejectLoading] = useState(false);
   const contractAddress = sessionStorage.getItem("employerContractAddress");
-  useEffect(() => {
-    axios
-      .get("http://localhost:5000/getPendingEmployees", {
-        params: {
-          contractAddress: contractAddress,
-        },
-      })
-      .then((res) => {
-        console.log(res.data);
-        setData(res.data);
-      });
-  }, []);
+  const { data: pendingEmployees, isLoading: pendingEmployeesLoading } =
+    useQuery({
+      queryKey: ["pending-employees"],
+      queryFn: () =>
+        axios
+          .get("http://localhost:5000/getPendingEmployees", {
+            params: {
+              contractAddress: contractAddress,
+            },
+          })
+          .then((res) => res.data),
+    });
+
   const accept = (employeeAddress: string, employerContractAddress: string) => {
+    setIsAcceptLoading(true);
     axios
       .post("http://localhost:5000/acceptEmployee", {
         employeeAddress,
@@ -26,9 +30,11 @@ const PendingEmp = () => {
       })
       .then((res) => {
         console.log(res.data);
+        setIsAcceptLoading(false);
       });
   };
   const reject = (employeeAddress: string, employerContractAddress: string) => {
+    setIsRejectLoading(true);
     axios
       .post("http://localhost:5000/rejectEmployee", {
         employeeAddress,
@@ -36,12 +42,20 @@ const PendingEmp = () => {
       })
       .then((res) => {
         console.log(res.data);
+        setIsRejectLoading(false);
       });
   };
 
   return (
     <>
-      <PendingEmployees data={data} accept={accept} reject={reject} />
+      <PendingEmployees
+        isLoading={pendingEmployeesLoading}
+        isAcceptLoading={isAcceptLoading}
+        isRejectLoading={isRejectLoading}
+        data={pendingEmployees}
+        accept={accept}
+        reject={reject}
+      />
     </>
   );
 };

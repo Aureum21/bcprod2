@@ -1,4 +1,12 @@
-import { Card, VStack, Text, HStack, Button, Heading } from "@chakra-ui/react";
+import {
+  Card,
+  VStack,
+  Text,
+  HStack,
+  Button,
+  Heading,
+  Spinner,
+} from "@chakra-ui/react";
 import type { skillForApplication } from "../pages/StudentPages/Application";
 import type { workExpForApplication } from "../pages/StudentPages/Application";
 import type { certForApplication } from "../pages/StudentPages/Application";
@@ -18,11 +26,21 @@ export interface ApplicantData {
 
 interface PendingProps {
   data: ApplicantData[];
+  isAcceptLoading: boolean;
+  isRejectLoading: boolean;
   accept: (employee_address: string, employerContractAddress: string) => void;
   reject: (employee_address: string, employerContractAddress: string) => void;
+  isLoading: boolean;
 }
 
-const PendingEmployees = ({ data, accept, reject }: PendingProps) => {
+const PendingEmployees = ({
+  data,
+  accept,
+  reject,
+  isAcceptLoading,
+  isRejectLoading,
+  isLoading,
+}: PendingProps) => {
   const employerContractAddress = sessionStorage.getItem(
     "employerContractAddress"
   ) as string;
@@ -30,9 +48,14 @@ const PendingEmployees = ({ data, accept, reject }: PendingProps) => {
   const cardBg = useColorModeValue("white", "gray.800");
   const cardBorder = useColorModeValue("gray.200", "gray.700");
 
-  return (
+  return isLoading ? (
+    <>
+      <Spinner size="md" />
+      <Text>Loading...</Text>
+    </>
+  ) : (
     <VStack gap={6} w="full" overflow="auto">
-      {data.map(
+      {data?.map(
         (item, index) =>
           item.employee_address !==
             "0x0000000000000000000000000000000000000000" && (
@@ -88,8 +111,9 @@ const PendingEmployees = ({ data, accept, reject }: PendingProps) => {
                         accept(item.employee_address, employerContractAddress)
                       }
                       variant="subtle"
+                      disabled={isAcceptLoading}
                     >
-                      Accept
+                      {isAcceptLoading ? <Spinner size="sm" /> : "Accept"}
                     </Button>
                     <Button
                       colorPalette="red"
@@ -98,8 +122,9 @@ const PendingEmployees = ({ data, accept, reject }: PendingProps) => {
                       onClick={() =>
                         reject(item.employee_address, employerContractAddress)
                       }
+                      disabled={isRejectLoading}
                     >
-                      Reject
+                      {isRejectLoading ? <Spinner size="sm" /> : "Reject"}
                     </Button>
                   </HStack>
                 </VStack>

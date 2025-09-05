@@ -7,9 +7,10 @@ import {
   Strong,
   Text,
 } from "@chakra-ui/react";
-import { LuCheck } from "react-icons/lu";
 import type { ApplicantData } from "./PendingEmployees";
 import DrawerComponent from "./DrawerComponent";
+import user from "../assets/User.jpg";
+import { AiOutlineEye } from "react-icons/ai";
 interface Props {
   data: ApplicantData;
 }
@@ -19,7 +20,7 @@ const EmployeeInfo = ({ data }: Props) => {
       <Card.Body>
         <HStack mb="6" gap="3">
           <Avatar.Root>
-            <Avatar.Image src="https://images.unsplash.com/photo-1511806754518-53bada35f930" />
+            <Avatar.Image src={user} />
             <Avatar.Fallback name="Nate Foss" />
           </Avatar.Root>
           <Stack gap="0">
@@ -43,7 +44,7 @@ const EmployeeInfo = ({ data }: Props) => {
           certData={data.certifications}
           trigger={
             <Button variant="subtle" colorPalette="blue" flex="1">
-              <LuCheck />
+              <AiOutlineEye />
               Show Info
             </Button>
           }
