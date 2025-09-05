@@ -9,7 +9,12 @@ const Piechart = ({ data }: Props) => {
   });
 
   return (
-    <Chart.Root boxSize="200px" mx="auto" chart={chart}>
+    <Chart.Root
+      boxSize="200px"
+      alignItems="center"
+      alignSelf="center"
+      chart={chart}
+    >
       <PieChart>
         <Tooltip
           cursor={false}

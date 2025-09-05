@@ -320,7 +320,7 @@ const ListPendingEmployees = async (contractAddress) => {
       institutes: employee[4],
       skills: employee[5].map((skill) => {
         return {
-          skillName: skill[0],
+          skill_name: skill[0],
           experience: skill[1],
           endorsed: skill[2],
           endorsedBy: skill[3],

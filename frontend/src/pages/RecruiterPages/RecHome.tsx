@@ -1,14 +1,24 @@
-import { Box, HStack, VStack, Text, Button } from "@chakra-ui/react";
+import {
+  Box,
+  HStack,
+  VStack,
+  Text,
+  Stat,
+  SimpleGrid,
+  Heading,
+} from "@chakra-ui/react";
 import Piechart from "../../components/Piechart";
 import EmployerInformation from "../../components/EmployerInformation";
-import EmployeeInfo from "../../components/employeeInfo";
-import { useEffect } from "react";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 import ListOfEmployees from "../../components/ListOfEmployees";
-import type { ApplicantData } from "../../components/PendingEmployees";
+import { motion } from "framer-motion";
+import { useColorModeValue } from "../../components/ui/color-mode";
+import StatDisplay from "../../components/StatDisplay";
+import EmployerDashboard from "../../components/EmployerDashboard";
 
-const numbers = [1, 2, 3, 4];
+const MotionBox = motion(Box);
+
 const RecHome = () => {
   const { data: employerInfo } = useQuery({
     queryKey: ["employer-info"],
@@ -33,6 +43,7 @@ const RecHome = () => {
         })
         .then((res) => res.data),
   });
+
   const { data: employeeInfo } = useQuery({
     queryKey: ["employee-info"],
     queryFn: () =>
@@ -44,47 +55,34 @@ const RecHome = () => {
         })
         .then((res) => res.data),
   });
+
   const totalNumberOfApplicants =
     parseInt(numberOfApplicants?.accepted) +
     parseInt(numberOfApplicants?.rejected) +
     parseInt(numberOfApplicants?.pending);
+
+  const cardBg = useColorModeValue("white", "gray.800");
+
   return (
-    <Box p={4}>
-      <HStack alignItems="center" mb="5" gap="2">
-        <EmployerInformation data={employerInfo} />
-        <VStack
-          shadow="md"
-          width="100%"
-          p={4}
-          borderRadius="md"
-          alignItems="start"
-        >
-          <Box shadow="md" p="2" borderRadius="md" bg="white">
-            <Text>Total Number of Employees</Text>
-            <Text>{totalNumberOfApplicants}</Text>
-          </Box>
-          <Piechart
-            data={[
-              {
-                name: "Accepted",
-                value: parseInt(numberOfApplicants?.accepted),
-                color: "#8884d8",
-              },
-              {
-                name: "Rejected",
-                value: parseInt(numberOfApplicants?.rejected),
-                color: "#82ca9d",
-              },
-              {
-                name: "Pending",
-                value: parseInt(numberOfApplicants?.pending),
-                color: "#82ca2d",
-              },
-            ]}
-          />
-        </VStack>
+    <Box px={{ base: 4, md: 10 }} py={6}>
+      {/* Employer Info */}
+      <HStack alignItems={"start"}>
+        <EmployerInformation
+          data={employerInfo}
+          totalNumberOfApplicants={totalNumberOfApplicants}
+          numberOfApplicants={numberOfApplicants}
+        />
+        <EmployerDashboard
+          totalNumberOfApplicants={totalNumberOfApplicants}
+          numberOfApplicants={numberOfApplicants}
+        />
       </HStack>
-      <ListOfEmployees data={employeeInfo} />
+
+      {/* <HStack align="start" gap={8} flexWrap="wrap">
+        <Box flex="1" minW="md">
+          <ListOfEmployees data={employeeInfo} />
+        </Box>
+      </HStack> */}
     </Box>
   );
 };

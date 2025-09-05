@@ -1,17 +1,19 @@
-import { Card, VStack, Text, HStack, Button } from "@chakra-ui/react";
-import type { Skill } from "../pages/StudentPages/AddSkill";
-import type { addCert } from "../pages/StudentPages/AddCert";
-import type { workExp } from "../pages/StudentPages/AddWorkExp";
+import { Card, VStack, Text, HStack, Button, Heading } from "@chakra-ui/react";
+import type { skillForApplication } from "../pages/StudentPages/Application";
+import type { workExpForApplication } from "../pages/StudentPages/Application";
+import type { certForApplication } from "../pages/StudentPages/Application";
 import DrawerComponent from "./DrawerComponent";
+import { useColorModeValue } from "./ui/color-mode";
+
 export interface ApplicantData {
   employee_name: string;
   application_status: string;
   employee_address: string;
   role: string;
   institutes: string[];
-  skills: Skill[];
-  workexps: workExp[];
-  certifications: addCert[];
+  skills: skillForApplication[];
+  workexps: workExpForApplication[];
+  certifications: certForApplication[];
 }
 
 interface PendingProps {
@@ -24,54 +26,88 @@ const PendingEmployees = ({ data, accept, reject }: PendingProps) => {
   const employerContractAddress = sessionStorage.getItem(
     "employerContractAddress"
   ) as string;
+
+  const cardBg = useColorModeValue("white", "gray.800");
+  const cardBorder = useColorModeValue("gray.200", "gray.700");
+
   return (
-    <Card.Root>
-      <Card.Body>
-        {data.map((item, index) =>
+    <VStack gap={6} w="full" overflow="auto">
+      {data.map(
+        (item, index) =>
           item.employee_address !==
-          "0x0000000000000000000000000000000000000000" ? (
-            <VStack key={index}>
-              <HStack>
-                <Text>Name:</Text>
-                <Text>{item.employee_name}</Text>
-              </HStack>
-              <HStack>
-                <Text>Address:</Text>
-                <Text>{item.employee_address}</Text>
-              </HStack>
-              <HStack>
-                <Text>Application Status:</Text>
-                <Text>{item.application_status}</Text>
-              </HStack>
-              <DrawerComponent
-                skillData={item.skills}
-                workExpData={item.workexps}
-                certData={item.certifications}
-                trigger={<Button>Show Info</Button>}
-              />
-              <HStack>
-                <Button
-                  onClick={() => {
-                    accept(item.employee_address, employerContractAddress);
-                  }}
-                >
-                  Accept
-                </Button>
-                <Button
-                  onClick={() => {
-                    reject(item.employee_address, employerContractAddress);
-                  }}
-                >
-                  Reject
-                </Button>
-              </HStack>
-            </VStack>
-          ) : (
-            <></>
+            "0x0000000000000000000000000000000000000000" && (
+            <Card.Root
+              key={index}
+              w="full"
+              maxW="3xl"
+              borderWidth="1px"
+              borderColor={cardBorder}
+              borderRadius="lg"
+              shadow="md"
+              bg={cardBg}
+              _hover={{ shadow: "lg", borderColor: "teal.400" }}
+              transition="all 0.2s ease-in-out"
+              p={6}
+            >
+              <Card.Body>
+                <VStack align="start" gap={4}>
+                  <Heading size="md" color="teal.500">
+                    {item.employee_name}
+                  </Heading>
+
+                  <HStack gap={2}>
+                    <Text fontWeight="semibold">Address:</Text>
+                    <Text fontSize="sm" color="gray.500" maxLines={1}>
+                      {item.employee_address}
+                    </Text>
+                  </HStack>
+
+                  <HStack gap={2}>
+                    <Text fontWeight="semibold">Application Status:</Text>
+                    <Text color="blue.500" fontWeight="medium">
+                      {item.application_status}
+                    </Text>
+                  </HStack>
+
+                  <DrawerComponent
+                    skillData={item.skills}
+                    workExpData={item.workexps}
+                    certData={item.certifications}
+                    trigger={
+                      <Button size="sm" variant="outline" colorScheme="teal">
+                        Show Info
+                      </Button>
+                    }
+                  />
+
+                  <HStack gap={4} pt={2}>
+                    <Button
+                      colorPalette="green"
+                      size="sm"
+                      onClick={() =>
+                        accept(item.employee_address, employerContractAddress)
+                      }
+                      variant="subtle"
+                    >
+                      Accept
+                    </Button>
+                    <Button
+                      colorPalette="red"
+                      size="sm"
+                      variant="subtle"
+                      onClick={() =>
+                        reject(item.employee_address, employerContractAddress)
+                      }
+                    >
+                      Reject
+                    </Button>
+                  </HStack>
+                </VStack>
+              </Card.Body>
+            </Card.Root>
           )
-        )}
-      </Card.Body>
-    </Card.Root>
+      )}
+    </VStack>
   );
 };
 

@@ -478,7 +478,7 @@ app.post("/applyForJob", async (req, res) => {
   }
   const newskill = skill.map((skills) => {
     return {
-      skill_name: safeString(skills.name),
+      skill_name: safeString(skills.skill_name),
       experience: safeString(skills.experience),
       endorsed: !!skills.endorsed,
       endorser_address:
