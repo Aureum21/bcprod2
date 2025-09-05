@@ -9,6 +9,7 @@ import UploadCertificate from "../../components/UploadCertificate";
 import { LuFolder } from "react-icons/lu";
 import { CiViewList } from "react-icons/ci";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import AlertMessage from "../../components/AlertMessage";
 export interface Skill {
   name: string;
   experience: string;
@@ -25,6 +26,7 @@ interface addSkillData {
 }
 const AddSkill = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [alertOpen, setAlertOpen] = useState(false);
   const colorMode = useColorMode().colorMode;
   const queryClient = useQueryClient();
   const studentContractAddress = sessionStorage.getItem(
@@ -64,6 +66,7 @@ const AddSkill = () => {
     const result = await addSkill(payload as addSkillData);
     console.log(result);
     setIsLoading(false);
+    setAlertOpen(true);
   };
   const { data: skillsData } = useQuery({
     queryKey: ["skills"],
@@ -90,6 +93,12 @@ const AddSkill = () => {
         </Tabs.List>
         <Tabs.Content value="Upload Skill">
           <center>
+            <AlertMessage
+              isOpen={alertOpen}
+              onClose={() => setAlertOpen(false)}
+              type="success"
+              message="Your Skill has been added successfully!"
+            />
             <UploadCertificate
               onSubmit={handleUpload}
               isLoading={isLoading}

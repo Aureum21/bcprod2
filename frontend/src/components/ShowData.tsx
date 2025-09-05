@@ -53,8 +53,8 @@ const ShowData = ({ type, data }: Props) => {
               {type === "Skill"
                 ? data.skillName
                 : type === "Certificate"
-                ? "Certificate Information"
-                : "Work Experience"}
+                ? data.certificate_name
+                : data.role}
             </Card.Title>
 
             {/* Skill Section */}

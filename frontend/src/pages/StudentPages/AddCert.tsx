@@ -9,6 +9,7 @@ import { useColorMode } from "../../components/ui/color-mode";
 import { PiCertificate } from "react-icons/pi";
 import { CiViewList } from "react-icons/ci";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import AlertMessage from "../../components/AlertMessage";
 export interface addCert {
   name: string;
   institute: string;
@@ -25,6 +26,7 @@ interface addCertData {
 }
 const AddCert = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [alertOpen, setAlertOpen] = useState(false);
   const colorMode = useColorMode().colorMode;
   const studentContractAddress = sessionStorage.getItem(
     "studentContractAddress"
@@ -47,6 +49,7 @@ const AddCert = () => {
       queryClient.invalidateQueries({
         queryKey: ["certs"],
       });
+      setAlertOpen(true);
     },
   });
 
@@ -73,6 +76,12 @@ const AddCert = () => {
 
   return (
     <>
+      <AlertMessage
+        isOpen={alertOpen}
+        onClose={() => setAlertOpen(false)}
+        type="success"
+        message="Your Certificate has been added successfully!"
+      />
       <Tabs.Root variant="outline" mt={2} defaultValue="Upload Certificate">
         <Tabs.List>
           <Tabs.Trigger value="Upload Certificate">

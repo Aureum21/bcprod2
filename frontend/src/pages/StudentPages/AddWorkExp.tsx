@@ -9,6 +9,7 @@ import UploadCertificate from "../../components/UploadCertificate";
 import { MdWorkOutline } from "react-icons/md";
 import { CiViewList } from "react-icons/ci";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import AlertMessage from "../../components/AlertMessage";
 export interface workExp {
   role: string;
   institute: string;
@@ -31,6 +32,7 @@ interface addWorkExpData {
 const AddWorkExp = () => {
   const colorMode = useColorMode().colorMode;
   const [isLoading, setIsLoading] = useState(false);
+  const [alertOpen, setAlertOpen] = useState(false);
   const studentContractAddress = sessionStorage.getItem(
     "studentContractAddress"
   ) as string;
@@ -53,6 +55,7 @@ const AddWorkExp = () => {
       queryClient.invalidateQueries({
         queryKey: ["certData"],
       });
+      setAlertOpen(true);
     },
   });
 
@@ -83,6 +86,12 @@ const AddWorkExp = () => {
 
   return (
     <>
+      <AlertMessage
+        isOpen={alertOpen}
+        onClose={() => setAlertOpen(false)}
+        type="success"
+        message="Your Work Experiance has been added successfully!"
+      />
       <Tabs.Root variant="outline" mt={2} defaultValue="Upload Work Experiance">
         <Tabs.List>
           <Tabs.Trigger value="Upload Work Experiance">
