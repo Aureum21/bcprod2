@@ -1,4 +1,5 @@
 // WARNING: the keys here are demo purposes ONLY. Please use a tool like EthSigner for production, rather than hard coding private keys
+
 module.exports = {
   tessera: {
     member1: {
@@ -11,12 +12,13 @@ module.exports = {
       publicKey: "1iTZde/ndBHvzhcl7V68x44Vx7pl8nwx9LqnM/AfJUg=",
     },
     member4: {
-      publicKey: "dCcMcbyr+QEohd+3PJTBrifO7J9qS7fezvj23lvpvjQ=",
+      publicKey: "ncsouM6CTJUfEFbV+aNZwsZ+X6PPN+mYRjigDJrKGTI=",
     },
   },
+
   contractInformations: {
     registerStud: {
-      contractAddress: "0x59793766164e121a1b5d42d95d2f7c3b76ea43fc",
+      contractAddress: "0xa5ab4802f86bf9bc93081505a92c0d23345df277",
       from: "0xf0e2db6c8dc6c681bb5d6ad121a107f300e9b2b5",
       fromName: "member1",
       for: "0xca843569e3427144cead5e4d5999a3d0ccf92b8e",
@@ -24,7 +26,7 @@ module.exports = {
     },
 
     registerEmp: {
-      contractAddress: "0xdca9e37ac7a78abffc310928a4fcb3bd18d43296",
+      contractAddress: "0x3e6803c9854a58712ab4a0fba5b1ada7a4c8bf85",
       from: "0xf0e2db6c8dc6c681bb5d6ad121a107f300e9b2b5",
       fromName: "member1",
       for: "0x58c4f9707bb5fc63139431fed6bf512cee2b7823",
@@ -32,7 +34,7 @@ module.exports = {
     },
 
     admin: {
-      contractAddress: "0x3e22898ebdb4d6173a778b1914c8d913abfe7179",
+      contractAddress: "0x8d36ffef6083c07ab80e45213da40e7d8380861b",
       from: "0xf0e2db6c8dc6c681bb5d6ad121a107f300e9b2b5",
       fromName: "member1",
       for: "0xf0e2db6c8dc6c681bb5d6ad121a107f300e9b2b5",
@@ -40,7 +42,7 @@ module.exports = {
     },
 
     publicdata: {
-      contractAddress: "0x175400c6aB0f56e2e1260dE14094bb5024bE4a0A",
+      contractAddress: "0x38Fef9ccf460A4d296f8327eBF7A9DfbD9135709",
       from: "c9c913c8c3c1cd416d80a0abf475db2062f161f6",
       fromName: "rpcnode",
     },
@@ -52,9 +54,9 @@ module.exports = {
       wsUrl: "ws://192.168.1.97:8546",
       nodekey:
         "0e93a540518eeb673d94fb496b746008ab56605463cb9212493997f5755124d1",
-      accountAddress: "0xc9c913c8c3c1cd416d80a0abf475db2062f161f6",
+      accountAddress: "c9c913c8c3c1cd416d80a0abf475db2062f161f6",
       accountPrivateKey:
-        "60bbe10a196a4e71451c0f6e9ec9beab454c2a5ac0542aa5b8b733ff5719fec3",
+        "0x60bbe10a196a4e71451c0f6e9ec9beab454c2a5ac0542aa5b8b733ff5719fec3",
     },
     member1: {
       name: "member1",
@@ -62,7 +64,7 @@ module.exports = {
       wsUrl: "ws://192.168.1.97:20001",
       privateUrl: "http://192.168.1.97:9081",
       nodekey:
-        "b9a4bd1539c15bcc83fa9078fe89200b6e9e802ae992f13cd83c853f16e8bed4",
+        "0xb9a4bd1539c15bcc83fa9078fe89200b6e9e802ae992f13cd83c853f16e8bed4",
       accountAddress: "0xf0e2db6c8dc6c681bb5d6ad121a107f300e9b2b5",
       accountPrivateKey:
         "8bbbb1b345af56b560a5b20bd4b0ed1cd8cc9958a16262bc75118453cb546df7",
@@ -89,16 +91,17 @@ module.exports = {
       accountPrivateKey:
         "61dced5af778942996880120b303fc11ee28cc8e5036d2fdff619b5675ded3f0",
     },
+
     member4: {
       name: "member4",
       url: "http://192.168.1.97:20006",
       wsUrl: "ws://192.168.1.97:20007",
       privateUrl: "http://192.168.1.97:9084",
       nodekey:
-        "14cc26919c3d3894ef2b0a8f5a1678f80e1fc3fac7450ba616627f5717c8f76d",
-      accountAddress: "0x09800c5e7400104a129da3a3859221bf3e5be835",
+        "6f8dde18b89f78964666351312b0a796f7bf973462eeaa393c48e3ef4ebdc237",
+      accountAddress: "0x48fe1f6b7f8be3a4685ea82087511651458c8f30",
       accountPrivateKey:
-        "fd915e4ef35d27d1d8a7984cc4fe12a9f8ec19c70d1eb2a8108757a36ceefa4b",
+        "f8cbfeb9541aa12a7a617d105f59d2c0377ac024b2d5fc9f39b174512bd0ec56",
     },
   },
   accounts: {
@@ -118,7 +121,7 @@ module.exports = {
         "0xae6ae8e5ccbfb04590405997ee2d52d2b330726137b875053c36d94e974d162f",
     },
     d: {
-      address: "0xaddff942ebfddd154b9519a44997ba86daa64f3e",
+      address: "0xAdDFf942EbfDDd154b9519a44997Ba86DAa64f3e",
       privateKey:
         "0x6417b4f788192420bd69a0915192a7d235817cad104e9989a49011a2b193df15",
     },

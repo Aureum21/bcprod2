@@ -74,12 +74,15 @@ async function createInstContract(value, type) {
     privateFrom: tessera.member2.publicKey,
     privateFor: [tessera.member1.publicKey],
   };
+  const startTimer = performance.now();
   const txHash = await web3quorum.priv.generateAndSendRawTransaction(txOptions);
   console.log("Getting contractAddress from txHash: ", txHash);
   const privateTxReceipt = await web3quorum.priv.waitForTransactionReceipt(
     txHash
   );
   console.log("Private Transaction Receipt: ", privateTxReceipt);
+  const endTimer = performance.now();
+  console.log("Time taken for contract creation: ", endTimer - startTimer);
   return privateTxReceipt;
 }
 

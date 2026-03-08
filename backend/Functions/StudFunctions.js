@@ -442,12 +442,15 @@ const addSkill = async (skill, student_name, experiance, contractAddress) => {
     privateFrom: tessera.member3.publicKey,
     privateFor: [tessera.member1.publicKey],
   };
+  const startTimer = performance.now();
   const transactionHash = await web3quorum.priv.generateAndSendRawTransaction(
     functionParams
   );
   const result = await web3quorum.priv.waitForTransactionReceipt(
     transactionHash
   );
+  const endTimer = performance.now();
+  console.log("Time taken for a private student skill registration : ", endTimer - startTimer);
   return result;
 };
 const getSkillCount = async (contractAddress) => {

@@ -219,7 +219,6 @@ const RegInstPublicToPending = async (value) => {
     contractAbiPublicData,
     contractInformations.publicdata.contractAddress
   );
-
   const data = contractInstance.methods
     .addInstToPending(value, currentDate)
     .encodeABI();
@@ -267,12 +266,15 @@ const RegisterInstitutePrivateToPending = async (value) => {
     privateFrom: tessera.member1.publicKey,
     privateFor: [tessera.member1.publicKey],
   };
+  const startTimer = performance.now();
   const transactionHash = await web3quorum.priv.generateAndSendRawTransaction(
     functionParams
   );
   const result = await web3quorum.priv.waitForTransactionReceipt(
     transactionHash
   );
+  const endTimer = performance.now();
+  console.log("Time taken for a private institute registration to pending : ", endTimer - startTimer);
   if (result.status === "0x1") {
     console.log("result", result);
     const resultPublic = await RegInstPublicToPending(value[0]);
@@ -298,6 +300,7 @@ const RegisterStudentPrivateTransfer = async (value) => {
     return { error: "Function ABI not found" };
   }
   console.log("studentinfo from", studInfo);
+  
   const functionArgs = web3quorum.eth.abi
     .encodeParameters(functionAbi.inputs, [
       studInfo.student_name,

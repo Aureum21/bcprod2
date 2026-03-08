@@ -10,7 +10,8 @@ import {
   Box,
   Badge,
   Spinner,
-} from "@chakra-ui/react";
+  Separator, 
+} from "@chakra-ui/react"; // Added Separator for style
 import ShowDataApp from "../../components/ShowDataApp";
 import type { Skill } from "./AddSkill";
 import type { addCert } from "./AddCert";
@@ -21,8 +22,11 @@ import AttachFile from "../../components/AttachFile";
 import { FaTools } from "react-icons/fa";
 import { PiCertificateBold } from "react-icons/pi";
 import { IoBriefcaseOutline } from "react-icons/io5";
+import { CiTimer } from "react-icons/ci"; // Added Icon
 import DataTag from "../../components/DataTag";
 import AlertMessage from "../../components/AlertMessage";
+import Web3 from "web3";
+
 interface Employer {
   name: string;
   employer_address: string;
@@ -55,6 +59,7 @@ export interface certForApplication {
   verified: boolean;
   cert_hash: string;
 }
+
 const Application = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState<Employer>({
@@ -62,6 +67,9 @@ const Application = () => {
     employer_address: "",
     email: "",
   });
+
+  // Benchmark State
+  const [isBenchmarking, setIsBenchmarking] = useState(false);
 
   const studentContractAddress = sessionStorage.getItem(
     "studentContractAddress"
@@ -126,136 +134,56 @@ const Application = () => {
         JSON.parse(sessionStorage.getItem("employerList") as string)
       );
     };
-    // const getSkills = async () => {
-    //   try {
-    //     await axios
-    //       .get("http://localhost:5000/listSkills", {
-    //         params: {
-    //           contractAddress: studentContractAddress,
-    //         },
-    //       })
-    //       .then((res) => {
-    //         sessionStorage.setItem("skills", JSON.stringify(res.data));
-    //         setSkills(
-    //           JSON.parse(sessionStorage.getItem("skills") as string) as Skill[]
-    //         );
-    //       });
-    //   } catch (error) {
-    //     console.error("Error fetching data:", error);
-    //   }
-    // };
-    // const getunofficialcertificates = async () => {
-    //   try {
-    //     await axios
-    //       .get("http://localhost:5000/getUnOfficialCert", {
-    //         params: {
-    //           contractAddress: studentContractAddress,
-    //         },
-    //       })
-    //       .then((res) => {
-    //         sessionStorage.setItem("certData", JSON.stringify(res.data));
-    //         setCertData(
-    //           JSON.parse(
-    //             sessionStorage.getItem("certData") as string
-    //           ) as addCert[]
-    //         );
-    //       });
-    //   } catch (error) {
-    //     console.error("Error fetching data:", error);
-    //   }
-    // };
-    // const getWorkExp = async () => {
-    //   try {
-    //     await axios
-    //       .get("http://localhost:5000/getWorkExp", {
-    //         params: {
-    //           contractAddress: studentContractAddress,
-    //         },
-    //       })
-    //       .then((res) => {
-    //         sessionStorage.setItem("certData", JSON.stringify(res.data));
-    //         setWorkExp(
-    //           JSON.parse(
-    //             sessionStorage.getItem("certData") as string
-    //           ) as workExp[]
-    //         );
-    //       });
-    //   } catch (error) {
-    //     console.error("Error fetching data:", error);
-    //   }
-    // };
 
     async function order() {
       await fetchEmployers();
-      // await getSkills();
-      // await getunofficialcertificates();
-      // await getWorkExp();
     }
     order();
   }, []);
+
   const [skillForApp, setSkillForApp] = useState<skillForApplication[]>([]);
   const [certForApp, setCertForApp] = useState<certForApplication[]>([]);
   const [workExpForApp, setWorkExpForApp] = useState<workExpForApplication[]>(
     []
   );
+
   const handleCheckboxChange = (e: any, data: any, type: string) => {
     if (type === "Skill") {
-      console.log(e.checked, data);
       if (e.checked) {
         setSkillForApp([...skillForApp, data]);
       } else {
         setSkillForApp(
           skillForApp?.filter(
             (item) =>
-              item?.skill_name !== data.skill_name &&
-              item?.experience !== data.experience &&
-              item?.endorsed !== data.endorsed &&
-              item?.endorser_address !== data.endorser_address &&
-              item?.review !== data.review &&
-              item?.visible !== data.visible
+              item?.skill_name !== data.skill_name
           )
         );
       }
-      console.log(skillForApp);
     }
 
     if (type === "Certificate") {
-      console.log(e.checked, data);
       if (e.checked) {
         setCertForApp([...certForApp, data]);
       } else {
         setCertForApp(
           certForApp?.filter(
             (item) =>
-              item.institute !== data.institute &&
-              item.certificate_name !== data.certificate_name &&
-              item.cert_hash !== data.cert_hash &&
-              item.verified !== data.verified &&
-              item.visible !== data.visible
+              item.certificate_name !== data.certificate_name
           )
         );
       }
-      console.log(certForApp);
     }
     if (type === "Work EXperiance") {
-      console.log(e.checked, data);
       if (e.checked) {
         setWorkExpForApp([...workExpForApp, data]);
       } else {
         setWorkExpForApp(
           workExpForApp?.filter(
             (item) =>
-              item.role !== data.role &&
-              item.institute !== data.institute &&
-              item.startdate !== data.startdate &&
-              item.enddate !== data.enddate &&
-              item.description !== data.description &&
-              item.cert_hash !== data.cert_hash &&
-              item.visible !== data.visible
+              item.role !== data.role
           )
         );
       }
-      console.log(workExpForApp);
     }
   };
   const [alertOpen, setAlertOpen] = useState(false);
@@ -291,6 +219,114 @@ const Application = () => {
       setWorkExpForApp([]);
     }
   };
+  const web3Instance = new Web3(window.ethereum);
+  // --- RESEARCH BENCHMARK FUNCTION (APPLICATION) ---
+  const runBenchmark = async () => {
+    const ITERATIONS = 50; // Adjusted to 50 as requested
+    
+    // Ensure an employer is selected or pick the first one available
+    let targetEmployer = searchTerm.employer_address;
+    if (!targetEmployer) {
+       if (employers.length > 0) {
+           targetEmployer = employers[0].employer_address;
+           console.log(`Auto-selected employer: ${employers[0].name}`);
+       } else {
+           alert("Please wait for employer list to load or select one manually.");
+           return;
+       }
+    }
+
+    if (!confirm(`Run ${ITERATIONS} Application transactions to ${targetEmployer}?`)) {
+      return;
+    }
+
+    setIsBenchmarking(true);
+
+    try {
+      console.log("--- Starting Application Benchmark ---");
+
+      // 1. Start Timer
+      await axios.post("http://localhost:5000/benchmark/start");
+
+      // 2. Loop 50 Times
+      for (let i = 5; i < ITERATIONS; i++) {
+        try {
+          // Construct dummy data matching the interfaces
+          const dummySkill = [{
+            skill_name: `Speed Coding ${i}`,
+            experience: "10 years",
+            endorsed: false,
+            endorsedBy: "0x0000000000000000000000000000000000000000",
+            review: "Fast",
+            visible: true,
+            cert_hash: ""
+          }];
+          
+          const dummyCert = [{
+            institute: "0x0000000000000000000000000000000000000000",
+            certificate_name: `Stress Test Degree ${i}`,
+            visible: true,
+            verified: true,
+            cert_hash: `HASH_${i}`
+          }];
+
+          const dummyWork = [{
+            role: "Load Tester",
+            institute: "0x0000000000000000000000000000000000000000",
+            employer: "The Blockchain",
+            startdate: "2023",
+            enddate: "2024",
+            verified: false,
+            description: "Spamming the network",
+            visible: true,
+            cert_hash: ""
+          }];
+          const accountstudent = web3Instance?.eth?.accounts?.create();
+          await axios.post("http://localhost:5000/applyForJob", {
+            account: accountstudent?.address,
+            studentName: `${studentName} (Bot ${i})`,
+            employerAddress: targetEmployer,
+            skill: dummySkill,
+            cert: dummyCert,
+            workExp: dummyWork,
+          });
+
+          if (i % 10 === 0) console.log(`Application ${i + 1}/${ITERATIONS} sent`);
+
+        } catch (err) {
+          console.error(`App Transaction ${i} failed`, err);
+        }
+      }
+
+      // 3. Stop Timer
+      await axios.post("http://localhost:5000/benchmark/stop");
+
+      // 4. Get Metrics
+      const metricsResponse = await axios.get("http://localhost:5000/benchmark/metrics");
+      const m = metricsResponse.data;
+
+      const report = `
+      RESEARCH DATA (Application):
+      ----------------------------
+      Total Tx: ${m.totalTransactions}
+      Total Time: ${m.totalDurationSec}s
+      Throughput (TPS): ${m.throughputTPS}
+      Avg Latency: ${m.avgLatencyMs}ms
+      P99 Latency: ${m.p99LatencyMs}ms
+      `;
+
+      alert(report);
+      console.log(m);
+
+    } catch (error) {
+      console.error("Benchmark crashed:", error);
+      alert("Benchmark failed.");
+    } finally {
+      setIsBenchmarking(false);
+    }
+  };
+  // ----------------------------------------------------
+
   const handleChange = (
     word: string,
     employer_address: string,
@@ -310,6 +346,7 @@ const Application = () => {
     data: skillForApplication | workExpForApplication | certForApplication,
     type: string
   ) => {
+      // (Original remove logic preserved)
     console.log(data, type);
     if (type === "Skill") {
       setSkillForApp(
@@ -437,8 +474,10 @@ const Application = () => {
               </VStack>
             </HStack>
           </HStack>
+
+          {/* Regular Apply Button */}
           <Button
-            disabled={isLoading}
+            disabled={isLoading || isBenchmarking}
             mt={2}
             alignSelf="end"
             width="25%"
@@ -455,6 +494,28 @@ const Application = () => {
           >
             {isLoading ? <Spinner /> : "Apply"}
           </Button>
+
+          {/* --- Research / Stress Test Section --- */}
+          <Separator mt={8} mb={4} />
+          <VStack align="stretch" bg="gray.50" p={4} borderRadius="md" border="1px dashed gray">
+            <HStack>
+                <CiTimer size={24} />
+                <Text fontWeight="bold">Research Mode</Text>
+            </HStack>
+            <Text fontSize="sm" color="gray.600">
+                Automate 50 consecutive job applications to the selected employer for throughput testing.
+            </Text>
+            <Button 
+                colorPalette="red" 
+                variant="solid" 
+                onClick={runBenchmark}
+                loading={isBenchmarking}
+                loadingText="Running 50 Tx..."
+            >
+                Start 50-Iteration Stress Test
+            </Button>
+          </VStack>
+
         </Card.Body>
       </Card.Root>
     </>

@@ -130,9 +130,11 @@ const ListPendingStudents = async (contractAddress) => {
   const web3quorum = new Web3Quorum(web3, chainId);
   const contract = new web3quorum.eth.Contract(contractAbiInstPending);
   console.log("started listing");
+
   const functionAbi = contract._jsonInterface.find((e) => {
     return e.name === "getPendingList";
   });
+
   const functionParams = {
     to: contractAddress,
     data: functionAbi.signature,
@@ -140,89 +142,112 @@ const ListPendingStudents = async (contractAddress) => {
     privateFrom: tessera.member2.publicKey,
     privateFor: [tessera.member1.publicKey],
   };
+
   console.log("functionParams", functionParams);
-  const transactionHash = await web3quorum.priv.generateAndSendRawTransaction(
-    functionParams
-  );
-  const result = await web3quorum.priv.waitForTransactionReceipt(
-    transactionHash
-  );
-  const decoded = web3quorum.eth.abi.decodeParameters(
-    functionAbi.outputs,
-    result.output
-  );
 
-  const pendingStudentList = decoded[0].map((student, index) => {
-    return {
-      name: student[0],
-      index: index,
-      application_status: student[1],
-      student_address: student[2],
-      email: student[3],
-      id: student[4],
-      registration_type: student[5],
-      institutes: student[6],
-      skills: student[7].map((skill) => {
-        return {
-          skillName: skill[0],
-          experience: skill[1],
-          endorsed: skill[2],
-          endorsedBy: skill[3],
-          review: skill[4],
-          visible: skill[5],
-          cert_hash: skill[6],
-        };
-      }),
-      workexps: student[8].map((exp) => {
-        return {
-          role: exp[0],
-          institute: exp[1],
-          employer: exp[2],
-          startdate: exp[3],
-          enddate: exp[4],
-          verified: exp[5],
-          description: exp[6],
-          visible: exp[7],
-          cert_hash: exp[8],
-        };
-      }),
-      certifications: student[9].map((cert) => {
-        return {
-          institute: cert[0],
-          certificate_name: cert[1],
-          visible: cert[2],
-          verified: cert[3],
-          cert_hash: cert[4],
-        };
-      }),
-      official_certifications: student[10].map((cert) => {
-        return {
-          student: cert[0],
-          cert_type: cert[1],
-          student_name: cert[2],
-          institute: cert[3],
-          startdate: cert[4],
-          enddate: cert[5],
-          verified: cert[6],
-          description: cert[7],
-          cert_hash: cert[8],
-        };
-      }),
-    };
-  });
-  const transferStudents = [];
-  const pendingStudents = [];
+  try {
+    const transactionHash = await web3quorum.priv.generateAndSendRawTransaction(
+      functionParams
+    );
+    
+    const result = await web3quorum.priv.waitForTransactionReceipt(
+      transactionHash
+    );
 
-  for (let i = 0; i < pendingStudentList.length; i++) {
-    const student = pendingStudentList[i];
-    if (student.registration_type === "Transfer") {
-      transferStudents.push(student);
-    } else if (student.registration_type === "Pending") {
-      pendingStudents.push(student);
+    // --- FIX STARTS HERE ---
+    // Check if the transaction actually returned data. 
+    // If it failed or returned 0x, return empty arrays instead of crashing.
+    // if (!result.output || result.output === "0x") {
+    //   console.warn("Transaction succeeded but returned no data (0x). Returning empty lists.");
+    //   return { pendingStudents: [], transferStudents: [] };
+    // }
+    // -----------------------
+
+    const decoded = web3quorum.eth.abi.decodeParameters(
+      functionAbi.outputs,
+      result.output
+    );
+
+    console.log("decoded", decoded);
+
+    const pendingStudentList = decoded[0].map((student, index) => {
+      return {
+        name: student[0],
+        index: index,
+        application_status: student[1],
+        student_address: student[2],
+        email: student[3],
+        id: student[4],
+        registration_type: student[5],
+        institutes: student[6],
+        skills: student[7].map((skill) => {
+          return {
+            skillName: skill[0],
+            experience: skill[1],
+            endorsed: skill[2],
+            endorsedBy: skill[3],
+            review: skill[4],
+            visible: skill[5],
+            cert_hash: skill[6],
+          };
+        }),
+        workexps: student[8].map((exp) => {
+          return {
+            role: exp[0],
+            institute: exp[1],
+            employer: exp[2],
+            startdate: exp[3],
+            enddate: exp[4],
+            verified: exp[5],
+            description: exp[6],
+            visible: exp[7],
+            cert_hash: exp[8],
+          };
+        }),
+        certifications: student[9].map((cert) => {
+          return {
+            institute: cert[0],
+            certificate_name: cert[1],
+            visible: cert[2],
+            verified: cert[3],
+            cert_hash: cert[4],
+          };
+        }),
+        official_certifications: student[10].map((cert) => {
+          return {
+            student: cert[0],
+            cert_type: cert[1],
+            student_name: cert[2],
+            institute: cert[3],
+            startdate: cert[4],
+            enddate: cert[5],
+            verified: cert[6],
+            description: cert[7],
+            cert_hash: cert[8],
+          };
+        }),
+      };
+    });
+
+    const transferStudents = [];
+    const pendingStudents = [];
+
+    for (let i = 0; i < pendingStudentList.length; i++) {
+      const student = pendingStudentList[i];
+      if (student.registration_type === "Transfer") {
+        transferStudents.push(student);
+      } else if (student.registration_type === "Pending") {
+        pendingStudents.push(student);
+      }
     }
-  }
 
-  return { pendingStudents, transferStudents };
+    return { pendingStudents, transferStudents };
+
+  } catch (error) {
+    console.error("Error in ListPendingStudents:", error);
+    // Return empty to avoid frontend crash
+    return { pendingStudents: [], transferStudents: [] };
+  }
 };
 
 // const ListTransferStudents = async (contractAddress) => {
@@ -383,6 +408,7 @@ const VerifyPendingStudent = async (
   inst_address,
   inst_Pending_contract_address
 ) => {
+  const startTimer = performance.now();
   const skills = newskills.map((skill) => {
     return {
       skill_name: skill.skillName,
@@ -463,6 +489,8 @@ const VerifyPendingStudent = async (
     student_address,
     inst_Pending_contract_address
   );
+  const endTimer = performance.now();
+  console.log("Time taken for the block: ", endTimer - startTimer);
   console.log("result1", result1);
   console.log("result2", result2);
   console.log("result3", result3);
@@ -491,10 +519,12 @@ const VerifyTransferStudent = async (
   const web3 = new Web3(besu.member2.url);
   console.log("started verifying", index);
   const key = web3.utils.soliditySha3(address, id);
+  const startTimer = performance.now();
   const result1 = await addInstTostudInfo(index, key, institute_address);
   const result2 = await verifystudent(index, "verifyTransferstudent");
   const result3 = await addInstToProfile(index, address, institute_address);
-
+  const endTimer = performance.now();
+  console.log("Time taken for inst block: ", endTimer - startTimer);
   console.log(
     result1.status === "0x1" &&
       result2.status === "0x1" &&

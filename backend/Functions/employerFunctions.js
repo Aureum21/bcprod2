@@ -241,12 +241,17 @@ async function applyForJob(
     privateFrom: tessera.member4.publicKey,
     privateFor: [tessera.member1.publicKey],
   };
+  const startTimer = performance.now();
   const transactionHash = await web3quorum.priv.generateAndSendRawTransaction(
     functionParams
   );
+  console.log("Transaction Hash from applyForJob : ", transactionHash);
   const result = await web3quorum.priv.waitForTransactionReceipt(
     transactionHash
   );
+  console.log("Result from applyForJob : ", result);
+  const endTimer = performance.now();
+  console.log("Time taken for the just applied job block: ", endTimer - startTimer);
   return result;
 }
 
@@ -375,12 +380,15 @@ const acceptEmployee = async (employeeAddress, employerContractAddress) => {
     privateFrom: tessera.member4.publicKey,
     privateFor: [tessera.member1.publicKey],
   };
+  const startTimer = performance.now();
   const transactionHash = await web3quorum.priv.generateAndSendRawTransaction(
     functionParams
   );
   const result = await web3quorum.priv.waitForTransactionReceipt(
     transactionHash
   );
+  const endTimer = performance.now();
+  console.log("Time taken for the block: ", endTimer - startTimer);
   return result;
 };
 const rejectEmployee = async (employeeAddress, employerContractAddress) => {
@@ -492,12 +500,15 @@ const getEmployeeInfo = async (employerContractAddress) => {
     privateFrom: tessera.member4.publicKey,
     privateFor: [tessera.member1.publicKey],
   };
+  const startTimer = performance.now();
   const transactionHash = await web3quorum.priv.generateAndSendRawTransaction(
     functionParams
   );
   const result = await web3quorum.priv.waitForTransactionReceipt(
     transactionHash
-  );
+  ); 
+  const endTimer = performance.now();
+  console.log("Time taken for the block: ", endTimer - startTimer);
   console.log(result);
 
   const decodedResult = web3quorum.eth.abi.decodeParameters(

@@ -69,15 +69,19 @@ const ListPendingInstitutes = async () => {
     privateFrom: tessera.member1.publicKey,
     privateFor: [tessera.member1.publicKey],
   };
-
+  const startTimer = performance.now();
   const transactionHash = await web3quorum.priv.generateAndSendRawTransaction(
     functionParams
   );
   // console.log(`Transaction hash: ${transactionHash}`);
+  const endTimer = performance.now();
+  console.log("Time taken: ", endTimer - startTimer);
   const result = await web3quorum.priv.waitForTransactionReceipt(
     transactionHash
   );
 
+  const inclusiveTimer = performance.now();
+  console.log("Time taken: ", inclusiveTimer - startTimer);
   const decoded = web3quorum.eth.abi.decodeParameters(
     functionAbi.outputs,
     result.output
@@ -189,6 +193,7 @@ const VerifyInstitute = async (info) => {
     privateFor: [tessera.member1.publicKey],
   };
   console.log("functionParams", functionParams);
+  
   const transactionHash = await web3quorum.priv.generateAndSendRawTransaction(
     functionParams
   );
