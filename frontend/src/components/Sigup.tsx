@@ -114,7 +114,7 @@ const Signup = () => {
     }
   };
 
-  // --- RESEARCH BENCHMARK FUNCTION ---
+
   const runBenchmark = async () => {
     const ITERATIONS = 50; 
 
