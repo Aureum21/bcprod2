@@ -1,0 +1,3 @@
+ENDPOINT_URL=https://rehabassistant.openai.azure.com/openai/deployments/gpt-4o-2/chat/completions?api-version=2024-02-15-preview
+DEPLOYMENT_NAME=gpt-4o-2
+AZURE_OPENAI_API_KEY=5ZJhZEZ8zCfHlrUVs061sYdxfChXDGh7UJncxIUWLlnDtQj1FX2VJQQJ99BBACYeBjFXJ3w3AAABACOG5Bgn

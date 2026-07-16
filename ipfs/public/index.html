@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Files - IPFS Storage</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="upload-section">
+            <h1><span class="highlight">UPLOAD</span> FILES</h1>
+            
+            <div class="upload-area" id="dropZone">
+                <div class="upload-content">
+                    <div class="upload-icon">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                    </div>
+                    <p class="upload-text">Drop your files here</p>
+                    <p class="upload-text">or</p>
+                    <label class="browse-btn" for="fileInput">Browse</label>
+                    <input type="file" id="fileInput" hidden multiple>
+                </div>
+            </div>
+
+            <div class="upload-list" id="uploadList"></div>
+
+            <div class="files-header">
+                <div class="search-container">
+                    <input type="text" id="searchInput" class="search-input" placeholder="Search files...">
+                    <i class="fas fa-search search-icon"></i>
+                </div>
+                <select id="fileViewOption" class="view-select">
+                    <option value="current">Current Session</option>
+                    <option value="all">All Files</option>
+                </select>
+            </div>
+
+            <div class="files-grid" id="filesList"></div>
+        </div>
+    </div>
+
+    <!-- Preview Modal -->
+    <div id="previewModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="previewFileName"></h2>
+                <button class="close-btn"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div id="previewContainer"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/script.js"></script>
+    
+</body>
+</html>
