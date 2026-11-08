@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+ipfs/temp/
+ipfs/encryption.key
+ipfs/filename_mapping.json
